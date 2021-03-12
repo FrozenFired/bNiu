@@ -35,7 +35,6 @@ exports.bsSizeStandardNew = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const obj = req.body.obj;
-		obj.Firm = crUser.Firm;
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 		if(obj.code.length < 2) return res.redirect("/error?info=bsSizeStandardNew,objCode");
 		const StandardSame = await StandardDB.findOne({code: obj.code});
@@ -82,8 +81,8 @@ exports.bsSizeNewAjax = async(req, res) => {
 		const Standard = await StandardDB.findOne({'_id': standardId})
 		if(!Standard) return res.json({status: 500, message: "没有找到此尺寸信息, 请刷新重试"});
 
-		const sizeSame = await SizeDB.findOne({SizeStandard: standardId, size: size});
-		if(sizeSame) return res.json({status: 500, message: "已经存在, 请刷新重试"});
+		const SizeSame = await SizeDB.findOne({SizeStandard: standardId, size: size});
+		if(SizeSame) return res.json({status: 500, message: "已经存在, 请刷新重试"});
 
 		const obj = new Object();
 		obj.SizeStandard = standardId;
@@ -91,7 +90,7 @@ exports.bsSizeNewAjax = async(req, res) => {
 		obj.symbol = symbol;
 
 		const _object = new SizeDB(obj);
-		const sizeSave = await _object.save();
+		const SizeSave = await _object.save();
 		return res.json({status: 200})
 	} catch(error) {
 		console.log(error);

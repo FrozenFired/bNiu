@@ -19,6 +19,7 @@ block content
 						-a;
 						th(width=widthTr+"%") #{sizeNum}
 			tbody
+				- type ="String";
 				- getUrl = "/bsSizeUpdAjax";
 				each Standard in Standards
 					- a;
@@ -41,6 +42,6 @@ block content
 									include ../../../aaPlugin/ajaxInputUpd
 									
 								else
-									span.text-warning.new-span(class="new-span-"+sizeNum+"-"+Standard._id, data-size=sizeNum, data-standard=Standard._id) *
+									span.bg-white.text-warning.new-span(class="new-span-"+sizeNum+"-"+Standard._id, data-size=sizeNum, data-standard=Standard._id) *
 									input.new-ipt.form-control(class="new-ipt-"+sizeNum+"-"+Standard._id, type="text", data-size=sizeNum, data-standard=Standard._id, data-url="/bsSizeNewAjax", style="display:none")
 	script(src="./js/bser/size/list.js")

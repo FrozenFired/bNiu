@@ -19,10 +19,9 @@ const dbSchema = new Schema({
 });
 dbSchema.pre('save', function(next) {	
 	if(this.isNew) {
-		this.updAt = this.ctAt = Date.now();
-	} else {
-		this.updAt = Date.now();
+		this.ctAt = Date.now();
 	}
+	this.updAt = Date.now();
 	next();
 });
 module.exports = mongoose.model(colection, dbSchema);

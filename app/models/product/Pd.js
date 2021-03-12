@@ -59,7 +59,7 @@ const dbSchema = new Schema({
 
 dbSchema.pre('save', function(next) {	
 	if(this.isNew) {
-		this.crtAt = this.updAt = Date.now();
+		this.crtAt = Date.now();
 	}
 	this.updAt = Date.now();
 	next();

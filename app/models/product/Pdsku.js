@@ -27,7 +27,7 @@ dbSchema.pre('save', function(next) {
 	if(this.isNew) {
 		if(!this.stock) this.stock = 0;
 		if(!this.sale) this.sale = 0;
-		this.crtAt = this.updAt = Date.now();
+		this.crtAt = Date.now();
 	}
 	this.updAt = Date.now();
 	next();

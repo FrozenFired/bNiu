@@ -1,5 +1,6 @@
 const Lang = require('../controllers/user/bser/lang');
 const Size = require('../controllers/user/bser/size');
+const Color = require('../controllers/user/bser/color');
 const Pd = require('../controllers/user/bser/pd');
 
 const postForm = require('connect-multiparty')();
@@ -19,6 +20,12 @@ module.exports = app => {
 	
 	app.post('/bsSizeNewAjax', bserIsLogin, Size.bsSizeNewAjax);
 	app.post('/bsSizeUpdAjax', bserIsLogin, Size.bsSizeUpdAjax);
+
+	/* ------------------------ Color ------------------------ */
+	app.get('/bsColors', bserIsLogin, Color.bsColors);
+	app.get('/bsColorAdd', bserIsLogin, Color.bsColorAdd);
+	app.post('/bsColorNew', bserIsLogin, postForm, Color.bsColorNew);
+	app.post('/bsColorUpdAjax', bserIsLogin, Color.bsColorUpdAjax);
 
 	/* ------------------------ Lang ------------------------ */
 	app.get('/bsLangs', bserIsLogin, Lang.bsLangs);

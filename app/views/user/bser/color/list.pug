@@ -1,0 +1,29 @@
+extends ../../aalayout/layout
+
+block content
+	.container
+		nav(aria-label="breadcrumb")
+			ol.breadcrumb
+				li.breadcrumb-item: a(href="/bser") Home
+				li.breadcrumb-item.active(aria-current="page") #{title}
+		.row.my-3
+			.col-12.text-right
+				a.btn.btn-warning(href="/bsColorAdd") +
+
+		- getUrl = "/bsColorUpdAjax";
+		.row
+			each Color in Colors
+				- object = Color;
+				.col-4.col-md-3.col-lg-2.mt-4
+					.card.text-center(style="width: 100%;")
+						.border-bottom(class="jsColor-rgb-rgb-"+Color._id, style="width: 100%; background-color: #"+Color.rgb)
+							- field="rgb", value=Color.rgb, subid="rgb", type="String";
+							include ../../../aaPlugin/ajaxInputUpd
+						.card-body
+							.code
+								- field="code", value=Color.code, subid="code", type="String";
+								include ../../../aaPlugin/ajaxInputUpd
+							.weight.mt-3
+								- field="weight", value=Color.weight, subid="weight", type="Int";
+								include ../../../aaPlugin/ajaxInputUpd
+

@@ -69,14 +69,15 @@ $(() => {
 	});
 	$(".jsUpd-ipt").blur(function(e) {
 		const target = $(e.target);
-		const url = target.data("url");		
-		const field = target.data("field");
-		const subid = target.data("subid");
-		const id = target.data("id");
+		const url = target.data("url");			// 路由
+		const field = target.data("field");		// 更改对象的field
+		const subid = target.data("subid");		// 如果是更改本对象下的某个数组对象中的值,该数组对象的id
+		const id = target.data("id");			// 当前更改对象的ID
+		const type = target.data("type");		// 更改的数据类型 如果没有 则默认为String
 		const orgVal = $(".jsUpd-org-"+field+"-"+subid+"-"+id).val();
 		const val = $(this).val();
 		if(val != orgVal) {
-			const data = "id="+id+"&field="+field+"&subid="+subid+"&val="+val;
+			const data = "id="+id+"&field="+field+"&subid="+subid+"&val="+val+"&type="+type;
 			$.ajax({
 				type: "POST",
 				url: url,
@@ -86,7 +87,7 @@ $(() => {
 						$(".jsUpd-span-"+field+"-"+subid+"-"+id).text(val);
 						$(".jsUpd-org-"+field+"-"+subid+"-"+id).val(val);
 						$(".jsUpd-ipt-"+field+"-"+subid+"-"+id).hide();
-						if(field == "color") {
+						if(field == "rgb") {
 							$(".jsColor-"+field+"-"+subid+"-"+id).css("background-color", "#"+val);
 						}
 					} else {

@@ -12,12 +12,16 @@ const dbSchema = new Schema({
 		nome: String
 	}],
 
+	weight: Number,
 	/* ------------------ 自动生成 ------------------ */
 	Firm: {type: ObjectId, ref: 'Firm'},
 	updAt: Date,
 });
 
 dbSchema.pre('save', function(next) {
+	if(this.isNew) {
+		if(!this.weight) this.weight = 0;
+	}
 	this.updAt = Date.now();
 	next();
 })
