@@ -4,11 +4,10 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 const Float = require('mongoose-float').loadType(mongoose, 2);
 
-const colection = 'Mtspu';
+const colection = 'Mtrial';
 const dbSchema = new Schema({
 	/* ------------------ 创建时 ------------------ */
 	MtCateg: {type: ObjectId, ref: 'MtCateg'},
-
 	code: String,	// 类型下唯一
 
 	langs: [{
@@ -19,8 +18,7 @@ const dbSchema = new Schema({
 	photo: String,
 
 	/* ------------------ 价格 ------------------ */
-	price: Float,
-	cost: Float,
+	cost: Float,	// 默认采购价
 
 	shelf: Number,
 	weight: Number,

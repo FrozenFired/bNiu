@@ -3,7 +3,7 @@ const Size = require('../controllers/user/bser/size');
 const Color = require('../controllers/user/bser/color');
 const Pattern = require('../controllers/user/bser/pattern');
 const MtCateg = require('../controllers/user/bser/mtCateg');
-const Mtspu = require('../controllers/user/bser/mtspu');
+const Mtrial = require('../controllers/user/bser/mtrial');
 const Pdspu = require('../controllers/user/bser/pdspu');
 
 const MdFile = require('../middle/MdFile');
@@ -17,7 +17,17 @@ module.exports = app => {
 	/* ------------------------ Pdspu ------------------------ */
 	app.get('/bsPdspus', bserIsLogin, Pdspu.bsPdspus);
 
-	/* ------------------------ MtCateg ------------------------ */
+	/* ------------------------ Mtrial 材质 ------------------------ */
+	app.get('/bsMtrials', bserIsLogin, Mtrial.bsMtrials);
+	app.get('/bsMtrialAdd', bserIsLogin, Mtrial.bsMtrialAdd);
+	app.get('/bsMtrial/:id', bserIsLogin, Mtrial.bsMtrial);
+	app.get('/bsMtrialUp/:id', bserIsLogin, Mtrial.bsMtrialUp);
+	app.post('/bsMtrialNew', bserIsLogin, postForm, Mtrial.bsMtrialNew);
+	app.post('/bsMtrialUpd', bserIsLogin, postForm, Mtrial.bsMtrialUpd);
+	app.post('/bsMtrialUpdAjax', bserIsLogin, Mtrial.bsMtrialUpdAjax);
+	app.post('/bsMtrialPhotoUpd', bserIsLogin, postForm, MdFile.newFiles, Mtrial.bsMtrialPhotoUpd);
+
+	/* ------------------------ MtCateg 材质分类 ----------------------- */
 	app.get('/bsMtCategs', bserIsLogin, MtCateg.bsMtCategs);
 	app.get('/bsMtCategAdd', bserIsLogin, MtCateg.bsMtCategAdd);
 	app.get('/bsMtCateg/:id', bserIsLogin, MtCateg.bsMtCateg);

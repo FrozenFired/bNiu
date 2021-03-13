@@ -1,0 +1,53 @@
+extends ../../aalayout/layout
+
+block content
+	.container
+		nav(aria-label="breadcrumb")
+			ol.breadcrumb
+				li.breadcrumb-item: a(href="/bser") Home
+				li.breadcrumb-item.active(aria-current="page") #{title}
+		.row.my-3
+			.col-12.text-right
+				a.btn.btn-warning(href="/bsMtrialAdd") +
+
+		- getUrl = "/bsMtrialUpdAjax";
+		.row
+			each Mtrial in Mtrials
+				- object = Mtrial;
+				.col-6.col-lg-3.mt-4
+					.card.text-center(style="width: 100%;")
+						img.card-img-top.border-bottom.js-click-imgEnlarge(id="img-"+Mtrial._id+"-photo-sub", src=Mtrial.photo, alt="Mtrial Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
+						
+						.row(class="jsImg-clickBefore-"+Mtrial._id+"-photo-sub")
+							.col-6
+								.jsImg-clickUpd.text-info(id="clickUpd-"+Mtrial._id+"-photo-sub") [点击]
+							.col-6
+								- field="photo", value=Mtrial.photo, subid="photo", type="img", fieldDesp="[upd]";
+								include ../../../aaPlugin/ajaxInputUpd
+								- fieldDesp = null;
+						.row(class="jsImg-clickAfter-"+Mtrial._id+"-photo-sub")(style="display:none")
+							.col-6
+								.jsImg-cancel.btn.btn-secondary(id="clickUpd-"+Mtrial._id+"-photo-sub") [取消]
+							.col-6
+								form(method="post", action="/bsMtrialPhotoUpd", enctype="multipart/form-data")
+									input(type="hidden", name="obj[_id]", value=Mtrial._id)
+									input(type="hidden", name="flDir", value=Conf.photo.mtrial.dir)
+									input(type="hidden", name="flName", value=crUser.Firm+"-"+Mtrial.code+"-"+crUser._id)
+									input.jsImg-ipt(id="ipt-"+Mtrial._id+"-photo-sub", type="file", name="fls", style="display:none")
+									.form-group
+										input.btn.btn-success(type="submit" value="确认")
+						.card-body
+							.code
+								- field="code", value=Mtrial.code, subid="code", type="String", fieldDesp="编号:";
+								include ../../../aaPlugin/ajaxInputUpd
+							.MtCateg.mt-2
+								a(href="/bsMtrial/"+Mtrial._id)
+									if Mtrial.MtCateg
+										- MtCateg = Mtrial.MtCateg;
+										span #{MtCateg.code}
+									else
+										span 未分类
+							.weight.mt-2
+								- field="weight", value=Mtrial.weight, subid="weight", type="Int", fieldDesp="权重:";
+								include ../../../aaPlugin/ajaxInputUpd
+

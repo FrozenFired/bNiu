@@ -3,7 +3,7 @@ const MdFile = require('../../../middle/MdFile');
 const _ = require('underscore');
 
 const MtCategDB = require('../../../models/material/MtCateg');
-const MtspuDB = require('../../../models/material/Mtspu');
+const MtrialDB = require('../../../models/material/Mtrial');
 
 exports.bsMtCategs = async(req, res) => {
 	// console.log("/bsMtCategs");
@@ -152,7 +152,7 @@ exports.bsMtCategDel = async(req, res) => {
 			MtCategFar.save();
 		}
 
-		MtspuDB.updateMany({MtCateg: id }, {MtCateg: null});
+		MtrialDB.updateMany({MtCateg: id }, {MtCateg: null});
 
 		const MtCategRm = await MtCategDB.deleteOne({_id: id});
 		return res.redirect("/bsMtCategs");

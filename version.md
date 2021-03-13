@@ -1,3 +1,5 @@
+0.0.4	mtrial
+		材质完成
 0.0.3	mtCateg
 		材质分类完成	
 0.0.2	pattern	

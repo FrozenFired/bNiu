@@ -18,7 +18,7 @@ const dbSchema = new Schema({
 		desp: String
 	}],
 
-	Mtspus: [{type: ObjectId, ref: 'Mtspu'}],
+	Mtrails: [{type: ObjectId, ref: 'Mtrail'}],
 
 	/* ------------------ Attr sku ------------------ */
 	Patterns: [{type: ObjectId, ref: 'Pattern'}],
@@ -28,7 +28,6 @@ const dbSchema = new Schema({
 	SizeStandard: {type: ObjectId, ref: 'SizeStandard'},
 	sizes: [{type: Number }],
 
-	/* ------------------ 库存 ------------------ */
 	Pdskus: [{type: ObjectId, ref: 'Pdsku'}],
 
 

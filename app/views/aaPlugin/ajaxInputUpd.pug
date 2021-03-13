@@ -1,6 +1,6 @@
 if fieldDesp
 	-a;
-	.jsUpd-field.text-info(data-field=field, data-subid=subid, data-id=object._id) #{fieldDesp}
+	span.mr-3.jsUpd-field.text-info(data-field=field, data-subid=subid, data-id=object._id) #{fieldDesp}
 if type != "img"
 	-a;
 	span.bg-white.text-info.jsUpd-span(class="jsUpd-span-"+field+"-"+subid+"-"+object._id, data-field=field, data-subid=subid, data-id=object._id) #{value}
