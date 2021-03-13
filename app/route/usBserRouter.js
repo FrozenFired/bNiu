@@ -4,6 +4,8 @@ const Color = require('../controllers/user/bser/color');
 const Pattern = require('../controllers/user/bser/pattern');
 const MtCateg = require('../controllers/user/bser/mtCateg');
 const Mtrial = require('../controllers/user/bser/mtrial');
+const PdCateg = require('../controllers/user/bser/pdCateg');
+const PdNome = require('../controllers/user/bser/pdNome');
 const Pdspu = require('../controllers/user/bser/pdspu');
 
 const MdFile = require('../middle/MdFile');
@@ -16,6 +18,29 @@ module.exports = app => {
 
 	/* ------------------------ Pdspu ------------------------ */
 	app.get('/bsPdspus', bserIsLogin, Pdspu.bsPdspus);
+	/* ------------------------ PdNome ------------------------ */
+	app.get('/bsPdNomes', bserIsLogin, PdNome.bsPdNomes);
+	app.get('/bsPdNomeAdd', bserIsLogin, PdNome.bsPdNomeAdd);
+	app.post('/bsPdNomeNew', bserIsLogin, postForm, PdNome.bsPdNomeNew);
+	app.post('/bsPdNomeUpdAjax', bserIsLogin, PdNome.bsPdNomeUpdAjax);
+
+	/* ------------------------ PdCateg 产品分类 ----------------------- */
+	app.get('/bsPdCategs', bserIsLogin, PdCateg.bsPdCategs);
+	app.get('/bsPdCategAdd', bserIsLogin, PdCateg.bsPdCategAdd);
+	app.get('/bsPdCateg/:id', bserIsLogin, PdCateg.bsPdCateg);
+	app.get('/bsPdCategUp/:id', bserIsLogin, PdCateg.bsPdCategUp);
+	app.get('/bsPdCategDel/:id', bserIsLogin, PdCateg.bsPdCategDel);
+	app.post('/bsPdCategNew', bserIsLogin, postForm, PdCateg.bsPdCategNew);
+	app.post('/bsPdCategUpd', bserIsLogin, postForm, PdCateg.bsPdCategUpd);
+
+	/* ------------------------ PdCateg 产品分类 ----------------------- */
+	app.get('/bsPdCategs', bserIsLogin, PdCateg.bsPdCategs);
+	app.get('/bsPdCategAdd', bserIsLogin, PdCateg.bsPdCategAdd);
+	app.get('/bsPdCateg/:id', bserIsLogin, PdCateg.bsPdCateg);
+	app.get('/bsPdCategUp/:id', bserIsLogin, PdCateg.bsPdCategUp);
+	app.get('/bsPdCategDel/:id', bserIsLogin, PdCateg.bsPdCategDel);
+	app.post('/bsPdCategNew', bserIsLogin, postForm, PdCateg.bsPdCategNew);
+	app.post('/bsPdCategUpd', bserIsLogin, postForm, PdCateg.bsPdCategUpd);
 
 	/* ------------------------ Mtrial 材质 ------------------------ */
 	app.get('/bsMtrials', bserIsLogin, Mtrial.bsMtrials);

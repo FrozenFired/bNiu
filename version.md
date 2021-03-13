@@ -1,3 +1,4 @@
+0.0.5	pdCateg pdNome
 0.0.4	mtrial
 		材质完成
 0.0.3	mtCateg
