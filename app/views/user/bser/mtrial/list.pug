@@ -25,7 +25,7 @@ block content
 								- field="photo", value=Mtrial.photo, subid="photo", type="img", fieldDesp="[upd]";
 								include ../../../aaPlugin/ajaxInputUpd
 								- fieldDesp = null;
-						.row(class="jsImg-clickAfter-"+Mtrial._id+"-photo-sub")(style="display:none")
+						.row(class="jsImg-clickAfter-"+Mtrial._id+"-photo-sub", style="display:none")
 							.col-6
 								.jsImg-cancel.btn.btn-secondary(id="clickUpd-"+Mtrial._id+"-photo-sub") [取消]
 							.col-6
@@ -41,13 +41,13 @@ block content
 								- field="code", value=Mtrial.code, subid="code", type="String", fieldDesp="编号:";
 								include ../../../aaPlugin/ajaxInputUpd
 							.MtCateg.mt-2
-								a(href="/bsMtrial/"+Mtrial._id)
-									if Mtrial.MtCateg
-										- MtCateg = Mtrial.MtCateg;
-										span #{MtCateg.code}
-									else
-										span 未分类
+								if Mtrial.MtCateg
+									- MtCateg = Mtrial.MtCateg;
+									span #{MtCateg.code}
+								else
+									span 未分类
 							.weight.mt-2
 								- field="weight", value=Mtrial.weight, subid="weight", type="Int", fieldDesp="权重:";
 								include ../../../aaPlugin/ajaxInputUpd
-
+							.text-right.mt-3
+								a(href="/bsMtrial/"+Mtrial._id) [查看]

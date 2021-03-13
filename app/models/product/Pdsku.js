@@ -4,10 +4,10 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 const Float = require('mongoose-float').loadType(mongoose, 2);
 
-const colection = 'Pd';
+const colection = 'Pdsku';
 const dbSchema = new Schema({
 	/* ------------------ Basic ------------------ */
-	Pd: {type: ObjectId, ref: 'Pd'},
+	Pdspu: {type: ObjectId, ref: 'Pdspu'},
 	Pattern: {type: ObjectId, ref: 'Pattern'},
 	Color: {type: ObjectId, ref: 'Colors'},
 	size: Number,

@@ -75,7 +75,7 @@ exports.bsMtrialUpd = async(req, res) => {
 		if(obj.code.length < 1) return res.redirect("/error?info=bsMtrialUpd,objCode");
 		if(obj.cost) {
 			obj.cost = parseFloat(obj.cost);
-			if(isNaN(obj.cost)) return res.redirect("/error?info=bsMtrialUpd,采购价格格式不对, 可以不输入");
+			if(isNaN(obj.cost)) return res.redirect("/error?info=bsMtrialUpd,请输入正确采购价, 可以不输入");
 		}
 		const Mtrial = await MtrialDB.findOne({_id: obj._id});
 		if(!Mtrial) return res.redirect("/error?info=bsMtrialUpd,没有找到此材料信息");
@@ -155,20 +155,20 @@ exports.bsMtrialPhotoUpd = async(req, res) => {
 	}
 }
 exports.bsMtrial = async(req, res) => {
-	// console.log("/bsMtrialAdd");
+	// console.log("/bsMtrial");
 	try{
 		const crUser = req.session.crUser;
 		const id = req.params.id;
 		const Mtrial = await MtrialDB.findOne({_id: id})
 		.populate("MtCateg")
 		if(!Mtrial) return res.redirect("/error?info=不存在此分类");
-		return res.render("./user/bser/mtrial/detail", {title: "材料分类详情", Mtrial, crUser});
+		return res.render("./user/bser/mtrial/detail", {title: "材料详情", Mtrial, crUser});
 	} catch(error) {
-		return res.redirect("/error?info=bsMtrialAdd,Error&error="+error);
+		return res.redirect("/error?info=bsMtrial,Error&error="+error);
 	}
 }
 exports.bsMtrialUp = async(req, res) => {
-	// console.log("/bsMtCategAdd");
+	// console.log("/bsMtrialUp");
 	try{
 		const crUser = req.session.crUser;
 		const id = req.params.id;
@@ -179,8 +179,8 @@ exports.bsMtrialUp = async(req, res) => {
 		.populate({path: "MtCategFar", populate: {path: "MtCategFar"}})
 		.sort({"weight": -1});
 
-		return res.render("./user/bser/mtrial/update", {title: "材料分类详情", Mtrial, MtCategs, crUser});
+		return res.render("./user/bser/mtrial/update", {title: "材料更新", Mtrial, MtCategs, crUser});
 	} catch(error) {
-		return res.redirect("/error?info=bsMtCategAdd,Error&error="+error);
+		return res.redirect("/error?info=bsMtrialUp,Error&error="+error);
 	}
 }

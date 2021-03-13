@@ -6,7 +6,8 @@ const MtCateg = require('../controllers/user/bser/mtCateg');
 const Mtrial = require('../controllers/user/bser/mtrial');
 const PdCateg = require('../controllers/user/bser/pdCateg');
 const PdNome = require('../controllers/user/bser/pdNome');
-const Pdspu = require('../controllers/user/bser/pdspu');
+const PdspuBasic = require('../controllers/user/bser/pdspu/basic');
+const PdspuAttr = require('../controllers/user/bser/pdspu/attr');
 
 const MdFile = require('../middle/MdFile');
 
@@ -16,8 +17,27 @@ module.exports = app => {
 	/* ------------------------ 首页 登录页面 登录 登出 ------------------------ */
 	app.get('/bser', bserIsLogin, (req, res) => {return res.render("./user/bser/index", {title: "Home Bser", crUser: req.session.crUser});});
 
-	/* ------------------------ Pdspu ------------------------ */
-	app.get('/bsPdspus', bserIsLogin, Pdspu.bsPdspus);
+	/* ============================================= Pdspu ============================================= */
+	/* ------------------------ basic ------------------------ */
+	app.get('/bsPdspuAdd', bserIsLogin, PdspuBasic.bsPdspuAdd);
+	app.post('/bsPdspuNew', bserIsLogin, postForm, PdspuBasic.bsPdspuNew);
+
+	app.get('/bsPdspus', bserIsLogin, PdspuBasic.bsPdspus);
+	app.get('/bsPdspu/:id', bserIsLogin, PdspuBasic.bsPdspu);
+	app.get('/bsPdspuUp/:id', bserIsLogin, PdspuBasic.bsPdspuUp);
+	app.post('/bsPdspuUpd', bserIsLogin, postForm, PdspuBasic.bsPdspuUpd);
+	app.post('/bsPdspuUpdAjax', bserIsLogin, PdspuBasic.bsPdspuUpdAjax);
+	app.post('/bsPdspuPhotoUpd', bserIsLogin, postForm, MdFile.newFiles, PdspuBasic.bsPdspuPhotoUpd);
+
+	/* ------------------------ attr ------------------------ */
+	app.get('/bsPdspuSizeUp/:id', bserIsLogin, PdspuAttr.bsPdspuSizeUp);
+	app.get('/bsPdspuSizeUpdAjax', bserIsLogin, PdspuAttr.bsPdspuSizeUpdAjax);
+	app.get('/bsPdspuSizeDelAjax', bserIsLogin, PdspuAttr.bsPdspuSizeDelAjax);
+
+	app.get('/bsPdspuColorUp/:id', bserIsLogin, PdspuAttr.bsPdspuColorUp);
+	app.get('/bsPdspuPatternUp/:id', bserIsLogin, PdspuAttr.bsPdspuPatternUp);
+	/* ============================================= Pdspu ============================================= */
+
 	/* ------------------------ PdNome ------------------------ */
 	app.get('/bsPdNomes', bserIsLogin, PdNome.bsPdNomes);
 	app.get('/bsPdNomeAdd', bserIsLogin, PdNome.bsPdNomeAdd);

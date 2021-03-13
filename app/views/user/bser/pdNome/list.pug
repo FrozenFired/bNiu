@@ -16,17 +16,6 @@ block content
 				- object = PdNome;
 				.col-6.col-lg-3.mt-4
 					.card.text-center(style="width: 100%;")
-						.row(class="jsImg-clickAfter-"+PdNome._id+"-photo-sub")(style="display:none")
-							.col-6
-								.jsImg-cancel.btn.btn-secondary(id="clickUpd-"+PdNome._id+"-photo-sub") [取消]
-							.col-6
-								form(method="post", action="/bsPdNomePhotoUpd", enctype="multipart/form-data")
-									input(type="hidden", name="obj[_id]", value=PdNome._id)
-									input(type="hidden", name="flDir", value=Conf.photo.pattern.dir)
-									input(type="hidden", name="flName", value=crUser.Firm+"-"+PdNome.code+"-"+crUser._id)
-									input.jsImg-ipt(id="ipt-"+PdNome._id+"-photo-sub", type="file", name="fls", style="display:none")
-									.form-group
-										input.btn.btn-success(type="submit" value="确认")
 						.card-body
 							.code
 								- field="code", value=PdNome.code, subid="code", type="String";

@@ -1,0 +1,70 @@
+extends ../../aalayout/layout
+
+block content
+	.container
+		nav(aria-label="breadcrumb")
+			ol.breadcrumb
+				li.breadcrumb-item: a(href="/bser") Home
+				li.breadcrumb-item: a(href="/bsPdspus") 产品列表
+				li.breadcrumb-item.active(aria-current="page") #{title}
+		.row
+			.col-sm-6.col-xl-3.mt-3.p-3
+				.card.text-center(style="width: 100%;")
+					img.card-img-top.border-bottom.js-click-imgEnlarge(id="img-"+Pdspu._id+"-photo-sub", src=Pdspu.photo, alt="Pdspu Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
+					h5.card-title 编号: #{Pdspu.code}
+					h6
+						if Pdspu.PdNome
+							- PdNome = Pdspu.PdNome;
+							span.mr-3 名称: #{PdNome.code}
+						else
+							span 未命名
+					.card-body
+						.far
+							if Pdspu.PdCateg
+								- PdCateg = Pdspu.PdCateg;
+								span.mr-3 分类: #{PdCateg.code}
+							else
+								span 未分类
+						.far
+							span 尺寸标准:
+							if Pdspu.SizeStandard
+								- SizeStandard = Pdspu.SizeStandard;
+								span.mr-3 #{SizeStandard.code}
+							else
+								span 错误
+						.price 售价: #{Pdspu.price}
+						.cost 采购价: #{Pdspu.cost}
+						.weight 排序: #{Pdspu.weight}
+						.text-right
+							a.btn.btn-warning(href="/bsPdspuUp/"+Pdspu._id) 修改
+			.col-sm-6.col-xl-3.mt-3.p-3
+				.card.text-center(style="width: 100%;")
+					h5.mt-3.card-title 模特尺寸
+					.card-body
+						each size in Pdspu.sizes
+							- let val = size;
+							each Size in Sizes
+								if Size.size == size
+									- val = Size.symbol;
+									- break;
+							.mt-2 #{val}
+						.text-right
+							a.btn.btn-warning(href="/bsPdspuSizeUp/"+Pdspu._id) 修改
+			.col-sm-6.col-xl-3.mt-3.p-3
+				.card.text-center(style="width: 100%;")
+					h5.mt-3.card-title 模特颜色
+					.card-body
+						each Color in Pdspu.Colors
+							-a;
+							.mt-2 #{Color.code}
+						.text-right
+							a.btn.btn-warning(href="/bsPdspuColorUp/"+Pdspu._id) 修改
+			.col-sm-6.col-xl-3.mt-3.p-3
+				.card.text-center(style="width: 100%;")
+					h5.mt-3.card-title 模特印花
+					.card-body
+						each Pattern in Pdspu.Patterns
+							-a;
+							.mt-2 #{Pattern.code}
+						.text-right
+							a.btn.btn-warning(href="/bsPdspuPatternUp/"+Pdspu._id) 修改

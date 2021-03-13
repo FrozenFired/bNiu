@@ -1,0 +1,12 @@
+extends ../../../aalayout/layout
+
+block content
+	.container
+		nav(aria-label="breadcrumb")
+			ol.breadcrumb
+				li.breadcrumb-item: a(href="/bser") Home
+				li.breadcrumb-item: a(href="/bsPdspus") 产品列表
+				li.breadcrumb-item: a(href="/bsPdspu/"+Pdspu._id) 产品详情
+				li.breadcrumb-item.active(aria-current="page") #{title}
+		hr
+		h1 印花
