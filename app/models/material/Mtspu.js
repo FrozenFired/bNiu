@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 const Float = require('mongoose-float').loadType(mongoose, 2);
 
-const colection = 'Mater';
+const colection = 'Mtspu';
 const dbSchema = new Schema({
 	/* ------------------ 创建时 ------------------ */
 	MtCateg: {type: ObjectId, ref: 'MtCateg'},
@@ -13,7 +13,7 @@ const dbSchema = new Schema({
 
 	langs: [{
 		Lang: {type: ObjectId, ref: 'Lang'},
-		nome: String
+		nome: String,
 		desp: String,
 	}],
 	photo: String,

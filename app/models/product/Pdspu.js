@@ -18,10 +18,7 @@ const dbSchema = new Schema({
 		desp: String
 	}],
 
-	maters: [{
-		Mater: {type: ObjectId, ref: 'Mater'},
-		value: Number
-	}],
+	Mtspus: [{type: ObjectId, ref: 'Mtspu'}],
 
 	/* ------------------ Attr sku ------------------ */
 	Patterns: [{type: ObjectId, ref: 'Pattern'}],
@@ -29,13 +26,8 @@ const dbSchema = new Schema({
 	Colors: [{type: ObjectId, ref: 'Colors'}],
 
 	SizeStandard: {type: ObjectId, ref: 'SizeStandard'},
-	sizes: [{
-		size: Number,
-		maters: [{
-			Mater: {type: ObjectId, ref: 'Mater'},
-			value: Float
-		}],
-	}],
+	sizes: [{type: Number }],
+
 	/* ------------------ 库存 ------------------ */
 	Pdskus: [{type: ObjectId, ref: 'Pdsku'}],
 

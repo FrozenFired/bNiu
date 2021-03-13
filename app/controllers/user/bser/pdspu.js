@@ -3,9 +3,9 @@ const MdFilter = require('../../../middle/MdFilter');
 const _ = require('underscore');
 
 const UserDB = require('../../../models/login/User');
-const PdDB = require('../../../models/product/Pd');
+const PdspuDB = require('../../../models/product/Pdspu');
 
-exports.bsPds = async(req, res) => {
+exports.bsPdspus = async(req, res) => {
 	// console.log("/bsPds");
 	try{
 		const crUser = req.session.crUser;

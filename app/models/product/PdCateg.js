@@ -14,6 +14,7 @@ const dbSchema = new Schema({
 
 	level: Number,	// 分类层级
 	PdCategFar: {type: ObjectId, ref: 'PdCateg'},
+	PdCategSons: [{type: ObjectId, ref: 'PdCateg'}],
 	isBottom: Number,	// 是否是最底层分类
 
 	shelf: Number,

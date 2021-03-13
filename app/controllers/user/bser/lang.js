@@ -1,3 +1,7 @@
+/*
+	[语言]数据库 可以添加修改 但不可以删除。
+	因为如果有其他数据库占据了 此颜色的id后 删除此颜色 其他数据库会不方便
+*/
 const Conf = require('../../../config/conf.js');
 const MdFilter = require('../../../middle/MdFilter');
 const _ = require('underscore');
@@ -10,7 +14,7 @@ exports.bsLangs = async(req, res) => {
 		const crUser = req.session.crUser;
 		const Langs = await LangDB.find().populate("langs.Lang");
 		// Langs.forEach((item) => {console.log(item); });
-		return res.render("./user/bser/lang/list", {title: "语言管理", Langs});
+		return res.render("./user/bser/lang/list", {title: "语言管理", Langs, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsLangs,Error&error="+error);
 	}
@@ -19,8 +23,9 @@ exports.bsLangs = async(req, res) => {
 exports.bsLangAdd = async(req, res) => {
 	// console.log("/bsLangAdd");
 	try{
+		const crUser = req.session.crUser;
 		const Langs = await LangDB.find();
-		return res.render("./user/bser/lang/add", {title: "添加语言", Langs});
+		return res.render("./user/bser/lang/add", {title: "添加语言", Langs, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsLangAdd,Error&error="+error);
 	}

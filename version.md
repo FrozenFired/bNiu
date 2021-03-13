@@ -1,3 +1,5 @@
+0.0.3	mtCateg
+		材质分类完成	
 0.0.2	pattern	
 		图片文字upd有小问题,upd后 图片需要不刷新就能修改
 0.0.1	color

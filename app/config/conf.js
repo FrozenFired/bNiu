@@ -36,14 +36,18 @@ const Conf = {
 		customer: {num:99, index: '/cter', code: 'ct', val: '客户 Customer', },
 	},
 	photo: {
-		pd: {dir: '/PD/', def: '/UPLOAD/DEF/PD.JPG'},
-		mater: {dir: '/MASTER/', def: '/UPLOAD/DEF/MASTER.JPG'},
+		pdspu: {dir: '/PDSPU/', def: '/UPLOAD/DEF/PDSPU.JPG'},
+		mtspu: {dir: '/MTSPU/', def: '/UPLOAD/DEF/MTSPU.JPG'},
 		pattern: {dir: '/PATTERN/', def: '/UPLOAD/DEF/PATTERN.JPG'},
 	},
 
 	shelf: {
 		off: {num: -1, val: '下架'},
 		put:{num: 1, val: '上架'}
+	},
+	isBottom: {
+		n: {num: -1, val: '非底层'},
+		y: {num: 1, val: '底层'}
 	},
 
 	sizeNums: [6, 7, 8, 9, 10, 11, 12, 13, 14],

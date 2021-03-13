@@ -1,3 +1,7 @@
+/*
+	[颜色]数据库 可以添加修改 但不可以删除。
+	因为如果有其他数据库占据了 此颜色的id后 删除此颜色 其他数据库会不方便
+*/
 const Conf = require('../../../config/conf.js');
 const Stint = require('../../../config/stint.js');
 const MdFilter = require('../../../middle/MdFilter');
@@ -12,7 +16,7 @@ exports.bsColors = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const Colors = await ColorDB.find().sort({"weight": -1});
-		return res.render("./user/bser/color/list", {title: "颜色管理", Colors});
+		return res.render("./user/bser/color/list", {title: "颜色管理", Colors, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsColors,Error&error="+error);
 	}
@@ -21,8 +25,9 @@ exports.bsColors = async(req, res) => {
 exports.bsColorAdd = async(req, res) => {
 	// console.log("/bsColorAdd");
 	try{
+		const crUser = req.session.crUser;
 		const colorStint = Stint.extent.color;
-		return res.render("./user/bser/color/add", {title: "添加新颜色", colorStint});
+		return res.render("./user/bser/color/add", {title: "添加新颜色", colorStint, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsColorAdd,Error&error="+error);
 	}

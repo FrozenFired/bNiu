@@ -1,3 +1,7 @@
+/*
+	[尺寸]数据库 可以任意添加修改删除。
+	因为其他数据库存储的尺寸全部为数字 在Conf中有储存
+*/
 const Conf = require('../../../config/conf.js');
 const MdFilter = require('../../../middle/MdFilter');
 const _ = require('underscore');
@@ -14,7 +18,7 @@ exports.bsSizes = async(req, res) => {
 		const sizeNums = Conf.sizeNums;
 		const Standards = await StandardDB.find();
 		const Sizes = await SizeDB.find();
-		return res.render("./user/bser/size/list", {title: "尺寸管理", sizeNums, Standards, Sizes});
+		return res.render("./user/bser/size/list", {title: "尺寸管理", sizeNums, Standards, Sizes, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsSizes,Error&error="+error);
 	}
@@ -23,8 +27,9 @@ exports.bsSizes = async(req, res) => {
 exports.bsSizeStandardAdd = async(req, res) => {
 	// console.log("/bsSizeStandardAdd");
 	try{
+		const crUser = req.session.crUser;
 		const Langs = await LangDB.find();
-		return res.render("./user/bser/size/addStandard", {title: "添加尺寸新标准", Langs});
+		return res.render("./user/bser/size/addStandard", {title: "添加尺寸新标准", Langs, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsSizeStandardAdd,Error&error="+error);
 	}

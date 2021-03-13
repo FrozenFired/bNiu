@@ -1,8 +1,10 @@
+/*
+	[印花 样板]数据库 可以添加修改 但不可以删除。
+	因为如果有其他数据库占据了 此颜色的id后 删除此颜色 其他数据库会不方便
+*/
 const Conf = require('../../../config/conf.js');
 const MdFile = require('../../../middle/MdFile');
 const _ = require('underscore');
-
-const LangDB = require('../../../models/login/Lang');
 
 const PatternDB = require('../../../models/attr/Pattern');
 
@@ -20,6 +22,7 @@ exports.bsPatterns = async(req, res) => {
 exports.bsPatternAdd = async(req, res) => {
 	// console.log("/bsPatternAdd");
 	try{
+		const crUser = req.session.crUser;
 		return res.render("./user/bser/pattern/add", {title: "添加新印花", crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPatternAdd,Error&error="+error);
