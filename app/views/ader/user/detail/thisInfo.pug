@@ -15,16 +15,6 @@ table.mt-3.table.table-hover
 					- role = roleUser.val;
 					- break;
 			span #{role}
-	tr
-		td: strong 语言:
-		td
-			- let lang = '';
-			each langUser in Conf.langUser
-				- lang = '';
-				if langUser.num == User.lang
-					- lang = langUser.val;
-					- break;
-			span #{lang}
 	if User.Firm
 		- Firm = User.Firm;
 		tr

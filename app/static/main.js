@@ -31,7 +31,8 @@ $(() => {
 	});
 	// 如果js-input中的值为0FocusDelZero 则隐藏  如果js-input中的值为0FocusDelZero 则隐藏
 	let ipt0 = true; // 记录进入焦点是数据是否为0,如果为0则失去焦点且没有输入时变回0
-	$(".js-input-focusHideZero").focus(function(e) {
+	// $(".js-input-focusHideZero").focus(function(e) {
+	$("body").on('focus', '.js-input-focusHideZero', function(e){
 		let thisVal = String($(this).val());
 		if(thisVal == "0") {
 			ipt0 = true;
@@ -40,7 +41,8 @@ $(() => {
 			ipt0 = false;
 		}
 	})
-	$(".js-input-focusHideZero").blur(function(e) {
+	// $(".js-input-focusHideZero").blur(function(e) {
+	$("body").on('blur', '.js-input-focusHideZero', function(e){
 		let thisVal = $(this).val();
 		if(ipt0 == true && (!thisVal || thisVal == "")) {
 			$(this).val(0)
@@ -48,26 +50,30 @@ $(() => {
 	})
 
 	/* ================================ 更新数据 ================================ */
-	$(".jsUpd-field").click(function(e) {
+	// $(".jsUpd-field").click(function(e) {
+	$("body").on('click', '.jsUpd-field', function(e){
 		const target = $(e.target);
 		const field = target.data("field");
 		const subid = target.data("subid");
 		const id = target.data("id");
 		$(".jsUpd-ipt-"+field+"-"+subid+"-"+id).toggle();
 	})
-	$(".jsUpd-span").click(function(e) {
+	// $(".jsUpd-span").click(function(e) {
+	$("body").on('click', '.jsUpd-span', function(e){
 		const target = $(e.target);
 		const field = target.data("field");
 		const subid = target.data("subid");
 		const id = target.data("id");
 		$(".jsUpd-ipt-"+field+"-"+subid+"-"+id).toggle();
 	})
-	$(".jsUpd-ipt").keydown(function(e) {
+	// $(".jsUpd-ipt").keydown(function(e) {
+	$("body").on('keydown', '.jsUpd-ipt', function(e){
 		if (e.keyCode == 13) {  
 			$(this).blur();
 		}  
 	});
-	$(".jsUpd-ipt").blur(function(e) {
+	// $(".jsUpd-ipt").blur(function(e) {
+	$("body").on('blur', '.jsUpd-ipt', function(e){
 		const target = $(e.target);
 		const url = target.data("url");			// 路由
 		const field = target.data("field");		// 更改对象的field
@@ -75,7 +81,7 @@ $(() => {
 		const id = target.data("id");			// 当前更改对象的ID
 		const type = target.data("type");		// 更改的数据类型 如果没有 则默认为String
 		const orgVal = $(".jsUpd-org-"+field+"-"+subid+"-"+id).val();
-		const val = $(this).val();
+		const val = $(this).val().replace(/^\s*/g,"").toUpperCase();
 		if(val != orgVal) {
 			const data = "id="+id+"&field="+field+"&subid="+subid+"&val="+val+"&type="+type;
 			$.ajax({
@@ -89,6 +95,8 @@ $(() => {
 						$(".jsUpd-ipt-"+field+"-"+subid+"-"+id).hide();
 						if(field == "rgb") {
 							$(".jsColor-"+field+"-"+subid+"-"+id).css("background-color", "#"+val);
+						} else if(field == "img") {
+							local.reload();
 						}
 					} else {
 						alert(results.message)
@@ -100,7 +108,41 @@ $(() => {
 		}
 	})
 
-	// 图片放大 到前端显示
+	/* ================================ 单张图片更改 ================================ */
+	// $(".jsImg-clickUpd").click(function(e) {
+	$("body").on('click', '.jsImg-clickUpd', function(e){
+		const htmlIds = $(this).attr("id").split('-');
+		const id = htmlIds[1];
+		const field = htmlIds[2];
+		const sub = htmlIds[3];
+		$("#ipt-"+id+"-"+field+"-"+sub).click();
+	})
+	// $(".jsImg-ipt").change(function(e) {
+	let orgImgSrc;
+	$("body").on('change', '.jsImg-ipt', function(e){
+		const htmlIds = $(this).attr("id").split('-');
+		const id = htmlIds[1];
+		const field = htmlIds[2];
+		const sub = htmlIds[3];
+
+		const imgFile = document.getElementById('ipt-'+id+"-"+field+"-"+sub).files[0];
+		const imgSrc = window.URL.createObjectURL(imgFile);
+		orgImgSrc = document.getElementById('img-'+id+"-"+field+"-"+sub).src;
+		document.getElementById('img-'+id+"-"+field+"-"+sub).src = imgSrc;
+		$(".jsImg-clickBefore-"+id+"-"+field+"-"+sub).hide();
+		$(".jsImg-clickAfter-"+id+"-"+field+"-"+sub).show();
+	})
+	$("body").on('click', '.jsImg-cancel', function(e){
+		const htmlIds = $(this).attr("id").split('-');
+		const id = htmlIds[1];
+		const field = htmlIds[2];
+		const sub = htmlIds[3];
+		document.getElementById('img-'+id+"-"+field+"-"+sub).src = orgImgSrc;
+		$(".jsImg-clickBefore-"+id+"-"+field+"-"+sub).show();
+		$(".jsImg-clickAfter-"+id+"-"+field+"-"+sub).hide();
+	})
+
+	/* ================================ 图片放大 ================================ */
 	$("body").on('click', '.js-click-imgEnlarge', function(e){
 		const target = $(e.target);
 		const info = target.data('info');

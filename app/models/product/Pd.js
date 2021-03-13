@@ -47,18 +47,19 @@ const dbSchema = new Schema({
 
 
 
-	// shelf: Number,		// 上下架
 	// status: Number,		// 其他标识
-	// weight: Number,		// 权重
+	shelf: Number,		// 上下架
+	weight: Number,		// 权重
 	/* ------------------ 自动生成 ------------------ */
 	Firm: {type: ObjectId, ref: 'Firm'},
 	crtAt: Date,
 	updAt: Date,
-
 });
 
 dbSchema.pre('save', function(next) {	
 	if(this.isNew) {
+		if(!this.weight) this.weight = 1;
+		if(!this.shelf) this.shelf = 1;
 		this.crtAt = Date.now();
 	}
 	this.updAt = Date.now();

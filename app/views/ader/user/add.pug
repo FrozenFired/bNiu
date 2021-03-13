@@ -33,14 +33,6 @@ block content
 							option(value=role.num) #{role.val}
 				.offset-3.col-9.col-form-label.text-danger
 			.form-group.row
-				label.col-3.col-sm-2.col-form-label(for="iptLang") Language
-				.col-9.col-sm-6
-					select#iptLang.form-control(name="obj[lang]", data-style="btn-info")
-						each lang in Conf.langUser
-							-a;
-							option(value=lang.num) [#{lang.num}] #{lang.val}
-				.offset-3.col-9.col-form-label.text-danger
-			.form-group.row
 				label.col-3.col-sm-2.col-form-label(for="iptNome") Name
 				.col-9.col-sm-6
 					input#iptNome.form-control(type="text", name="obj[nome]")

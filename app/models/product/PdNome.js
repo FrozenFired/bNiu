@@ -14,14 +14,15 @@ const dbSchema = new Schema({
 	}],
 
 	weight: Number,
-	shelf: Number,
-
 	/* ------------------ 自动生成 ------------------ */
 	Firm: {type: ObjectId, ref: 'Firm'},
 	updAt: Date,
 });
 
 dbSchema.pre('save', function(next) {	
+	if(this.isNew) {
+		if(!this.weight) this.weight = 1;
+	}
 	this.updAt = Date.now();
 	next();
 })

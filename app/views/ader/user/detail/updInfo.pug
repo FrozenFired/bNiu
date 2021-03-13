@@ -23,17 +23,6 @@ a.btn.btn-warning(href="#", data-toggle="modal", data-target="#updInfo") edit
 										option(value=role.num, selected="selected") #{role.val}
 									else
 										option(value=role.num) #{role.val}
-					.form-group.row
-						label.col-3.col-form-label(for="langIpt") language
-						.col-9
-							select#langIpt.form-control(name="obj[lang]", data-style="btn-info")
-								each lang in Conf.langUser
-									-a;
-									if User.lang == lang.num
-										-a;
-										option(value=lang.num, selected="selected") #{lang.val}
-									else
-										option(value=lang.num) #{lang.val}
 				.modal-footer
 					button.btn.btn-default(type="button" data-dismiss="modal") 取消
 					button.btn.btn-success(type="submit") 提交

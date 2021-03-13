@@ -22,7 +22,7 @@ const dbSchema = new Schema({
 
 dbSchema.pre('save', function(next) {
 	if(this.isNew) {
-		if(!this.weight) this.weight = 0;
+		if(!this.weight) this.weight = 1;
 	}
 	this.updAt = Date.now();
 	next();

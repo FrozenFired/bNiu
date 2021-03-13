@@ -1,5 +1,5 @@
 const Conf = require('../../../config/conf.js');
-const MdFilter = require('../../../middle/mdFilter');
+const MdFilter = require('../../../middle/MdFilter');
 const _ = require('underscore');
 
 const LangDB = require('../../../models/login/Lang');
@@ -55,11 +55,19 @@ exports.bsSizeStandardUpdAjax = async(req, res) => {
 		if(!Standard) return res.json({status: 500, message: "没有找到此尺寸信息, 请刷新重试"});
 
 		const field = req.body.field;	// 传输数据的类型
-		const val = String(req.body.val).replace(/^\s*/g,"").toUpperCase();		// 数据的值
-		if(!val) {
-			const StandardRm = await StandardDB.deleteOne({_id: id});
-			const SizesRm = await SizeDB.deleteMany({SizeStandard: id});
-		} else {
+		let val = String(req.body.val).replace(/^\s*/g,"").toUpperCase();		// 数据的值
+		if(field == "code") {
+			if(!val) {
+				const StandardRm = await StandardDB.deleteOne({_id: id});
+				const SizesRm = await SizeDB.deleteMany({SizeStandard: id});
+			} else {
+				const StandardSame = await StandardDB.findOne({code: val});
+				if(StandardSame) return res.json({status: 500, message: "有相同的编号"});
+				Standard[field] = val;
+			}
+		} else if(field == "weight"){
+			val = parseInt(val);
+			if(isNaN(val)) val = 1;
 			Standard[field] = val;
 		}
 		const StandardSave = Standard.save();

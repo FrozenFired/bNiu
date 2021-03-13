@@ -1,7 +1,10 @@
 const Lang = require('../controllers/user/bser/lang');
 const Size = require('../controllers/user/bser/size');
 const Color = require('../controllers/user/bser/color');
+const Pattern = require('../controllers/user/bser/pattern');
 const Pd = require('../controllers/user/bser/pd');
+
+const MdFile = require('../middle/MdFile');
 
 const postForm = require('connect-multiparty')();
 
@@ -11,6 +14,13 @@ module.exports = app => {
 
 	/* ------------------------ Pd ------------------------ */
 	app.get('/bsPds', bserIsLogin, Pd.bsPds);
+
+	/* ------------------------ Pattern ------------------------ */
+	app.get('/bsPatterns', bserIsLogin, Pattern.bsPatterns);
+	app.get('/bsPatternAdd', bserIsLogin, Pattern.bsPatternAdd);
+	app.post('/bsPatternNew', bserIsLogin, postForm, Pattern.bsPatternNew);
+	app.post('/bsPatternUpdAjax', bserIsLogin, Pattern.bsPatternUpdAjax);
+	app.post('/bsPatternPhotoUpd', bserIsLogin, postForm, MdFile.newFiles, Pattern.bsPatternPhotoUpd);
 
 	/* ------------------------ Size ------------------------ */
 	app.get('/bsSizes', bserIsLogin, Size.bsSizes);

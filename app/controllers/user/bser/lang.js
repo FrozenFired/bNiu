@@ -1,5 +1,5 @@
 const Conf = require('../../../config/conf.js');
-const MdFilter = require('../../../middle/mdFilter');
+const MdFilter = require('../../../middle/MdFilter');
 const _ = require('underscore');
 
 const LangDB = require('../../../models/login/Lang');
@@ -60,15 +60,21 @@ exports.bsLangUpdAjax = async(req, res) => {
 		const Lang = await LangDB.findOne({'_id': id})
 		if(!Lang) return res.json({status: 500, message: "没有找到此语言信息, 请刷新重试"});
 
-		const field = req.body.field;	// 传输数据的类型
-		const val = String(req.body.val).replace(/^\s*/g,"").toUpperCase();		// 数据的值
+		const field = req.body.field;	// 要改变的 key
+		let val = String(req.body.val).replace(/^\s*/g,"").toUpperCase();		// 数据的值
 		
 		if(field == "nome") {
+			if(val.length < 1) val = '*';
 			const lang = Lang.langs.find((item) => {
 				return String(item._id) == String(req.body.subid);
 			});
 			lang.nome = val;
 		} else {
+			if(field == "code") {
+				if(val.length < 2) return res.json({status: 500, message: "国家编号错误"});
+				const LangSame = await LangDB.findOne({code: val});
+				if(LangSame) return res.json({status: 500, message: "有相同的编号"});
+			}
 			Lang[field] = val;
 		}
 

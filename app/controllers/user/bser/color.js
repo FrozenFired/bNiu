@@ -1,6 +1,6 @@
 const Conf = require('../../../config/conf.js');
 const Stint = require('../../../config/stint.js');
-const MdFilter = require('../../../middle/mdFilter');
+const MdFilter = require('../../../middle/MdFilter');
 const _ = require('underscore');
 
 const LangDB = require('../../../models/login/Lang');
@@ -70,6 +70,8 @@ exports.bsColorUpdAjax = async(req, res) => {
 		const field = req.body.field;
 		if(field == "code") {
 			if(val.length < 1) return res.json({status: 500, message: "bsColorUpdAjax Code Error"});
+			const ColorSame = await ColorDB.findOne({code: val});
+			if(ColorSame) return res.json({status: 500, message: "已经存在, 请刷新重试"});
 		} else if(field == "rgb") {
 			const regexp = new RegExp(Stint.extent.color.rgb.regexp);
 			if(!regexp.test(val) || (val.length != Stint.extent.color.rgb.len)) {

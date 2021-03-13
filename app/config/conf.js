@@ -35,12 +35,10 @@ const Conf = {
 		// seller:   {num:95, index: '/sler', code: 'sl', val: '销售 SELLER', },
 		customer: {num:99, index: '/cter', code: 'ct', val: '客户 Customer', },
 	},
-
-	langNums: [1, 2, 3],
-	langUser: {
-		cn: {num: 1, val: '中文'},
-		en: {num: 2, val: 'English'},
-		it: {num: 3, val: 'Italiano'},
+	photo: {
+		pd: {dir: '/PD/', def: '/UPLOAD/DEF/PD.JPG'},
+		mater: {dir: '/MASTER/', def: '/UPLOAD/DEF/MASTER.JPG'},
+		pattern: {dir: '/PATTERN/', def: '/UPLOAD/DEF/PATTERN.JPG'},
 	},
 
 	shelf: {
