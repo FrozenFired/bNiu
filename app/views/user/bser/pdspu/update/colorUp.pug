@@ -12,14 +12,14 @@ block content
 		h4 产品颜色(已选)
 		.row#ColoredsBox
 			each Color in Pdspu.Colors
-				- var codeColor = ' ';
+				- var colorCode = ' ';
 				if Color.code
-					- codeColor = Color.code;
-					if codeColor.length > 8
-						- codeColor = codeColor.slice(0,6) + '...';
+					- colorCode = Color.code;
+					if colorCode.length > 8
+						- colorCode = colorCode.slice(0,6) + '...';
 				.col-4.col-md-6.col-xl-1.mt-3(id="Colored-"+Color._id)
-					.colorIpt(style="background-Color:#"+Color.rgb+"; height: 30px", data-id=Color._id, data-Color=Color.rgb, data-code=Color.code, data-sym=-1, title=Color.code)
-					.code(class="text-success", style="Font-size: 8px", title=Color.code) #{codeColor}
+					.colorClick(style="background-Color:#"+Color.rgb+"; height: 30px", data-pdspuid=Pdspu._id, data-colorid=Color._id, data-rgb=Color.rgb, data-code=Color.code, data-option=-1, title=Color.code)
+					.code(class="text-success", style="Font-size: 8px", title=Color.code) #{colorCode}
 		hr
 		h4 颜色池(未选)
 		.row#ColorPoolsBox
@@ -31,12 +31,12 @@ block content
 						- break;
 				if flag == 1
 					- continue;
-				- var codeColor = ' ';
+				- var colorCode = ' ';
 				if Color.code
-					- codeColor = Color.code;
-					if codeColor.length > 8
-						- codeColor = codeColor.slice(0,6) + '...';
+					- colorCode = Color.code;
+					if colorCode.length > 8
+						- colorCode = colorCode.slice(0,6) + '...';
 				.col-4.col-md-6.col-xl-1.mt-3(id="ColorPool-"+Color._id)
-					.colorIpt.border(style="background-Color:#"+Color.rgb+"; height: 30px", data-id=Color._id, data-Color=Color.rgb, data-code=Color.code, data-sym=1, title=Color.code)
-					.code.text-center(style="Font-size: 8px", title=Color.code) #{codeColor}
+					.colorClick.border(style="background-Color:#"+Color.rgb+"; height: 30px", data-pdspuid=Pdspu._id, data-colorid=Color._id, data-rgb=Color.rgb, data-code=Color.code, data-option=1, title=Color.code)
+					.code.text-center(style="Font-size: 8px", title=Color.code) #{colorCode}
 	script(src="/js/bser/pdspu/pdcolor.js")

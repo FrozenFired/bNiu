@@ -1,56 +1,50 @@
 $(function() {
 	/* ============= 颜色 增删 ============= */
-	$(".body").on('click', '.colorIpt', function(e) {
-		alert(1)
-		let target = $(e.target);
-		let ColorId = target.data('id');
-		let Color = target.data('Color');
-		let nome = target.data('nome');
-		console.log(ColorId);
-		console.log(Color);
-		console.log(nome);
-		return;
-		if(!nome) nome = ' ';
-		let Colornome = nome;
-		if(Colornome.length > 8)
-			Colornome = Colornome.slice(0,6) + '...';
-		let sym = target.data('sym');
-		let id = $("#pdfirId").val();
+	$("body").on('click', '.colorClick', function(e) {
+		const target = $(e.target);
+		const colorId = target.data('colorid');
+		const pdspuId = target.data('pdspuid');
+		const rgb = target.data('rgb');
+		const code = target.data('code');
+		const option = target.data('option');
+
+		if(!code) code = ' ';
+		let colorCode = code;
+		if(colorCode.length > 8) colorCode = colorCode.slice(0,6) + '...';
 		$.ajax({
 			type: "GET",
-			url: '/bsPdspuColorUpdAjax?id='+id+'&ColorId='+ColorId+'&sym='+sym,
+			url: '/bsPdspuColorUpdAjax?pdspuId='+pdspuId+'&colorId='+colorId+'&option='+option,
 			success: function(results) {
-				if(results.success == 1) {
-					sym = results.sym;
-					if(sym == 1) {
+				if(results.status == 200) {
+					if(option == 1) {
 						let elem = "";
-						elem += '<div class="col-4 col-md-6 col-xl-1 mt-3" id="Colored-'+ColorId+'">'
-							elem += '<div class="colorIpt" style="background-Color:#'+Color+'; height: 30px" '
-							elem += 'data-id='+ColorId+' data-Color='+Color+' data-nome='+nome
-							elem +=' data-sym=0, title='+nome+'>'
+						elem += '<div class="col-4 col-md-6 col-xl-1 mt-3" id="Colored-'+colorId+'">'
+							elem += '<div class="colorClick" style="background-color:#'+rgb+'; height: 30px" '
+							elem += 'data-pdspuid='+pdspuId+' data-colorid='+colorId+' data-rgb='+rgb+' data-code='+code
+							elem +=' data-option=-1, title='+code+'>'
 							elem += '</div>'
-							elem += '<div class="nome text-success" style="Font-size: 8px" title='+nome+'>'
-								elem += Colornome
+							elem += '<div class="code text-success" style="Font-size: 8px" title='+code+'>'
+								elem += colorCode
 							elem += '</div>'
 						elem += '</div>'
 						$("#ColoredsBox").prepend(elem)
-						$("#ColorPool-"+ColorId).remove()
+						$("#ColorPool-"+colorId).remove()
 					} else {
 						let elem = "";
-						elem += '<div class="col-4 col-md-6 col-xl-1 mt-3" id="ColorPool-'+ColorId+'">'
-							elem += '<div class="colorIpt" style="background-Color:#'+Color+'; height: 30px" '
-							elem += 'data-id='+ColorId+' data-Color='+Color+' data-nome='+nome
-							elem +=' data-sym=1, title='+nome+'>'
+						elem += '<div class="col-4 col-md-6 col-xl-1 mt-3" id="ColorPool-'+colorId+'">'
+							elem += '<div class="colorClick" style="background-color:#'+rgb+'; height: 30px" '
+							elem += 'data-pdspuid='+pdspuId+' data-colorid='+colorId+' data-rgb='+rgb+' data-code='+code
+							elem +=' data-option=1, title='+code+'>'
 							elem += '</div>'
-							elem += '<div class="nome" style="Font-size: 8px" title='+nome+'>'
-								elem += Colornome
+							elem += '<div class="code" style="Font-size: 8px" title='+code+'>'
+								elem += colorCode
 							elem += '</div>'
 						elem += '</div>'
 						$("#ColorPoolsBox").prepend(elem)
-						$("#Colored-"+ColorId).remove()
+						$("#Colored-"+colorId).remove()
 					}
 				} else {
-					alert(results.info);
+					alert(results.message);
 				}
 			}
 		});

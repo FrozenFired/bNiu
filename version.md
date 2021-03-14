@@ -1,3 +1,4 @@
+0.0.56	Pdspu color pattern
 0.0.55	Pdspu basic size[color, (pattern)]
 0.0.5	pdCateg pdNome
 0.0.4	mtrial

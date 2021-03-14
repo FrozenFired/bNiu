@@ -23,7 +23,7 @@ const dbSchema = new Schema({
 	/* ------------------ Attr sku ------------------ */
 	Patterns: [{type: ObjectId, ref: 'Pattern'}],
 
-	Colors: [{type: ObjectId, ref: 'Colors'}],
+	Colors: [{type: ObjectId, ref: 'Color'}],
 
 	SizeStandard: {type: ObjectId, ref: 'SizeStandard'},
 	sizes: [{type: Number }],

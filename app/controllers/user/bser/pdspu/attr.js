@@ -66,7 +66,7 @@ exports.bsPdspuSizeDelAjax = async(req, res) => {
 
 		const Pdspu = await PdspuDB.findOne({_id: id});
 		if(!Pdspu) return res.json({status: 500, message: "没有找到此模特"});
-		if(!Pdspu.sizes || Pdspu.sizes.length == 0) res.json({status: 500, message: "此模特没有尺寸, 请添加"});
+		if(!Pdspu.sizes || Pdspu.sizes.length == 0) return res.json({status: 500, message: "此模特没有尺寸, 请添加"});
 
 		if(size == "l"){
 			Pdspu.sizes.shift();
@@ -88,7 +88,7 @@ exports.bsPdspuColorUp = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const id = req.params.id;
-		const Pdspu = await PdspuDB.findOne({_id: id});
+		const Pdspu = await PdspuDB.findOne({_id: id}).populate("Colors");
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
 		const Colors = await ColorDB.find();
 
@@ -98,68 +98,29 @@ exports.bsPdspuColorUp = async(req, res) => {
 	}
 }
 exports.bsPdspuColorUpdAjax = async(req, res) => {
-	let crUser = req.session.crUser;
-	let id = req.query.id;
-	let colorId = req.query.colorId;
-	let sym = parseInt(req.query.sym);
-	Pdfir.findOne({_id: id, firm: crUser.firm}, {colors: 1})
-	.exec(function(err, pdfir) {
-		if(err) {
-			console.log(err);
-			info = "bser AjaxDelColor, pdfir findOne, Error！";
-			res.json({success: 0, info: info})
-		} else if(!pdfir) {
-			info = "没有找到此模特";
-			res.json({success: 0, info: info})
-		} else {
-			// console.log(pdfir)
-			if(sym == 0) {
-				var i=0
-				for(; i<pdfir.colors.length; i++) {
-					if(colorId == pdfir.colors[i]) break;
-				}
-				if(i == pdfir.colors.length) {
-					info = "请刷新重试";
-					res.json({success: 0, info: info})
-				} else {
-					pdfir.colors.remove(colorId)
+	// console.log("/bsPdspuColorUpdAjax");
+	try {
+		const crUser = req.session.crUser;
+		const pdspuId = req.query.pdspuId;
+		const colorId = req.query.colorId;
+		const option = parseInt(req.query.option);
+		const Pdspu = await PdspuDB.findOne({_id: pdspuId, firm: crUser.firm}, {Colors: 1});
+		if(!Pdspu) return res.json({status: 500, message: "没有找到此模特"});
 
-					pdfir.save(function(err, pdSave) {
-						if(err) {
-							console.log(err);
-							info = "bser AjaxDelColor, pdfir save, Error！";
-							res.json({success: 0, info: info})
-						} else {
-							res.json({success: 1, sym})
-						}
-					})
-				}
-			} else if(sym == 1) {
-				var i=0
-				for(; i<pdfir.colors.length; i++) {
-					if(colorId == pdfir.colors[i]) break;
-				}
-				if(i != pdfir.colors.length) {
-					info = "不能添加相同颜色";
-					res.json({success: 0, info: info})
-				} else {
-					pdfir.colors.unshift(colorId);
-					pdfir.save(function(err, pdSave) {
-						if(err) {
-							console.log(err);
-							info = "bser AjaxNewColor, pdfir save, Error！";
-							res.json({success: 0, info: info})
-						} else {
-							res.json({success: 1, sym})
-						}
-					})
-				}
-			} else {
-				info = "操作错误";
-				res.json({success: 0, info: info})
-			}
+		const isExist = Pdspu.Colors.includes(colorId);
+		if(option == 1) {
+			if(isExist == true) return res.json({status: 500, message: "已经有此颜色, 不可重复添加, 请刷新重试"});
+			Pdspu.Colors.unshift(colorId);
+		} else {
+			if(isExist == false) return res.json({status: 500, message: "此颜色已被删除, 请刷新查看"});
+			Pdspu.Colors.remove(colorId)
 		}
-	})
+		const PdspuSave = await Pdspu.save();
+		return res.json({status: 200});
+	} catch(error) {
+		console.log(error)
+		return res.json({status: 500, message: "/bsPdspuColorUpdAjax Error: "+error});
+	}
 }
 
 exports.bsPdspuPatternUp = async(req, res) => {
@@ -167,11 +128,36 @@ exports.bsPdspuPatternUp = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const id = req.params.id;
-		const Pdspu = await PdspuDB.findOne({_id: id});
+		const Pdspu = await PdspuDB.findOne({_id: id}).populate("Patterns");
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
 		const Patterns = await PatternDB.find();
 		return res.render("./user/bser/pdspu/update/patternUp", {title: "产品印花更新", Pdspu, Patterns, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPdspuUp,Error&error="+error);
+	}
+}
+exports.bsPdspuPatternUpdAjax = async(req, res) => {
+	// console.log("/bsPdspuPatternUpdAjax");
+	try {
+		const crUser = req.session.crUser;
+		const pdspuId = req.query.pdspuId;
+		const patternId = req.query.patternId;
+		const option = parseInt(req.query.option);
+		const Pdspu = await PdspuDB.findOne({_id: pdspuId, firm: crUser.firm}, {Patterns: 1});
+		if(!Pdspu) return res.json({status: 500, message: "没有找到此印花图案"});
+
+		const isExist = Pdspu.Patterns.includes(patternId);
+		if(option == 1) {
+			if(isExist == true) return res.json({status: 500, message: "已经有此印花图案, 不可重复添加, 请刷新重试"});
+			Pdspu.Patterns.unshift(patternId);
+		} else {
+			if(isExist == false) return res.json({status: 500, message: "此印花图案已被删除, 请刷新查看"});
+			Pdspu.Patterns.remove(patternId)
+		}
+		const PdspuSave = await Pdspu.save();
+		return res.json({status: 200});
+	} catch(error) {
+		console.log(error)
+		return res.json({status: 500, message: "/bsPdspuPatternUpdAjax Error: "+error});
 	}
 }

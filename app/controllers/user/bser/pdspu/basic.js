@@ -213,6 +213,8 @@ exports.bsPdspu = async(req, res) => {
 		.populate("PdCateg")
 		.populate("PdNome")
 		.populate("SizeStandard")
+		.populate("Colors")
+		.populate("Patterns")
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
 
 		const Sizes = await SizeDB.find({SizeStandard: Pdspu.SizeStandard._id});

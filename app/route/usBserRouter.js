@@ -35,7 +35,10 @@ module.exports = app => {
 	app.get('/bsPdspuSizeDelAjax', bserIsLogin, PdspuAttr.bsPdspuSizeDelAjax);
 
 	app.get('/bsPdspuColorUp/:id', bserIsLogin, PdspuAttr.bsPdspuColorUp);
+	app.get('/bsPdspuColorUpdAjax', bserIsLogin, PdspuAttr.bsPdspuColorUpdAjax);
+
 	app.get('/bsPdspuPatternUp/:id', bserIsLogin, PdspuAttr.bsPdspuPatternUp);
+	app.get('/bsPdspuPatternUpdAjax', bserIsLogin, PdspuAttr.bsPdspuPatternUpdAjax);
 	/* ============================================= Pdspu ============================================= */
 
 	/* ------------------------ PdNome ------------------------ */
