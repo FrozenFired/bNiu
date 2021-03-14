@@ -4,6 +4,7 @@
 */
 const Conf = require('../../../../config/conf.js');
 const _ = require('underscore');
+const MdFile = require('../../../../middle/MdFile');
 
 const PdspuDB = require('../../../../models/product/Pdspu');
 const SizeStandardDB = require('../../../../models/attr/SizeStandard');
@@ -159,5 +160,44 @@ exports.bsPdspuPatternUpdAjax = async(req, res) => {
 	} catch(error) {
 		console.log(error)
 		return res.json({status: 500, message: "/bsPdspuPatternUpdAjax Error: "+error});
+	}
+}
+
+exports.bsPdSpusPhotosNew = async(req, res) => {
+	try {
+		const crUser = req.session.crUser;
+		const id = req.body.id;
+		const Pdspu = await PdspuDB.findOne({_id: id});
+		if(!Pdspu) return res.redirect("/error?info=没有找到此模特, 刷新重试");
+		if(!Pdspu.photos) Pdspu.photos = new Array();
+		const photos = req.body.files;
+		for(let i=0; i<photos.length; i++) {
+			Pdspu.photos.push(photos[i]);
+		}
+		PdspuSave = await Pdspu.save();
+		return res.redirect('/bsPdspu/'+id);
+	} catch(error) {
+		console.log(error);
+		return res.redirect("/error?info=bsPdSpusPhotosNew Error");
+	}
+}
+exports.bsPdSpusPhotosDel = async(req, res) => {
+	try {
+		const crUser = req.session.crUser;
+		const id = req.params.id;
+		const photo = req.query.photo;
+
+		const Pdspu = await PdspuDB.findOne({_id: id});
+		if(!Pdspu) return res.redirect("/error?info=没有找到此模特, 刷新重试");
+		const isExist = Pdspu.photos.includes(photo);
+		if(isExist) {
+			MdFile.delFile(photo);
+			Pdspu.photos.remove(photo);
+			const PdspuSave = await Pdspu.save();
+		}
+		return res.redirect('/bsPdspu/'+id);
+	} catch(error) {
+		console.log(error);
+		return res.redirect("/error?info=bsPdspuPostDel Error");
 	}
 }

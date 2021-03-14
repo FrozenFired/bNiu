@@ -39,6 +39,9 @@ module.exports = app => {
 
 	app.get('/bsPdspuPatternUp/:id', bserIsLogin, PdspuAttr.bsPdspuPatternUp);
 	app.get('/bsPdspuPatternUpdAjax', bserIsLogin, PdspuAttr.bsPdspuPatternUpdAjax);
+
+	app.post('/bsPdSpusPhotosNew', bserIsLogin, postForm, MdFile.newFiles, PdspuAttr.bsPdSpusPhotosNew);
+	app.get('/bsPdSpusPhotosDel/:id', bserIsLogin, PdspuAttr.bsPdSpusPhotosDel);
 	/* ============================================= Pdspu ============================================= */
 
 	/* ------------------------ PdNome ------------------------ */

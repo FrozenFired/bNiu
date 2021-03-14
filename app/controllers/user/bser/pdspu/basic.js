@@ -3,8 +3,8 @@
 	因为如果有其他数据库占据了 此颜色的id后 删除此颜色 其他数据库会不方便
 */
 const Conf = require('../../../../config/conf.js');
-const MdFile = require('../../../../middle/MdFile');
 const _ = require('underscore');
+const MdFile = require('../../../../middle/MdFile');
 
 const PdspuDB = require('../../../../models/product/Pdspu');
 const PdCategDB = require('../../../../models/product/PdCateg');

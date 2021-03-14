@@ -142,6 +142,21 @@ $(() => {
 		$(".jsImg-clickAfter-"+id+"-"+field+"-"+sub).hide();
 	})
 
+	/* ================================ 多图片上传 ================================ */
+	$("#uploadPics").change(function(e) {
+		$(".postsCrtBox").remove();
+		const files = document.getElementById('uploadPics').files;
+		let elem = ""
+		for(let i=0; i<files.length; i++) {
+			let src = window.URL.createObjectURL(files[i]);
+			elem += '<div class="col-6 mt-3 postsCrtBox">'
+				elem += '<img id="postsCrt-'+i+'" class="postsCrt" src='+src+ ' width="100%" height="100px" />'
+			elem += '</div>'
+		}
+		// document.getElementById('crtImgs').src = src;
+		$("#crtImgs").append(elem)
+	})
+
 	/* ================================ 图片放大 ================================ */
 	$("body").on('click', '.js-click-imgEnlarge', function(e){
 		const target = $(e.target);
