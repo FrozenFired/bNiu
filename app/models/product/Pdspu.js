@@ -18,7 +18,7 @@ const dbSchema = new Schema({
 		desp: String
 	}],
 
-	Mtrails: [{type: ObjectId, ref: 'Mtrail'}],
+	Mtrials: [{type: ObjectId, ref: 'Mtrial'}],
 
 	/* ------------------ Attr sku ------------------ */
 	Patterns: [{type: ObjectId, ref: 'Pattern'}],

@@ -13,6 +13,8 @@ const SizeDB = require('../../../../models/attr/Size');
 const ColorDB = require('../../../../models/attr/Color');
 const PatternDB = require('../../../../models/attr/Pattern');
 
+const MtrialDB = require('../../../../models/material/Mtrial');
+
 exports.bsPdspuSizeUp = async(req, res) => {
 	// console.log("/bsPdspuUp");
 	try{
@@ -160,6 +162,45 @@ exports.bsPdspuPatternUpdAjax = async(req, res) => {
 	} catch(error) {
 		console.log(error)
 		return res.json({status: 500, message: "/bsPdspuPatternUpdAjax Error: "+error});
+	}
+}
+
+exports.bsPdspuMtrialUp = async(req, res) => {
+	// console.log("/bsPdspuUp");
+	try{
+		const crUser = req.session.crUser;
+		const id = req.params.id;
+		const Pdspu = await PdspuDB.findOne({_id: id}).populate("Mtrials");
+		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
+		const Mtrials = await MtrialDB.find();
+		return res.render("./user/bser/pdspu/update/mtrialUp", {title: "产品印花更新", Pdspu, Mtrials, crUser});
+	} catch(error) {
+		return res.redirect("/error?info=bsPdspuUp,Error&error="+error);
+	}
+}
+exports.bsPdspuMtrialUpdAjax = async(req, res) => {
+	// console.log("/bsPdspuMtrialUpdAjax");
+	try {
+		const crUser = req.session.crUser;
+		const pdspuId = req.query.pdspuId;
+		const mtrialId = req.query.mtrialId;
+		const option = parseInt(req.query.option);
+		const Pdspu = await PdspuDB.findOne({_id: pdspuId, firm: crUser.firm}, {Mtrials: 1});
+		if(!Pdspu) return res.json({status: 500, message: "没有找到此印花图案"});
+
+		const isExist = Pdspu.Mtrials.includes(mtrialId);
+		if(option == 1) {
+			if(isExist == true) return res.json({status: 500, message: "已经有此印花图案, 不可重复添加, 请刷新重试"});
+			Pdspu.Mtrials.unshift(mtrialId);
+		} else {
+			if(isExist == false) return res.json({status: 500, message: "此印花图案已被删除, 请刷新查看"});
+			Pdspu.Mtrials.remove(mtrialId)
+		}
+		const PdspuSave = await Pdspu.save();
+		return res.json({status: 200});
+	} catch(error) {
+		console.log(error)
+		return res.json({status: 500, message: "/bsPdspuMtrialUpdAjax Error: "+error});
 	}
 }
 

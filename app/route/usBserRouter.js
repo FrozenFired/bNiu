@@ -40,6 +40,9 @@ module.exports = app => {
 	app.get('/bsPdspuPatternUp/:id', bserIsLogin, PdspuAttr.bsPdspuPatternUp);
 	app.get('/bsPdspuPatternUpdAjax', bserIsLogin, PdspuAttr.bsPdspuPatternUpdAjax);
 
+	app.get('/bsPdspuMtrialUp/:id', bserIsLogin, PdspuAttr.bsPdspuMtrialUp);
+	app.get('/bsPdspuMtrialUpdAjax', bserIsLogin, PdspuAttr.bsPdspuMtrialUpdAjax);
+
 	app.post('/bsPdSpusPhotosNew', bserIsLogin, postForm, MdFile.newFiles, PdspuAttr.bsPdSpusPhotosNew);
 	app.get('/bsPdSpusPhotosDel/:id', bserIsLogin, PdspuAttr.bsPdSpusPhotosDel);
 	/* ============================================= Pdspu ============================================= */

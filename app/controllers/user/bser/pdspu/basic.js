@@ -212,6 +212,7 @@ exports.bsPdspu = async(req, res) => {
 		const Pdspu = await PdspuDB.findOne({_id: id})
 		.populate("PdCateg")
 		.populate("PdNome")
+		.populate("Mtrials")
 		.populate("SizeStandard")
 		.populate("Colors")
 		.populate("Patterns")

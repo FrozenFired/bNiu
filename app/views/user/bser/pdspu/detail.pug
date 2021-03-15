@@ -7,19 +7,9 @@ block content
 				li.breadcrumb-item: a(href="/bser") Home
 				li.breadcrumb-item: a(href="/bsPdspus") 产品列表
 				li.breadcrumb-item.active(aria-current="page") #{title}
-		.text-right
-			a.btn.btn-danger(href="#", data-toggle="modal", data-target="#delPost") 删除照片
-		.border.rounded.p-2
-			.row
-				each photo in Pdspu.photos
-					-a;
-					.col-6.col-xl-3
-						img.js-click-imgEnlarge.border(src=photo, width="100%", height="150px", style="object-fit: scale-down;")
-				.col-6.col-md-4.col-xl-2
-					a(href="#", data-toggle="modal", data-target="#addPost")
-						img(src="/media/indicate/crt.jpg", width="100%", height="100px")
+		
 		.row
-			.col-sm-6.col-xl-3.mt-3.p-3
+			.col-sm-6.col-xl-4.mt-3.p-3
 				.card.text-center(style="width: 100%;")
 					img.card-img-top.border-bottom.js-click-imgEnlarge(id="img-"+Pdspu._id+"-photo-sub", src=Pdspu.photo, alt="Pdspu Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
 					h5.card-title 编号: #{Pdspu.code}
@@ -48,7 +38,7 @@ block content
 						.weight 排序: #{Pdspu.weight}
 						.text-right
 							a.btn.btn-warning(href="/bsPdspuUp/"+Pdspu._id) 修改
-			.col-sm-6.col-xl-3.mt-3.p-3
+			.col-sm-6.col-xl-4.mt-3.p-3
 				.card.text-center(style="width: 100%;")
 					h5.mt-3.card-title 模特尺寸
 					.card-body
@@ -61,7 +51,7 @@ block content
 							.mt-2 #{val}
 						.text-right
 							a.btn.btn-warning(href="/bsPdspuSizeUp/"+Pdspu._id) 修改
-			.col-sm-6.col-xl-3.mt-3.p-3
+			.col-sm-6.col-xl-4.mt-3.p-3
 				.card.text-center(style="width: 100%;")
 					h5.mt-3.card-title 模特颜色
 					.card-body
@@ -70,17 +60,46 @@ block content
 							.mt-2 #{Color.code}
 						.text-right
 							a.btn.btn-warning(href="/bsPdspuColorUp/"+Pdspu._id) 修改
-			.col-sm-6.col-xl-3.mt-3.p-3
-				.card.text-center(style="width: 100%;")
-					h5.mt-3.card-title 模特印花
-					.card-body
-						each Pattern in Pdspu.Patterns
-							-a;
-							.card.mt-3
-								img.card-img-top.border-bottom.js-click-imgEnlarge(src=Pattern.photo, alt="Pattern Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
-								h5 #{Pattern.code}
-						.text-right
-							a.btn.btn-warning(href="/bsPdspuPatternUp/"+Pdspu._id) 修改
+		.row.border.rounded.p-2.mt-3
+			.col-6.my-2
+				h3 材质:
+			.col-6.my-2.text-right
+				a.btn.btn-warning(href="/bsPdspuMtrialUp/"+Pdspu._id) 修改
+			each Mtrial in Pdspu.Mtrials
+				-a;
+				.col-6.col-xl-3.mt-3
+					.card.text-center(style="width: 100%;")
+						img.card-img-top.border-bottom.js-click-imgEnlarge(src=Mtrial.photo, alt="Mtrial Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
+						h5.mt-3.card-title #{Mtrial.code}
+
+		.row.border.rounded.p-2.mt-3
+			.col-6.my-2
+				h3 模特印花:
+			.col-6.my-2.text-right
+				a.btn.btn-warning(href="/bsPdspuPatternUp/"+Pdspu._id) 修改
+			each Pattern in Pdspu.Patterns
+				-a;
+				.col-6.col-xl-3.mt-3
+					.card.text-center(style="width: 100%;")
+						img.card-img-top.border-bottom.js-click-imgEnlarge(src=Pattern.photo, alt="Pattern Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
+						h5.mt-3.card-title #{Pattern.code}
+		.row.border.rounded.p-2.mt-3
+			.col-6.my-2
+				h3 子图片:
+			.col-6.my-2.text-right
+					a.btn.btn-danger(href="#", data-toggle="modal", data-target="#delPost") 删除照片
+			each photo in Pdspu.photos
+				-a;
+				.col-6.col-xl-3.mt-3
+					img.js-click-imgEnlarge.border(src=photo, width="100%", height="150px", style="object-fit: scale-down;")
+			.col-6.col-xl-3.mt-3
+				a(href="#", data-toggle="modal", data-target="#addPost")
+					img(src="/media/indicate/crt.jpg", width="100%", height="150px")
+		div(style="height: 200px")
+
+
+
+
 	#addPost.modal.fade
 		.modal-dialog
 			.modal-content

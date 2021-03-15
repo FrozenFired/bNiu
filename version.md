@@ -1,3 +1,4 @@
+0.0.6	Pdspu&Mtrial
 0.0.6	Pdspu photos
 0.0.56	Pdspu color pattern
 0.0.55	Pdspu basic size[color, (pattern)]

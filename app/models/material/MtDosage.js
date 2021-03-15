@@ -9,7 +9,7 @@ const dbSchema = new Schema({
 	/* ------------------ Basic ------------------ */
 	Pd: {type: ObjectId, ref: 'Pd'},
 
-	Mtrail: {type: ObjectId, ref: 'Mtrail'},
+	Mtrial: {type: ObjectId, ref: 'Mtrial'},
 	size: Number,
 
 	dosage: Float,
