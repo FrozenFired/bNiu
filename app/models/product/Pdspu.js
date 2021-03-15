@@ -20,6 +20,8 @@ const dbSchema = new Schema({
 
 	Mtrials: [{type: ObjectId, ref: 'Mtrial'}],
 
+	MtDosages: [{type: ObjectId, ref: 'MtDosage'}],
+
 	/* ------------------ Attr sku ------------------ */
 	Patterns: [{type: ObjectId, ref: 'Pattern'}],
 

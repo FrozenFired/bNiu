@@ -83,6 +83,7 @@ block content
 					.card.text-center(style="width: 100%;")
 						img.card-img-top.border-bottom.js-click-imgEnlarge(src=Pattern.photo, alt="Pattern Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
 						h5.mt-3.card-title #{Pattern.code}
+
 		.row.border.rounded.p-2.mt-3
 			.col-6.my-2
 				h3 子图片:
@@ -95,46 +96,79 @@ block content
 			.col-6.col-xl-3.mt-3
 				a(href="#", data-toggle="modal", data-target="#addPost")
 					img(src="/media/indicate/crt.jpg", width="100%", height="150px")
-		div(style="height: 200px")
-
-
-
-
-	#addPost.modal.fade
-		.modal-dialog
-			.modal-content
-				form#upGroup(method="post", action="/bsPdSpusPhotosNew", enctype="multipart/form-data")
+		#addPost.modal.fade
+			.modal-dialog
+				.modal-content
+					form#upGroup(method="post", action="/bsPdSpusPhotosNew", enctype="multipart/form-data")
+						.modal-header
+							h5 添加海报
+						.modal-body
+							input(type="hidden", name="id", value=Pdspu._id)
+							input(type="hidden", name="flDir", value=Conf.photo.pdspu.dir)
+							input(type="hidden", name="flName", value=crUser.Firm+"-"+Pdspu.code+"-"+crUser._id)
+							.row
+								.col-12(align="center")
+									input#uploadPics.btn.btn-info.btn-block(type="file", name="fls", multiple)
+							.form-group.row#crtImgs
+						.modal-footer
+							.row
+								.col-6
+									button.btn.btn-secondary(type="button" data-dismiss="modal") 取消
+								.col-6.text-right
+									button.btn.btn-success(type="submit") 确定
+		#delPost.modal.fade
+			.modal-dialog
+				.modal-content
 					.modal-header
-						h5 添加海报
+						h5 删除海报
 					.modal-body
-						input(type="hidden", name="id", value=Pdspu._id)
-						input(type="hidden", name="flDir", value=Conf.photo.pdspu.dir)
-						input(type="hidden", name="flName", value=crUser.Firm+"-"+Pdspu.code+"-"+crUser._id)
-						.row
-							.col-12(align="center")
-								input#uploadPics.btn.btn-info.btn-block(type="file", name="fls", multiple)
-						.form-group.row#crtImgs
-					.modal-footer
-						.row
-							.col-6
-								button.btn.btn-secondary(type="button" data-dismiss="modal") 取消
-							.col-6.text-right
-								button.btn.btn-success(type="submit") 确定
-	#delPost.modal.fade
-		.modal-dialog
-			.modal-content
-				.modal-header
-					h5 删除海报
-				.modal-body
-					if Pdspu.photos
-						-a;
-						each photo in Pdspu.photos
+						if Pdspu.photos
 							-a;
-							.row.mt-5
-								.col-8
-									img(src=photo, width="60%")
-								.col-4.pt-5
-									a.btn.btn-danger(href="/bsPdSpusPhotosDel/"+Pdspu._id+"?photo="+photo) 删除
-							hr
-				.modal-footer
-					button.btn.btn-secondary(type="button" data-dismiss="modal") 取消
+							each photo in Pdspu.photos
+								-a;
+								.row.mt-5
+									.col-8
+										img(src=photo, width="60%")
+									.col-4.pt-5
+										a.btn.btn-danger(href="/bsPdSpusPhotosDel/"+Pdspu._id+"?photo="+photo) 删除
+								hr
+					.modal-footer
+						button.btn.btn-secondary(type="button" data-dismiss="modal") 取消
+
+		.row.border.rounded.p-2.mt-3
+			.col-12.mt-3
+				h3 用料管理
+			.col-12.mt-3
+				- let widthTr = 100/(Pdspu.sizes.length+1);
+
+				- type ="Float";
+				- getUrl = "/bsPdspuMtDosageUpdAjax"
+				- field="dosage", subid='dosage';
+				table.table.table-hover.table-bordered.text-center
+					thead
+						tr
+							th(width=widthTr+"%")
+							each size in Pdspu.sizes
+								- let val = size;
+								each Size in Sizes
+									if Size.size == size
+										- val = Size.symbol;
+										- break;
+								th(width=widthTr+"%") #{val}
+					tbody
+						each Mtrial in Pdspu.Mtrials
+							- a;
+							tr
+								td #{Mtrial.code}
+
+								each size in Pdspu.sizes
+									- a;
+									td
+										- let Dosage = {};
+										each MtDosage in Pdspu.MtDosages
+											if MtDosage.size == size && String(MtDosage.Mtrial) == String(Mtrial._id)
+												- Dosage = MtDosage;
+												- break;
+										- object=Dosage, value=Dosage.dosage;
+										include ../../../aaPlugin/ajaxInputUpd
+		div(style="height: 200px")

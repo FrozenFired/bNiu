@@ -7,7 +7,7 @@ const Float = require('mongoose-float').loadType(mongoose, 2);
 const colection = 'MtDosage';
 const dbSchema = new Schema({
 	/* ------------------ Basic ------------------ */
-	Pd: {type: ObjectId, ref: 'Pd'},
+	Pdspu: {type: ObjectId, ref: 'Pdspu'},
 
 	Mtrial: {type: ObjectId, ref: 'Mtrial'},
 	size: Number,

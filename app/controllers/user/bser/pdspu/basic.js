@@ -13,6 +13,9 @@ const SizeStandardDB = require('../../../../models/attr/SizeStandard');
 
 const SizeDB = require('../../../../models/attr/Size');
 
+const MtDosageDB = require('../../../../models/material/MtDosage');
+const PdskuDB = require('../../../../models/product/Pdsku');
+
 exports.bsPdspus = async(req, res) => {
 	// console.log("/bsPdspus");
 	try{
@@ -44,21 +47,18 @@ exports.bsPdspuNew = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const obj = req.body.obj;
+		// Pdspu值的初始化
 		obj.Firm = crUser.Firm;
+		obj.photo = Conf.photo.pdspu.def;
+		// Pdspu值的判断
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 		if(obj.code.length < 3) return res.redirect("/error?info=bsPdspuNew,编号长度最小为3");
-		obj.photo = Conf.photo.pdspu.def;
-
 		obj.price = parseFloat(obj.price);
 		if(isNaN(obj.price)) return res.redirect("/error?info=bsPdspuNew,请输入正确售价");
-
 		if(obj.cost) {
 			obj.cost = parseFloat(obj.cost);
 			if(isNaN(obj.cost)) return res.redirect("/error?info=bsPdspuNew,请输入正确采购价, 可以不输入");
 		}
-		const PdspuSame = await PdspuDB.findOne({code: obj.code});
-		if(PdspuSame) return res.redirect("/error?info=bsPdspuNew,PdspuSame");
-
 		if(obj.PdCateg) {
 			const PdCateg = await PdCategDB.findOne({_id: obj.PdCateg});
 			if(!PdCateg) return res.redirect("/error?info=bsPdspuNew,没有此分类");
@@ -74,8 +74,27 @@ exports.bsPdspuNew = async(req, res) => {
 		const SizeStandard = await SizeStandardDB.findOne({_id: obj.SizeStandard});
 		if(!SizeStandard) return res.redirect("/error?info=bsPdspuNew,没有此尺寸标准");
 
+		const PdspuSame = await PdspuDB.findOne({code: obj.code});
+		if(PdspuSame) return res.redirect("/error?info=bsPdspuNew,PdspuSame");
+
 		const _object = new PdspuDB(obj);
+		// 自动添加 MtDosage
+		const objMtDosage = new Object();
+		objMtDosage.Firm = crUser.Firm;
+		objMtDosage.Pdspu = _object._id;
+		const _objMtDosage = new MtDosageDB(objMtDosage);
+		_object.MtDosages.push(_objMtDosage._id);
+		// 自动添加 Pdsku
+		const objPdsku = new Object();
+		objPdsku.Firm = crUser.Firm;
+		objPdsku.Pdspu = _object._id;
+		const _objPdsku = new PdskuDB(objPdsku);
+		_object.Pdskus.push(_objPdsku._id);
+
 		const PdspuSave = await _object.save();
+		const MtDosageSave = await _objMtDosage.save();
+		const PdskuSave = await _objPdsku.save();
+
 		return res.redirect("/bsPdspus");
 	} catch(error) {
 		return res.redirect("/error?info=bsPdspuNew,Error&error="+error);
@@ -86,6 +105,10 @@ exports.bsPdspuUpd = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const obj = req.body.obj;
+
+		const Pdspu = await PdspuDB.findOne({_id: obj._id});
+		if(!Pdspu) return res.redirect("/error?info=bsPdspuUpd,没有找到此材料信息");
+
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 		if(obj.code.length < 3) return res.redirect("/error?info=bsPdspuUpd,objCode");
 		obj.price = parseFloat(obj.price);
@@ -94,12 +117,6 @@ exports.bsPdspuUpd = async(req, res) => {
 			obj.cost = parseFloat(obj.cost);
 			if(isNaN(obj.cost)) return res.redirect("/error?info=bsPdspuUpd,请输入正确采购价, 可以不输入");
 		}
-		const Pdspu = await PdspuDB.findOne({_id: obj._id});
-		if(!Pdspu) return res.redirect("/error?info=bsPdspuUpd,没有找到此材料信息");
-
-		const PdspuSame = await PdspuDB.findOne({_id: {"$ne": obj._id}, code: obj.code});
-		if(PdspuSame) return res.redirect("/error?info=bsPdspuUpd,有相同的编号");
-
 		if(obj.PdCateg) {
 			const PdCateg = await PdCategDB.findOne({_id: obj.PdCateg});
 			if(!PdCateg) return res.redirect("/error?info=bsPdspuUpd,没有此分类");
@@ -114,6 +131,9 @@ exports.bsPdspuUpd = async(req, res) => {
 		}
 		const SizeStandard = await SizeStandardDB.findOne({_id: obj.SizeStandard});
 		if(!SizeStandard) return res.redirect("/error?info=bsPdspuNew,没有此尺寸标准");
+
+		const PdspuSame = await PdspuDB.findOne({_id: {"$ne": obj._id}, code: obj.code});
+		if(PdspuSame) return res.redirect("/error?info=bsPdspuUpd,有相同的编号");
 
 		const _object = _.extend(Pdspu, obj);
 		const PdspuSave = await _object.save();
@@ -157,7 +177,6 @@ exports.bsPdspuUpdAjax = async(req, res) => {
 		const PdspuSave = Pdspu.save();
 		return res.json({status: 200});
 	} catch(error) {
-		console.log(error);
 		return res.json({status: 500, message: error});
 	}
 }
@@ -180,30 +199,6 @@ exports.bsPdspuPhotoUpd = async(req, res) => {
 }
 
 
-exports.bsPdspuNewAjax = async(req, res) => {
-	// console.log("/bsPdspuNewAjax");
-	try{
-		const crUser = req.session.crUser;
-
-		const code = req.body.code.replace(/^\s*/g,"").toUpperCase();
-		if(!code) return res.json({status: 500, message: "请输入产品标识, 请刷新重试"});
-
-		const PdspuSame = await PdspuDB.findOne({code: code});
-		if(PdspuSame) return res.json({status: 500, message: "已经存在, 请刷新重试"});
-
-		const obj = new Object();
-		obj.Firm = crUser.Firm;
-		obj.code = code;
-
-		const _object = new PdspuDB(obj);
-		const PdspuSave = await _object.save();
-		return res.json({status: 200})
-	} catch(error) {
-		console.log(error);
-		return res.json({status: 500, message: error});
-	}
-}
-
 exports.bsPdspu = async(req, res) => {
 	// console.log("/bsPdspu");
 	try{
@@ -216,9 +211,14 @@ exports.bsPdspu = async(req, res) => {
 		.populate("SizeStandard")
 		.populate("Colors")
 		.populate("Patterns")
+		.populate("MtDosages")
+		.populate("Pdskus")
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
 
 		const Sizes = await SizeDB.find({SizeStandard: Pdspu.SizeStandard._id});
+
+		// const MtDosages = await MtDosageDB.find({Pdspu: id, Mtrial: null});
+		// console.log(MtDosages)
 
 		return res.render("./user/bser/pdspu/detail", {title: "产品详情", Pdspu, Sizes, crUser});
 	} catch(error) {

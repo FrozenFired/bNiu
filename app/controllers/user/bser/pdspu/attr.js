@@ -15,6 +15,9 @@ const PatternDB = require('../../../../models/attr/Pattern');
 
 const MtrialDB = require('../../../../models/material/Mtrial');
 
+const MtDosageDB = require('../../../../models/material/MtDosage');
+const PdskuDB = require('../../../../models/product/Pdsku');
+
 exports.bsPdspuSizeUp = async(req, res) => {
 	// console.log("/bsPdspuUp");
 	try{
@@ -39,20 +42,42 @@ exports.bsPdspuSizeUpdAjax = async(req, res) => {
 		const Pdspu = await PdspuDB.findOne({_id: id});
 		if(!Pdspu) return res.json({status: 500, message: "没有找到此模特"});
 
+		let sizeNew = 10;
 		if(!Pdspu.sizes || Pdspu.sizes.length == 0) {
-			Pdspu.sizes.push(10);
+			Pdspu.sizes.push(sizeNew);
 		} else {
 			if(size == "l"){
-				const sizel = Pdspu.sizes[0]
+				const sizel = Pdspu.sizes[0];
 				if(sizel <= Conf.sizeNums[0]) return res.json({status: 500, message: "已经不可添加, 请联系管理员"});
-				Pdspu.sizes.unshift(sizel-1);
+				sizeNew = sizel-1;
+				Pdspu.sizes.unshift(sizeNew);
 				
 			} else {
-				let sizer = Pdspu.sizes[Pdspu.sizes.length-1]
+				let sizer = Pdspu.sizes[Pdspu.sizes.length-1];
 				if(sizer >= Conf.sizeNums[Conf.sizeNums.length-1]) return res.json({status: 500, message: "已经不可添加, 请联系管理员"});
-				Pdspu.sizes.push(sizer+1);
+				sizeNew = sizer+1;
+				Pdspu.sizes.push(sizeNew);
 			}
 		}
+		// 在Pdspu下 为每个没有 size值的 MtDosages 添加一个含有 size = sizeNew 的 MtDosage;
+		const crtObjParam = {Pdspu: id, size: null};
+		const crtObj = {size: sizeNew};
+		const MtDosages = await MtDosageDB.find(crtObjParam);
+		for(let i=0; i<MtDosages.length; i++) {
+			const MtDosage = MtDosages[i];
+			const objMtDosage = new Object();
+			objMtDosage.Firm = MtDosage.Firm;
+			objMtDosage.Pdspu = MtDosage.Pdspu;
+			if(crtObj.size) {objMtDosage.size = crtObj.size; } else{objMtDosage.size = MtDosage.size; }
+			if(crtObj.Mtrial) {objMtDosage.Mtrial = crtObj.Mtrial; } else {objMtDosage.Mtrial = MtDosage.Mtrial; }
+			const MtDosageSame = await MtDosageDB.findOne({Pdspu: id, size: objMtDosage.size, Mtrial: objMtDosage.Mtrial});
+			if(!MtDosageSame) {
+				const _objMtDosage = new MtDosageDB(objMtDosage);
+				const MtDosageSave = await _objMtDosage.save();
+				Pdspu.MtDosages.push(MtDosageSave._id);
+			}
+		}
+
 		const PdspuSave = await Pdspu.save();
 		return res.json({status: 200});
 	} catch(error) {
@@ -71,11 +96,21 @@ exports.bsPdspuSizeDelAjax = async(req, res) => {
 		if(!Pdspu) return res.json({status: 500, message: "没有找到此模特"});
 		if(!Pdspu.sizes || Pdspu.sizes.length == 0) return res.json({status: 500, message: "此模特没有尺寸, 请添加"});
 
+		let sizeDel = "-1";
 		if(size == "l"){
+			sizeDel = Pdspu.sizes[0];
 			Pdspu.sizes.shift();
 		} else {
+			sizeDel = Pdspu.sizes[Pdspu.sizes.length-1]
 			Pdspu.sizes.pop();
 		}
+		// 删除Pdspu下 MtDosages中 所有包含 size: sizeDel MtDosages
+		const delObjParam = {Pdspu: id, size: sizeDel};
+		const MtDosages = await MtDosageDB.find(delObjParam, {_id: 1});
+		for(let i=0; i<MtDosages.length; i++) {
+			Pdspu.MtDosages.remove(MtDosages[i]._id);
+		}
+		const MtDosagesRm = await MtDosageDB.deleteMany(delObjParam);
 
 		const PdspuSave = await Pdspu.save()
 		return res.json({status: 200});
@@ -179,27 +214,50 @@ exports.bsPdspuMtrialUp = async(req, res) => {
 	}
 }
 exports.bsPdspuMtrialUpdAjax = async(req, res) => {
-	// console.log("/bsPdspuMtrialUpdAjax");
 	try {
 		const crUser = req.session.crUser;
 		const pdspuId = req.query.pdspuId;
 		const mtrialId = req.query.mtrialId;
 		const option = parseInt(req.query.option);
-		const Pdspu = await PdspuDB.findOne({_id: pdspuId, firm: crUser.firm}, {Mtrials: 1});
+		const Pdspu = await PdspuDB.findOne({_id: pdspuId, firm: crUser.firm}, {Mtrials: 1, MtDosages: 1});
 		if(!Pdspu) return res.json({status: 500, message: "没有找到此印花图案"});
 
 		const isExist = Pdspu.Mtrials.includes(mtrialId);
 		if(option == 1) {
 			if(isExist == true) return res.json({status: 500, message: "已经有此印花图案, 不可重复添加, 请刷新重试"});
 			Pdspu.Mtrials.unshift(mtrialId);
+			// 在Pdspu下 为每个没有 Mtrial值的 MtDosages 添加一个含有 Mtrial = mtrialId 的 MtDosage;
+			const crtObjParam = {Pdspu: pdspuId, Mtrial: null};
+			const crtObj = {Mtrial: mtrialId};
+			const MtDosages = await MtDosageDB.find(crtObjParam);
+			for(let i=0; i<MtDosages.length; i++) {
+				const MtDosage = MtDosages[i];
+				const objMtDosage = new Object();
+				objMtDosage.Firm = MtDosage.Firm;
+				objMtDosage.Pdspu = MtDosage.Pdspu;
+				if(crtObj.size) {objMtDosage.size = crtObj.size; } else{objMtDosage.size = MtDosage.size; }
+				if(crtObj.Mtrial) {objMtDosage.Mtrial = crtObj.Mtrial; } else {objMtDosage.Mtrial = MtDosage.Mtrial; }
+				const MtDosageSame = await MtDosageDB.findOne({Pdspu: pdspuId, size: objMtDosage.size, Mtrial: objMtDosage.Mtrial});
+				if(!MtDosageSame) {
+					const _objMtDosage = new MtDosageDB(objMtDosage);
+					const MtDosageSave = await _objMtDosage.save();
+					Pdspu.MtDosages.push(MtDosageSave._id);
+				}
+			}
 		} else {
 			if(isExist == false) return res.json({status: 500, message: "此印花图案已被删除, 请刷新查看"});
 			Pdspu.Mtrials.remove(mtrialId)
+			// 删除Pdspu下 MtDosages中 所有包含 Mtrial: mtrialId的 MtDosages
+			const delObjParam = {Pdspu: pdspuId, Mtrial: mtrialId};
+			const MtDosages = await MtDosageDB.find(delObjParam, {_id: 1});
+			for(let i=0; i<MtDosages.length; i++) {
+				Pdspu.MtDosages.remove(MtDosages[i]._id);
+			}
+			const MtDosagesRm = await MtDosageDB.deleteMany(delObjParam);
 		}
 		const PdspuSave = await Pdspu.save();
 		return res.json({status: 200});
 	} catch(error) {
-		console.log(error)
 		return res.json({status: 500, message: "/bsPdspuMtrialUpdAjax Error: "+error});
 	}
 }
@@ -240,5 +298,70 @@ exports.bsPdSpusPhotosDel = async(req, res) => {
 	} catch(error) {
 		console.log(error);
 		return res.redirect("/error?info=bsPdspuPostDel Error");
+	}
+}
+
+/* 在Pdspu下 为每个没有 Mtrial值的 MtDosages 添加一个含有 Mtrial = mtrialId 的 MtDosage; */
+// const crtMtDosagePdspu_FuncProm = async(crtObjParam, crtObj) => {
+// 	try {
+// 		return new Promise(async(resolve, reject) => {
+// 			const newMtDosages = new Array();
+// 			const MtDosages = await MtDosageDB.find(crtObjParam);
+// 			console.log('s')
+// 			for(let i=0; i<MtDosages.length; i++) {
+// 			console.log(i)
+// 				const MtDosage = MtDosages[i];
+// 				const objMtDosage = new Object();
+// 				objMtDosage.Firm = MtDosage.Firm;
+// 				objMtDosage.Pdspu = MtDosage.Pdspu;
+
+// 				if(crtObj.size) {
+// 					objMtDosage.size = crtObj.size;
+// 				} else{
+// 					objMtDosage.size = MtDosage.size;
+// 				}
+// 				if(crtObj.Mtrial) {
+// 					objMtDosage.Mtrial = crtObj.Mtrial;
+// 				} else {
+// 					objMtDosage.Mtrial = MtDosage.Mtrial;
+// 				}
+// 				const _objMtDosage = new MtDosageDB(objMtDosage);
+// 				const MtDosageSave = await _objMtDosage.save();
+// 				newMtDosages.push(MtDosageSave._id);
+// 			}
+// 			console.log('e')
+// 			resolve(newMtDosages);
+// 		})
+// 	} catch(error) {
+// 		reject(error);
+// 	}
+// }
+
+exports.bsPdspuMtDosageUpdAjax = async(req, res) => {
+		// console.log("/bsPdspuMtDosageUpdAjax");
+	try{
+		const id = req.body.id;		// 所要更改的Color的id
+		const MtDosage = await MtDosageDB.findOne({'_id': id})
+		if(!MtDosage) return res.json({status: 500, message: "没有找到此颜色信息, 请刷新重试"});
+
+		let val = req.body.val;		// 数据的值
+		const type = req.body.type;	// 传输数据的类型
+		if(type == "Float") {
+			val = parseFloat(val);
+			if(isNaN(val) || val<0) return res.json({status: 500, message: "请传递正确的数值"});
+		} else {
+			// type == "String"
+			val = String(val).replace(/^\s*/g,"").toUpperCase();
+		}
+
+		const field = req.body.field;
+
+		MtDosage[field] = val;
+
+		const MtDosageSave = MtDosage.save();
+		return res.json({status: 200})
+	} catch(error) {
+		console.log(error);
+		return res.json({status: 500, message: error});
 	}
 }

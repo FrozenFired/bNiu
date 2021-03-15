@@ -9,7 +9,7 @@ const dbSchema = new Schema({
 	/* ------------------ Basic ------------------ */
 	Pdspu: {type: ObjectId, ref: 'Pdspu'},
 	Pattern: {type: ObjectId, ref: 'Pattern'},
-	Color: {type: ObjectId, ref: 'Colors'},
+	Color: {type: ObjectId, ref: 'Color'},
 	size: Number,
 
 	/* ------------------ 库存 ------------------ */
