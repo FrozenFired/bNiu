@@ -4,21 +4,20 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 const Float = require('mongoose-float').loadType(mongoose, 2);
 
-const colection = 'Pdsku';
+const colection = 'Odsku';
 const dbSchema = new Schema({
 	/* ------------------ Basic ------------------ */
+	Odspu: {type: ObjectId, ref: 'Odspu'},
+
 	Pdspu: {type: ObjectId, ref: 'Pdspu'},
 	Ptern: {type: ObjectId, ref: 'Ptern'},
-	Color: {type: ObjectId, ref: 'Color'},
-	size: Number,
 
-	/* 用料: 根据尺寸 确定所有用料 比如 布料1 不料2 扣子1 腰带 , 订单查询比较方便*/
-	MtDosages: [{type: ObjectId, ref: 'MtDosage'}],
+	size: Number
+	Color: {type: ObjectId, ref: 'Color'},
 
 	/* ------------------ 库存 ------------------ */
-	stock: Number,
-	sale: Number,
-
+	quan: Number,
+	ship: Number,	// 发货量
 
 	/* ------------------ 自动生成 ------------------ */
 	Firm: {type: ObjectId, ref: 'Firm'},
@@ -26,8 +25,8 @@ const dbSchema = new Schema({
 
 dbSchema.pre('save', function(next) {	
 	if(this.isNew) {
-		if(!this.stock) this.stock = 0;
-		if(!this.sale) this.sale = 0;
+		if(!this.quan) this.quan = 0;
+		if(!this.ship) this.ship = 0;
 	}
 	next();
 })

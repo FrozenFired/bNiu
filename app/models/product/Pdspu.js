@@ -11,7 +11,7 @@ const dbSchema = new Schema({
 	PdCateg: {type: ObjectId, ref: 'PdCateg'},	// 种类
 	PdNome: {type: ObjectId, ref: 'PdNome'},	// 名称
 	photo: String,
-	photos: [{type:String}],
+	photos: [String],
 	langs: [{
 		Lang: {type: ObjectId, ref: 'Lang'},
 		nome: String,
@@ -19,16 +19,16 @@ const dbSchema = new Schema({
 	}],
 
 	Mtrials: [{type: ObjectId, ref: 'Mtrial'}],
-
+	/* 用料: 根据尺寸 确定所有用料 比如 布料1 不料2 扣子1 腰带 要显示在商品详情页下*/
 	MtDosages: [{type: ObjectId, ref: 'MtDosage'}],
 
 	/* ------------------ Attr sku ------------------ */
-	Patterns: [{type: ObjectId, ref: 'Pattern'}],
+	Pterns: [{type: ObjectId, ref: 'Ptern'}],
 
 	Colors: [{type: ObjectId, ref: 'Color'}],
 
-	SizeStandard: {type: ObjectId, ref: 'SizeStandard'},
-	sizes: [{type: Number }],
+	SizeSyst: {type: ObjectId, ref: 'SizeSyst'},
+	sizes: [Number],
 
 	Pdskus: [{type: ObjectId, ref: 'Pdsku'}],
 
@@ -36,8 +36,6 @@ const dbSchema = new Schema({
 	/* ------------------ 价格 ------------------ */
 	price: Float,
 	cost: Float,
-
-
 
 
 

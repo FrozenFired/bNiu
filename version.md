@@ -1,4 +1,7 @@
-0.0.7	MtDosage
+0.0.71	attr/Pattern -> pattern/Ptern; SizeStandard -> SizeSyst
+		建立PtCateg PtFirm MtFirm
+0.0.7	d588da6c4dc11718e3c2570e355b33287d8faf78
+			MtDosage
 0.0.6	0ae25c7e23200f2b31e835e696281191bf691993
 			Pdspu&Mtrial
 0.0.6	49ad95572c3c90801f494d9a2597ec47500077b5

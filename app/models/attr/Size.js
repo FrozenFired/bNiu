@@ -6,7 +6,7 @@ const Float = require('mongoose-float').loadType(mongoose, 2);
 
 const colection = 'Size';
 const dbSchema = new Schema({
-	SizeStandard: {type: ObjectId, ref: 'SizeStandard'},
+	SizeSyst: {type: ObjectId, ref: 'SizeSyst'},
 	size: Number,
 
 	symbol: String,

@@ -9,7 +9,7 @@ const _ = require('underscore');
 const LangDB = require('../../../models/login/Lang');
 
 const SizeDB = require('../../../models/attr/Size');
-const StandardDB = require('../../../models/attr/SizeStandard');
+const StandardDB = require('../../../models/attr/SizeSyst');
 
 exports.bsSizes = async(req, res) => {
 	// console.log("/bsSizes");
@@ -24,36 +24,36 @@ exports.bsSizes = async(req, res) => {
 	}
 }
 
-exports.bsSizeStandardAdd = async(req, res) => {
-	// console.log("/bsSizeStandardAdd");
+exports.bsSizeSystAdd = async(req, res) => {
+	// console.log("/bsSizeSystAdd");
 	try{
 		const crUser = req.session.crUser;
 		const Langs = await LangDB.find();
 		return res.render("./user/bser/size/addStandard", {title: "添加尺寸新标准", Langs, crUser});
 	} catch(error) {
-		return res.redirect("/error?info=bsSizeStandardAdd,Error&error="+error);
+		return res.redirect("/error?info=bsSizeSystAdd,Error&error="+error);
 	}
 }
 
-exports.bsSizeStandardNew = async(req, res) => {
-	// console.log("/bsSizeStandardNew");
+exports.bsSizeSystNew = async(req, res) => {
+	// console.log("/bsSizeSystNew");
 	try{
 		const crUser = req.session.crUser;
 		const obj = req.body.obj;
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
-		if(obj.code.length < 2) return res.redirect("/error?info=bsSizeStandardNew,objCode");
+		if(obj.code.length < 2) return res.redirect("/error?info=bsSizeSystNew,objCode");
 		const StandardSame = await StandardDB.findOne({code: obj.code});
-		if(StandardSame) return res.redirect("/error?info=bsSizeStandardNew,StandardSame");
+		if(StandardSame) return res.redirect("/error?info=bsSizeSystNew,StandardSame");
 		const _object = new StandardDB(obj);
 		const SizeSave = await	_object.save();
 		return res.redirect("/bsSizes");
 	} catch(error) {
-		return res.redirect("/error?info=bsSizeStandardNew,Error&error="+error);
+		return res.redirect("/error?info=bsSizeSystNew,Error&error="+error);
 	}
 }
 
-exports.bsSizeStandardUpdAjax = async(req, res) => {
-	// console.log("/bsSizeStandardUpdAjax");
+exports.bsSizeSystUpdAjax = async(req, res) => {
+	// console.log("/bsSizeSystUpdAjax");
 	try{
 		const id = req.body.id;		// 所要更改的Size的id
 		const Standard = await StandardDB.findOne({'_id': id})
@@ -64,7 +64,7 @@ exports.bsSizeStandardUpdAjax = async(req, res) => {
 		if(field == "code") {
 			if(!val) {
 				const StandardRm = await StandardDB.deleteOne({_id: id});
-				const SizesRm = await SizeDB.deleteMany({SizeStandard: id});
+				const SizesRm = await SizeDB.deleteMany({SizeSyst: id});
 			} else {
 				const StandardSame = await StandardDB.findOne({code: val});
 				if(StandardSame) return res.json({status: 500, message: "有相同的编号"});
@@ -94,11 +94,11 @@ exports.bsSizeNewAjax = async(req, res) => {
 		const Standard = await StandardDB.findOne({'_id': standardId})
 		if(!Standard) return res.json({status: 500, message: "没有找到此尺寸信息, 请刷新重试"});
 
-		const SizeSame = await SizeDB.findOne({SizeStandard: standardId, size: size});
+		const SizeSame = await SizeDB.findOne({SizeSyst: standardId, size: size});
 		if(SizeSame) return res.json({status: 500, message: "已经存在, 请刷新重试"});
 
 		const obj = new Object();
-		obj.SizeStandard = standardId;
+		obj.SizeSyst = standardId;
 		obj.size = size;
 		obj.symbol = symbol;
 

@@ -9,7 +9,7 @@ const MdFile = require('../../../../middle/MdFile');
 const PdspuDB = require('../../../../models/product/Pdspu');
 const PdCategDB = require('../../../../models/product/PdCateg');
 const PdNomeDB = require('../../../../models/product/PdNome');
-const SizeStandardDB = require('../../../../models/attr/SizeStandard');
+const SizeSystDB = require('../../../../models/attr/SizeSyst');
 
 const SizeDB = require('../../../../models/attr/Size');
 
@@ -35,8 +35,8 @@ exports.bsPdspuAdd = async(req, res) => {
 		.populate({path: "PdCategFar", populate: {path: "PdCategFar"}})
 		.sort({"weight": -1})
 		const PdNomes = await PdNomeDB.find().sort({"weight": -1});
-		const SizeStandards = await SizeStandardDB.find().sort({"weight": -1});
-		return res.render("./user/bser/pdspu/add", {title: "添加新产品", PdCategs, PdNomes, SizeStandards, crUser});
+		const SizeSysts = await SizeSystDB.find().sort({"weight": -1});
+		return res.render("./user/bser/pdspu/add", {title: "添加新产品", PdCategs, PdNomes, SizeSysts, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPdspuAdd,Error&error="+error);
 	}
@@ -71,8 +71,8 @@ exports.bsPdspuNew = async(req, res) => {
 		} else {
 			obj.PdNome = null;
 		}
-		const SizeStandard = await SizeStandardDB.findOne({_id: obj.SizeStandard});
-		if(!SizeStandard) return res.redirect("/error?info=bsPdspuNew,没有此尺寸标准");
+		const SizeSyst = await SizeSystDB.findOne({_id: obj.SizeSyst});
+		if(!SizeSyst) return res.redirect("/error?info=bsPdspuNew,没有此尺寸标准");
 
 		const PdspuSame = await PdspuDB.findOne({code: obj.code});
 		if(PdspuSame) return res.redirect("/error?info=bsPdspuNew,PdspuSame");
@@ -129,8 +129,8 @@ exports.bsPdspuUpd = async(req, res) => {
 		} else {
 			obj.PdNome = null;
 		}
-		const SizeStandard = await SizeStandardDB.findOne({_id: obj.SizeStandard});
-		if(!SizeStandard) return res.redirect("/error?info=bsPdspuNew,没有此尺寸标准");
+		const SizeSyst = await SizeSystDB.findOne({_id: obj.SizeSyst});
+		if(!SizeSyst) return res.redirect("/error?info=bsPdspuNew,没有此尺寸标准");
 
 		const PdspuSame = await PdspuDB.findOne({_id: {"$ne": obj._id}, code: obj.code});
 		if(PdspuSame) return res.redirect("/error?info=bsPdspuUpd,有相同的编号");
@@ -208,14 +208,14 @@ exports.bsPdspu = async(req, res) => {
 		.populate("PdCateg")
 		.populate("PdNome")
 		.populate("Mtrials")
-		.populate("SizeStandard")
+		.populate("SizeSyst")
 		.populate("Colors")
-		.populate("Patterns")
+		.populate("Pterns")
 		.populate("MtDosages")
 		.populate("Pdskus")
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
 
-		const Sizes = await SizeDB.find({SizeStandard: Pdspu.SizeStandard._id});
+		const Sizes = await SizeDB.find({SizeSyst: Pdspu.SizeSyst._id});
 
 		// const MtDosages = await MtDosageDB.find({Pdspu: id, Mtrial: null});
 		// console.log(MtDosages)
@@ -237,8 +237,8 @@ exports.bsPdspuUp = async(req, res) => {
 		.populate({path: "PdCategFar", populate: {path: "PdCategFar"}})
 		.sort({"weight": -1})
 		const PdNomes = await PdNomeDB.find().sort({"weight": -1});
-		const SizeStandards = await SizeStandardDB.find().sort({"weight": -1});
-		return res.render("./user/bser/pdspu/update/basicUp", {title: "产品更新", Pdspu, PdCategs, PdNomes, SizeStandards, crUser});
+		const SizeSysts = await SizeSystDB.find().sort({"weight": -1});
+		return res.render("./user/bser/pdspu/update/basicUp", {title: "产品更新", Pdspu, PdCategs, PdNomes, SizeSysts, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPdspuUp,Error&error="+error);
 	}

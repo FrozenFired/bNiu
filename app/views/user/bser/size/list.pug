@@ -8,7 +8,7 @@ block content
 				li.breadcrumb-item.active(aria-current="page") #{title}
 		.row.my-3
 			.col-12.text-right
-				a.btn.btn-warning(href="/bsSizeStandardAdd") +
+				a.btn.btn-warning(href="/bsSizeSystAdd") +
 
 		- let widthTr = 100/(sizeNums.length+1);
 		table.table.table-hover.table-bordered
@@ -24,7 +24,7 @@ block content
 					- a;
 					tr
 						td
-							- getUrl = "/bsSizeStandardUpdAjax", object = Standard;
+							- getUrl = "/bsSizeSystUpdAjax", object = Standard;
 							- field="code", value=Standard.code, subid='code';
 							include ../../../aaPlugin/ajaxInputUpd
 
@@ -32,7 +32,7 @@ block content
 							- size = null;
 							td
 								each Size in Sizes
-									if String(Size.SizeStandard) == String(Standard._id) && Size.size == sizeNum
+									if String(Size.SizeSyst) == String(Standard._id) && Size.size == sizeNum
 										- size = Size;
 										- break;
 								if size

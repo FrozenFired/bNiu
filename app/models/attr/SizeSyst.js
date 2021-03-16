@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 const Float = require('mongoose-float').loadType(mongoose, 2);
 
-const colection = 'SizeStandard';
+const colection = 'SizeSyst';
 const dbSchema = new Schema({
 	code: String,	// 唯一 国际 欧洲 上衣 裤子
 	langs: [{

@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 const Float = require('mongoose-float').loadType(mongoose, 2);
 
-const colection = 'Pattern';
+const colection = 'Ptern';
 const dbSchema = new Schema({
 	code: String,
 	langs: [{

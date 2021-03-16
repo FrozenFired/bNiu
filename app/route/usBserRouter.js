@@ -1,7 +1,7 @@
 const Lang = require('../controllers/user/bser/lang');
 const Size = require('../controllers/user/bser/size');
 const Color = require('../controllers/user/bser/color');
-const Pattern = require('../controllers/user/bser/pattern');
+const Ptern = require('../controllers/user/bser/ptern');
 const MtCateg = require('../controllers/user/bser/mtCateg');
 const Mtrial = require('../controllers/user/bser/mtrial');
 const PdCateg = require('../controllers/user/bser/pdCateg');
@@ -37,8 +37,8 @@ module.exports = app => {
 	app.get('/bsPdspuColorUp/:id', bserIsLogin, PdspuAttr.bsPdspuColorUp);
 	app.get('/bsPdspuColorUpdAjax', bserIsLogin, PdspuAttr.bsPdspuColorUpdAjax);
 
-	app.get('/bsPdspuPatternUp/:id', bserIsLogin, PdspuAttr.bsPdspuPatternUp);
-	app.get('/bsPdspuPatternUpdAjax', bserIsLogin, PdspuAttr.bsPdspuPatternUpdAjax);
+	app.get('/bsPdspuPternUp/:id', bserIsLogin, PdspuAttr.bsPdspuPternUp);
+	app.get('/bsPdspuPternUpdAjax', bserIsLogin, PdspuAttr.bsPdspuPternUpdAjax);
 
 	app.get('/bsPdspuMtrialUp/:id', bserIsLogin, PdspuAttr.bsPdspuMtrialUp);
 	app.get('/bsPdspuMtrialUpdAjax', bserIsLogin, PdspuAttr.bsPdspuMtrialUpdAjax);
@@ -92,18 +92,18 @@ module.exports = app => {
 	app.post('/bsMtCategNew', bserIsLogin, postForm, MtCateg.bsMtCategNew);
 	app.post('/bsMtCategUpd', bserIsLogin, postForm, MtCateg.bsMtCategUpd);
 
-	/* ------------------------ Pattern ------------------------ */
-	app.get('/bsPatterns', bserIsLogin, Pattern.bsPatterns);
-	app.get('/bsPatternAdd', bserIsLogin, Pattern.bsPatternAdd);
-	app.post('/bsPatternNew', bserIsLogin, postForm, Pattern.bsPatternNew);
-	app.post('/bsPatternUpdAjax', bserIsLogin, Pattern.bsPatternUpdAjax);
-	app.post('/bsPatternPhotoUpd', bserIsLogin, postForm, MdFile.newFiles, Pattern.bsPatternPhotoUpd);
+	/* ------------------------ Ptern ------------------------ */
+	app.get('/bsPterns', bserIsLogin, Ptern.bsPterns);
+	app.get('/bsPternAdd', bserIsLogin, Ptern.bsPternAdd);
+	app.post('/bsPternNew', bserIsLogin, postForm, Ptern.bsPternNew);
+	app.post('/bsPternUpdAjax', bserIsLogin, Ptern.bsPternUpdAjax);
+	app.post('/bsPternPhotoUpd', bserIsLogin, postForm, MdFile.newFiles, Ptern.bsPternPhotoUpd);
 
 	/* ------------------------ Size ------------------------ */
 	app.get('/bsSizes', bserIsLogin, Size.bsSizes);
-	app.get('/bsSizeStandardAdd', bserIsLogin, Size.bsSizeStandardAdd);
-	app.post('/bsSizeStandardNew', bserIsLogin, postForm, Size.bsSizeStandardNew);
-	app.post('/bsSizeStandardUpdAjax', bserIsLogin, Size.bsSizeStandardUpdAjax);
+	app.get('/bsSizeSystAdd', bserIsLogin, Size.bsSizeSystAdd);
+	app.post('/bsSizeSystNew', bserIsLogin, postForm, Size.bsSizeSystNew);
+	app.post('/bsSizeSystUpdAjax', bserIsLogin, Size.bsSizeSystUpdAjax);
 	
 	app.post('/bsSizeNewAjax', bserIsLogin, Size.bsSizeNewAjax);
 	app.post('/bsSizeUpdAjax', bserIsLogin, Size.bsSizeUpdAjax);

@@ -10,35 +10,35 @@ block content
 				li.breadcrumb-item.active(aria-current="page") #{title}
 		hr
 		h4 产品印花(已选)
-		.row#PatternedsBox
-			each Pattern in Pdspu.Patterns
-				- var patternCode = ' ';
-				if Pattern.code
-					- patternCode = Pattern.code;
-					if patternCode.length > 8
-						- patternCode = patternCode.slice(0,6) + '...';
-				.col-6.col-lg-3.mt-3.text-center(id="Patterned-"+Pattern._id)
+		.row#PternedsBox
+			each Ptern in Pdspu.Pterns
+				- var pternCode = ' ';
+				if Ptern.code
+					- pternCode = Ptern.code;
+					if pternCode.length > 8
+						- pternCode = pternCode.slice(0,6) + '...';
+				.col-6.col-lg-3.mt-3.text-center(id="Pterned-"+Ptern._id)
 					.card
-						img.card-img-top.border-bottom.js-click-imgEnlarge(src=Pattern.photo, alt="Pattern Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
-						.patternClick.text-success(data-pdspuid=Pdspu._id, data-patternid=Pattern._id, data-option=-1) #{patternCode}
+						img.card-img-top.border-bottom.js-click-imgEnlarge(src=Ptern.photo, alt="Ptern Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
+						.pternClick.text-success(data-pdspuid=Pdspu._id, data-pternid=Ptern._id, data-option=-1) #{pternCode}
 		hr
 		h4 未选
-		.row#PatternPoolsBox
-			each Pattern in Patterns
+		.row#PternPoolsBox
+			each Ptern in Pterns
 				- var flag = 0;
-				each cl in Pdspu.Patterns
-					if String(cl._id) == String(Pattern._id)
+				each cl in Pdspu.Pterns
+					if String(cl._id) == String(Ptern._id)
 						- flag = 1;
 						- break;
 				if flag == 1
 					- continue;
-				- var patternCode = ' ';
-				if Pattern.code
-					- patternCode = Pattern.code;
-					if patternCode.length > 8
-						- patternCode = patternCode.slice(0,6) + '...';
-				.col-6.col-lg-3.mt-3.text-center(id="PatternPool-"+Pattern._id)
+				- var pternCode = ' ';
+				if Ptern.code
+					- pternCode = Ptern.code;
+					if pternCode.length > 8
+						- pternCode = pternCode.slice(0,6) + '...';
+				.col-6.col-lg-3.mt-3.text-center(id="PternPool-"+Ptern._id)
 					.card
-						img.card-img-top.border-bottom.js-click-imgEnlarge(src=Pattern.photo, alt="Pattern Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
-						.patternClick.text-dark(data-pdspuid=Pdspu._id, data-patternid=Pattern._id, data-option=1) #{patternCode}
-	script(src="/js/bser/pdspu/pdpattern.js")
+						img.card-img-top.border-bottom.js-click-imgEnlarge(src=Ptern.photo, alt="Ptern Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
+						.pternClick.text-dark(data-pdspuid=Pdspu._id, data-pternid=Ptern._id, data-option=1) #{pternCode}
+	script(src="/js/bser/pdspu/pdptern.js")

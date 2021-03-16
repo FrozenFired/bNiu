@@ -1,0 +1,46 @@
+extends ../../aalayout/layout
+
+block content
+	.container
+		nav(aria-label="breadcrumb")
+			ol.breadcrumb
+				li.breadcrumb-item: a(href="/bser") Home
+				li.breadcrumb-item.active(aria-current="page") #{title}
+		.row.my-3
+			.col-12.text-right
+				a.btn.btn-warning(href="/bsPternAdd") +
+
+		- getUrl = "/bsPternUpdAjax";
+		.row
+			each Ptern in Pterns
+				- object = Ptern;
+				.col-6.col-lg-3.mt-4
+					.card.text-center(style="width: 100%;")
+						img.card-img-top.border-bottom.js-click-imgEnlarge(id="img-"+Ptern._id+"-photo-sub", src=Ptern.photo, alt="Ptern Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
+						
+						.row(class="jsImg-clickBefore-"+Ptern._id+"-photo-sub")
+							.col-6
+								.jsImg-clickUpd.text-info(id="clickUpd-"+Ptern._id+"-photo-sub") [点击]
+							.col-6
+								- field="photo", value=Ptern.photo, subid="photo", type="img", fieldDesp="[upd]";
+								include ../../../aaPlugin/ajaxInputUpd
+								- fieldDesp = null;
+						.row(class="jsImg-clickAfter-"+Ptern._id+"-photo-sub", style="display:none")
+							.col-6
+								.jsImg-cancel.btn.btn-secondary(id="clickUpd-"+Ptern._id+"-photo-sub") [取消]
+							.col-6
+								form(method="post", action="/bsPternPhotoUpd", enctype="multipart/form-data")
+									input(type="hidden", name="obj[_id]", value=Ptern._id)
+									input(type="hidden", name="flDir", value=Conf.photo.ptern.dir)
+									input(type="hidden", name="flName", value=crUser.Firm+"-"+Ptern.code+"-"+crUser._id)
+									input.jsImg-ipt(id="ipt-"+Ptern._id+"-photo-sub", type="file", name="fls", style="display:none")
+									.form-group
+										input.btn.btn-success(type="submit" value="确认")
+						.card-body
+							.code
+								- field="code", value=Ptern.code, subid="code", type="String";
+								include ../../../aaPlugin/ajaxInputUpd
+							.weight.mt-3
+								- field="weight", value=Ptern.weight, subid="weight", type="Int";
+								include ../../../aaPlugin/ajaxInputUpd
+

@@ -38,7 +38,7 @@ const Conf = {
 	photo: {
 		pdspu: {dir: '/PDSPU/', def: '/UPLOAD/DEF/PDSPU.JPG'},
 		mtrial: {dir: '/MTRIAL/', def: '/UPLOAD/DEF/MTRIAL.JPG'},
-		pattern: {dir: '/PATTERN/', def: '/UPLOAD/DEF/PATTERN.JPG'},
+		ptern: {dir: '/PTERN/', def: '/UPLOAD/DEF/PTERN.JPG'},
 	},
 
 	shelf: {

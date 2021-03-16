@@ -35,12 +35,12 @@ block content
 							- code = "["+PdNome.code+"]";
 							option(value=PdNome._id) #{code}
 			.form-group.row
-				label.col-3.col-sm-2.col-form-label(for="SizeStandardIpt") 尺寸标准
+				label.col-3.col-sm-2.col-form-label(for="SizeSystIpt") 尺寸标准
 				.col-9.col-sm-6
-					select#SizeStandardIpt.form-control(name="obj[SizeStandard]", data-style="btn-info")
-						each SizeStandard in SizeStandards
-							- code = "["+SizeStandard.code+"]";
-							option(value=SizeStandard._id) #{code}
+					select#SizeSystIpt.form-control(name="obj[SizeSyst]", data-style="btn-info")
+						each SizeSyst in SizeSysts
+							- code = "["+SizeSyst.code+"]";
+							option(value=SizeSyst._id) #{code}
 			.form-group.row
 				label.col-3.col-sm-2.col-form-label(for="priceIpt") price
 				.col-9.col-sm-6

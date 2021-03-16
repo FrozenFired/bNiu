@@ -7,11 +7,11 @@ const _ = require('underscore');
 const MdFile = require('../../../../middle/MdFile');
 
 const PdspuDB = require('../../../../models/product/Pdspu');
-const SizeStandardDB = require('../../../../models/attr/SizeStandard');
+const SizeSystDB = require('../../../../models/attr/SizeSyst');
 
 const SizeDB = require('../../../../models/attr/Size');
 const ColorDB = require('../../../../models/attr/Color');
-const PatternDB = require('../../../../models/attr/Pattern');
+const PternDB = require('../../../../models/pattern/Ptern');
 
 const MtrialDB = require('../../../../models/material/Mtrial');
 
@@ -25,7 +25,7 @@ exports.bsPdspuSizeUp = async(req, res) => {
 		const id = req.params.id;
 		const Pdspu = await PdspuDB.findOne({_id: id});
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
-		const Sizes = await SizeDB.find({SizeStandard: Pdspu.SizeStandard});
+		const Sizes = await SizeDB.find({SizeSyst: Pdspu.SizeSyst});
 
 		return res.render("./user/bser/pdspu/update/sizeUp", {title: "产品尺寸更新", Pdspu, Sizes, crUser});
 	} catch(error) {
@@ -161,42 +161,42 @@ exports.bsPdspuColorUpdAjax = async(req, res) => {
 	}
 }
 
-exports.bsPdspuPatternUp = async(req, res) => {
+exports.bsPdspuPternUp = async(req, res) => {
 	// console.log("/bsPdspuUp");
 	try{
 		const crUser = req.session.crUser;
 		const id = req.params.id;
-		const Pdspu = await PdspuDB.findOne({_id: id}).populate("Patterns");
+		const Pdspu = await PdspuDB.findOne({_id: id}).populate("Pterns");
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
-		const Patterns = await PatternDB.find();
-		return res.render("./user/bser/pdspu/update/patternUp", {title: "产品印花更新", Pdspu, Patterns, crUser});
+		const Pterns = await PternDB.find();
+		return res.render("./user/bser/pdspu/update/pternUp", {title: "产品印花更新", Pdspu, Pterns, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPdspuUp,Error&error="+error);
 	}
 }
-exports.bsPdspuPatternUpdAjax = async(req, res) => {
-	// console.log("/bsPdspuPatternUpdAjax");
+exports.bsPdspuPternUpdAjax = async(req, res) => {
+	// console.log("/bsPdspuPternUpdAjax");
 	try {
 		const crUser = req.session.crUser;
 		const pdspuId = req.query.pdspuId;
-		const patternId = req.query.patternId;
+		const pternId = req.query.pternId;
 		const option = parseInt(req.query.option);
-		const Pdspu = await PdspuDB.findOne({_id: pdspuId, firm: crUser.firm}, {Patterns: 1});
+		const Pdspu = await PdspuDB.findOne({_id: pdspuId, firm: crUser.firm}, {Pterns: 1});
 		if(!Pdspu) return res.json({status: 500, message: "没有找到此印花图案"});
 
-		const isExist = Pdspu.Patterns.includes(patternId);
+		const isExist = Pdspu.Pterns.includes(pternId);
 		if(option == 1) {
 			if(isExist == true) return res.json({status: 500, message: "已经有此印花图案, 不可重复添加, 请刷新重试"});
-			Pdspu.Patterns.unshift(patternId);
+			Pdspu.Pterns.unshift(pternId);
 		} else {
 			if(isExist == false) return res.json({status: 500, message: "此印花图案已被删除, 请刷新查看"});
-			Pdspu.Patterns.remove(patternId)
+			Pdspu.Pterns.remove(pternId)
 		}
 		const PdspuSave = await Pdspu.save();
 		return res.json({status: 200});
 	} catch(error) {
 		console.log(error)
-		return res.json({status: 500, message: "/bsPdspuPatternUpdAjax Error: "+error});
+		return res.json({status: 500, message: "/bsPdspuPternUpdAjax Error: "+error});
 	}
 }
 
