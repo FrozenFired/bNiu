@@ -1,5 +1,7 @@
-0.0.71	attr/Pattern -> pattern/Ptern; SizeStandard -> SizeSyst
-		建立PtCateg PtFirm MtFirm
+0.0.75	调整文件结构
+0.0.71	6fe4ea39a2e580f9ab91a795a24dc94e9056ccef
+		attr/Pattern -> pattern/Ptern; SizeStandard -> SizeSyst
+		建立 PtCateg PtFirm MtFirm
 0.0.7	d588da6c4dc11718e3c2570e355b33287d8faf78
 			MtDosage
 0.0.6	0ae25c7e23200f2b31e835e696281191bf691993

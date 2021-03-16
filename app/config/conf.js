@@ -36,9 +36,9 @@ const Conf = {
 		customer: {num:99, index: '/cter', code: 'ct', val: '客户 Customer', },
 	},
 	photo: {
-		pdspu: {dir: '/PDSPU/', def: '/UPLOAD/DEF/PDSPU.JPG'},
-		mtrial: {dir: '/MTRIAL/', def: '/UPLOAD/DEF/MTRIAL.JPG'},
-		ptern: {dir: '/PTERN/', def: '/UPLOAD/DEF/PTERN.JPG'},
+		Pdspu: {dir: '/PDSPU/', def: '/UPLOAD/DEF/PDSPU.JPG'},
+		Mtrial: {dir: '/MTRIAL/', def: '/UPLOAD/DEF/MTRIAL.JPG'},
+		Ptern: {dir: '/PTERN/', def: '/UPLOAD/DEF/PTERN.JPG'},
 	},
 
 	shelf: {
@@ -50,7 +50,7 @@ const Conf = {
 		y: {num: 1, val: '底层'}
 	},
 
-	sizeNums: [6, 7, 8, 9, 10, 11, 12, 13, 14],
+	SizeNums: [6, 7, 8, 9, 10, 11, 12, 13, 14],
 }
 
 module.exports = Conf

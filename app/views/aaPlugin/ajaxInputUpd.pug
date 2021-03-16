@@ -6,6 +6,6 @@ if type != "img"
 	span.bg-white.text-info.jsUpd-span(class="jsUpd-span-"+field+"-"+subid+"-"+object._id, data-field=field, data-subid=subid, data-id=object._id) [ #{value} ]
 input.form-control(class="jsUpd-org-"+field+"-"+subid+"-"+object._id, type="hidden", value=value)
 input.jsUpd-ipt.form-control(class="jsUpd-ipt-"+field+"-"+subid+"-"+object._id, type="text", data-field=field, data-subid=subid, data-id=object._id, data-url=getUrl, data-type=type, value=value, style="display:none")
-if field == "color"
+//- if field == "rgb"
 	-a;
-	.color.border(class="jsColor-"+field+"-"+subid+"-"+object._id, style="width: 100px; height: 30px; background-color: #"+value)
+	.rgb.border(class="jsColor-"+field+"-"+subid+"-"+object._id, style="width: 100px; height: 30px; background-color: #"+value)

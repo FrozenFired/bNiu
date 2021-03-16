@@ -14,16 +14,16 @@ module.exports = app => {
 			let pwd = String(req.body.pwd).replace(/(\s*$)/g, "").replace( /^\s*/, '');
 			if(pwd.length == 0) pwd = " ";
 
-			const user = await User.findOne({code: code});
-			if(!user) return res.redirect("/error?info=loginUser,Error.!user");
+			const User = await User.findOne({code: code});
+			if(!User) return res.redirect("/error?info=loginUser,Error.!User");
 			
-			const isMatch = await bcrypt.compare(pwd, user.pwd);
+			const isMatch = await bcrypt.compare(pwd, User.pwd);
 			if(!isMatch) return res.redirect('/error?info=loginUser Code 密码不符, 请重新登陆');
 
-			req.session.crUser = user;
+			req.session.crUser = User;
 
-			if(user.role == 1) return res.redirect('/bser');
-			if(user.role == 99) return res.redirect('/cter');
+			if(User.role == 1) return res.redirect('/bser');
+			if(User.role == 99) return res.redirect('/cter');
 			return res.redirect('/error?info=loginUser 登录角色错误，请联系管理员');
 		} catch(error) {
 			return res.redirect("/error?info=loginUser,Error&error="+error);

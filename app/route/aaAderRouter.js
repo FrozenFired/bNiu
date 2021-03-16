@@ -1,8 +1,8 @@
 const Index = require('../controllers/ader/index');
 
-const Ader = require('../controllers/ader/ader'); // ct control
-const Firm = require('../controllers/ader/firm');
-const User = require('../controllers/ader/user');
+const Ader = require('../controllers/ader/Ader'); // ct control
+const Firm = require('../controllers/ader/Firm');
+const User = require('../controllers/ader/User');
 
 const multipart = require('connect-multiparty');
 const postForm = multipart();
@@ -36,7 +36,7 @@ module.exports = function(app){
 	
 	app.delete('/adFirmDelAjax', aderIsLogin, Firm.adFirmDelAjax);
 
-	/* user ---------------------- user ---------------------------------- */
+	/* User ---------------------- User ---------------------------------- */
 	app.get('/adUsers', aderIsLogin, User.adUsers);
 	app.get('/adUser/:id', aderIsLogin, User.adUser);
 	app.get('/adUserDel/:id', aderIsLogin, User.adUserDel);

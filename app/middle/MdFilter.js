@@ -1,12 +1,12 @@
 const Stint = require('../config/stint.js');
 const bcrypt = require('bcryptjs');
 
-exports.userPwdBcrypt_FilterProm = (pwd) => {
+exports.UserPwdBcrypt_FilterProm = (pwd) => {
 	return new Promise((resolve, reject) => {
 		if(!pwd) reject('请您输入密码');
 		pwd = pwd.replace(/^\s*/g,"");
-		if(pwd.length < Stint.extent.user.pwd.min || pwd.length > Stint.extent.user.pwd.max) {
-			reject('密码长度至少是'+Stint.extent.user.pwd.min+'个字符 最多是'+Stint.extent.user.pwd.max+'个字符');
+		if(pwd.length < Stint.extent.User.pwd.min || pwd.length > Stint.extent.User.pwd.max) {
+			reject('密码长度至少是'+Stint.extent.User.pwd.min+'个字符 最多是'+Stint.extent.User.pwd.max+'个字符');
 		} else {
 			bcrypt.genSalt(parseInt(process.env.SALT_WORK_FACTOR), function(err, salt) {
 				if(err) {
@@ -25,15 +25,15 @@ exports.userPwdBcrypt_FilterProm = (pwd) => {
 	})
 }
 
-exports.userCode_FilterProm = (code) => {
+exports.UserCode_FilterProm = (code) => {
 	return new Promise((resolve, reject) => {
 		if(!code) reject('请您输入成员账号');
 		code = code.replace(/^\s*/g,"").toUpperCase();
-		const regexp = new RegExp(Stint.extent.user.code.regexp);
+		const regexp = new RegExp(Stint.extent.User.code.regexp);
 		if(!regexp.test(code)) {
 			reject('账号只能由字母组成');
-		} else if(code.length < Stint.extent.user.code.min || code.length > Stint.extent.user.code.max) {
-			reject('用户帐号长度至少是'+Stint.extent.user.code.min+'个字符 最多是'+Stint.extent.user.code.max+'个字符');
+		} else if(code.length < Stint.extent.User.code.min || code.length > Stint.extent.User.code.max) {
+			reject('用户帐号长度至少是'+Stint.extent.User.code.min+'个字符 最多是'+Stint.extent.User.code.max+'个字符');
 		} else {
 			resolve(code)
 		}

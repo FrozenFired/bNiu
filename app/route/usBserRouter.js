@@ -1,13 +1,17 @@
 const Lang = require('../controllers/user/bser/lang');
-const Size = require('../controllers/user/bser/size');
-const Color = require('../controllers/user/bser/color');
-const Ptern = require('../controllers/user/bser/ptern');
-const MtCateg = require('../controllers/user/bser/mtCateg');
-const Mtrial = require('../controllers/user/bser/mtrial');
-const PdCateg = require('../controllers/user/bser/pdCateg');
-const PdNome = require('../controllers/user/bser/pdNome');
-const PdspuBasic = require('../controllers/user/bser/pdspu/basic');
-const PdspuAttr = require('../controllers/user/bser/pdspu/attr');
+
+const Size = require('../controllers/user/bser/attr/Size');
+const Color = require('../controllers/user/bser/attr/Color');
+
+const Ptern = require('../controllers/user/bser/pattern/Ptern');
+
+const MtCateg = require('../controllers/user/bser/material/MtCateg');
+const Mtrial = require('../controllers/user/bser/material/Mtrial');
+
+const PdCateg = require('../controllers/user/bser/product/PdCateg');
+const PdNome = require('../controllers/user/bser/product/PdNome');
+const PdspuBasic = require('../controllers/user/bser/product/basic');
+const PdspuAttr = require('../controllers/user/bser/product/attr');
 
 const MdFile = require('../middle/MdFile');
 
@@ -17,7 +21,7 @@ module.exports = app => {
 	/* ------------------------ 首页 登录页面 登录 登出 ------------------------ */
 	app.get('/bser', bserIsLogin, (req, res) => {return res.render("./user/bser/index", {title: "Home Bser", crUser: req.session.crUser});});
 
-	/* ============================================= Pdspu ============================================= */
+	/* ============================================= product ============================================= */
 	/* ------------------------ basic ------------------------ */
 	app.get('/bsPdspuAdd', bserIsLogin, PdspuBasic.bsPdspuAdd);
 	app.post('/bsPdspuNew', bserIsLogin, postForm, PdspuBasic.bsPdspuNew);
@@ -47,7 +51,6 @@ module.exports = app => {
 	app.get('/bsPdSpusPhotosDel/:id', bserIsLogin, PdspuAttr.bsPdSpusPhotosDel);
 
 	app.post('/bsPdspuMtDosageUpdAjax', bserIsLogin, PdspuAttr.bsPdspuMtDosageUpdAjax);
-	/* ============================================= Pdspu ============================================= */
 
 	/* ------------------------ PdNome ------------------------ */
 	app.get('/bsPdNomes', bserIsLogin, PdNome.bsPdNomes);
@@ -63,16 +66,9 @@ module.exports = app => {
 	app.get('/bsPdCategDel/:id', bserIsLogin, PdCateg.bsPdCategDel);
 	app.post('/bsPdCategNew', bserIsLogin, postForm, PdCateg.bsPdCategNew);
 	app.post('/bsPdCategUpd', bserIsLogin, postForm, PdCateg.bsPdCategUpd);
+	/* ============================================= product ============================================= */
 
-	/* ------------------------ PdCateg 产品分类 ----------------------- */
-	app.get('/bsPdCategs', bserIsLogin, PdCateg.bsPdCategs);
-	app.get('/bsPdCategAdd', bserIsLogin, PdCateg.bsPdCategAdd);
-	app.get('/bsPdCateg/:id', bserIsLogin, PdCateg.bsPdCateg);
-	app.get('/bsPdCategUp/:id', bserIsLogin, PdCateg.bsPdCategUp);
-	app.get('/bsPdCategDel/:id', bserIsLogin, PdCateg.bsPdCategDel);
-	app.post('/bsPdCategNew', bserIsLogin, postForm, PdCateg.bsPdCategNew);
-	app.post('/bsPdCategUpd', bserIsLogin, postForm, PdCateg.bsPdCategUpd);
-
+	/* ============================================= matrial ============================================= */
 	/* ------------------------ Mtrial 材质 ------------------------ */
 	app.get('/bsMtrials', bserIsLogin, Mtrial.bsMtrials);
 	app.get('/bsMtrialAdd', bserIsLogin, Mtrial.bsMtrialAdd);
@@ -91,14 +87,18 @@ module.exports = app => {
 	app.get('/bsMtCategDel/:id', bserIsLogin, MtCateg.bsMtCategDel);
 	app.post('/bsMtCategNew', bserIsLogin, postForm, MtCateg.bsMtCategNew);
 	app.post('/bsMtCategUpd', bserIsLogin, postForm, MtCateg.bsMtCategUpd);
+	/* ============================================= matrial ============================================= */
 
+	/* ============================================= pattern ============================================= */
 	/* ------------------------ Ptern ------------------------ */
 	app.get('/bsPterns', bserIsLogin, Ptern.bsPterns);
 	app.get('/bsPternAdd', bserIsLogin, Ptern.bsPternAdd);
 	app.post('/bsPternNew', bserIsLogin, postForm, Ptern.bsPternNew);
 	app.post('/bsPternUpdAjax', bserIsLogin, Ptern.bsPternUpdAjax);
 	app.post('/bsPternPhotoUpd', bserIsLogin, postForm, MdFile.newFiles, Ptern.bsPternPhotoUpd);
+	/* ============================================= pattern ============================================= */
 
+	/* ============================================= attr ============================================= */
 	/* ------------------------ Size ------------------------ */
 	app.get('/bsSizes', bserIsLogin, Size.bsSizes);
 	app.get('/bsSizeSystAdd', bserIsLogin, Size.bsSizeSystAdd);
@@ -113,6 +113,7 @@ module.exports = app => {
 	app.get('/bsColorAdd', bserIsLogin, Color.bsColorAdd);
 	app.post('/bsColorNew', bserIsLogin, postForm, Color.bsColorNew);
 	app.post('/bsColorUpdAjax', bserIsLogin, Color.bsColorUpdAjax);
+	/* ============================================= attr ============================================= */
 
 	/* ------------------------ Lang ------------------------ */
 	app.get('/bsLangs', bserIsLogin, Lang.bsLangs);

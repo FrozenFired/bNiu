@@ -1,0 +1,29 @@
+extends ../../../aalayout/layout
+
+block content
+	.container
+		nav(aria-label="breadcrumb")
+			ol.breadcrumb
+				li.breadcrumb-item: a(href="/bser") Home
+				li.breadcrumb-item: a(href="/bsMtrials") 材料列表
+				li.breadcrumb-item.active(aria-current="page") #{title}
+		.row.my-3
+			.col-12.text-right
+				a.btn.btn-warning(href="/bsMtrialUp/"+Mtrial._id) 修改
+		hr
+		.row
+			.col-md-4
+			.col-md-4
+				.card.text-center(style="width: 100%;")
+					img.card-img-top.border-bottom.js-click-imgEnlarge(id="img-"+Mtrial._id+"-photo-sub", src=Mtrial.photo, alt="Mtrial Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
+					h5.card-title 编号: #{Mtrial.code}
+					.card-body
+						.far
+							if Mtrial.MtCateg
+								- MtCateg = Mtrial.MtCateg;
+								span.mr-3 分类: #{MtCateg.code}
+							else
+								span 未分类
+						.cost
+							span 采购费用: #{Mtrial.cost}
+						.weight 排序: #{Mtrial.weight}
