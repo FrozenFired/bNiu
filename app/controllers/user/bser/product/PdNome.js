@@ -51,13 +51,10 @@ exports.bsPdNomeUpdAjax = async(req, res) => {
 		if(!PdNome) return res.json({status: 500, message: "没有找到此名称信息, 请刷新重试"});
 
 		let val = req.body.val;		// 数据的值
-		const type = req.body.type;	// 传输数据的类型
-		if(type == "Int") {
-			val = parseInt(val);
-			if(isNaN(val)) return res.json({status: 500, message: "updAjax 参数为整数, 请传递正确的参数"});
-		}
+
 		const field = req.body.field;
 		if(field == "code") {
+			val = String(val).replace(/^\s*/g,"").toUpperCase();
 			if(val.length < 1) {
 				/*
 					[产品名称]数据库 删除
@@ -70,6 +67,9 @@ exports.bsPdNomeUpdAjax = async(req, res) => {
 			}
 			const PdNomeSame = await PdNomeDB.findOne({code: val});
 			if(PdNomeSame) return res.json({status: 500, message: "有相同的编号"});
+		} else if(field == "weight") {
+			val = parseInt(val);
+			if(isNaN(val)) return res.json({status: 500, message: "[bsPdNomeUpdAjax weight] 排序为数字, 请传递正确的参数"});
 		}
 
 		PdNome[field] = val;

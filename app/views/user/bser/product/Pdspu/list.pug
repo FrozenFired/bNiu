@@ -22,9 +22,9 @@ block content
 							.col-6
 								.jsImg-clickUpd.text-info(id="clickUpd-"+Pdspu._id+"-photo-sub") [点击]
 							.col-6
-								- field="photo", value=Pdspu.photo, subid="photo", type="img", fieldDesp="[upd]";
+								- field="photo", value=Pdspu.photo, subid="photo", valueHide=1, toUp=-1, fieldDesp="[upd]";
 								include ../../../../aaPlugin/ajaxInputUpd
-								- fieldDesp = null;
+								- fieldDesp = null, valueHide = null, toUp = null;
 						.row(class="jsImg-clickAfter-"+Pdspu._id+"-photo-sub", style="display:none")
 							.col-6
 								.jsImg-cancel.btn.btn-secondary(id="clickUpd-"+Pdspu._id+"-photo-sub") [取消]
@@ -38,10 +38,10 @@ block content
 										input.btn.btn-success(type="submit" value="确认")
 						.card-body
 							.code
-								- field="code", value=Pdspu.code, subid="code", type="String";
+								- field="code", value=Pdspu.code, subid="code";
 								include ../../../../aaPlugin/ajaxInputUpd
 							.weight.mt-3
-								- field="weight", value=Pdspu.weight, subid="weight", type="Int";
+								- field="weight", value=Pdspu.weight, subid="weight";
 								include ../../../../aaPlugin/ajaxInputUpd
 							.text-right.mt-3
 								a(href="/bsPdspu/"+Pdspu._id) [查看]

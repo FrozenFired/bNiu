@@ -11,12 +11,15 @@ const LangDB = require('../../../../models/login/Lang');
 
 const ColorDB = require('../../../../models/attr/Color');
 
+const PdspuDB = require('../../../../models/product/Pdspu');
+
 exports.bsColors = async(req, res) => {
 	// console.log("/bsColors");
 	try{
+		const info = req.query.info;
 		const crUser = req.session.crUser;
 		const Colors = await ColorDB.find().sort({"weight": -1});
-		return res.render("./user/bser/attr/Color/list", {title: "颜色管理", Colors, crUser});
+		return res.render("./user/bser/attr/Color/list", {title: "颜色列表", info, Colors, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsColors,Error&error="+error);
 	}
@@ -63,30 +66,27 @@ exports.bsColorUpdAjax = async(req, res) => {
 		if(!Color) return res.json({status: 500, message: "没有找到此颜色信息, 请刷新重试"});
 
 		let val = req.body.val;		// 数据的值
-		const type = req.body.type;	// 传输数据的类型
-		if(type == "Int") {
-			val = parseInt(val);
-			if(isNaN(val)) return res.json({status: 500, message: "updAjax 参数为整数, 请传递正确的参数"});
-		} else {
-			// type == "String"
-			val = String(val).replace(/^\s*/g,"").toUpperCase();
-		}
 
 		const field = req.body.field;
 		if(field == "code") {
-			if(val.length < 1) return res.json({status: 500, message: "bsColorUpdAjax Code Error"});
+			val = String(val).replace(/^\s*/g,"").toUpperCase();
+			if(val.length < 1) return res.json({status: 500, message: "[bsColorUpdAjax code] 颜色名称不正确"});
 			const ColorSame = await ColorDB.findOne({code: val});
-			if(ColorSame) return res.json({status: 500, message: "已经存在, 请刷新重试"});
+			if(ColorSame) return res.json({status: 500, message: "[bsColorUpdAjax code] 颜色名称已经存在, 请刷新重试"});
 		} else if(field == "rgb") {
+			val = String(val).replace(/^\s*/g,"").toUpperCase();
 			const regexp = new RegExp(Stint.extent.Color.rgb.regexp);
 			if(!regexp.test(val) || (val.length != Stint.extent.Color.rgb.len)) {
-				return res.json({status: 500, message: "bsColorUpdAjax RGB Error"});
+				return res.json({status: 500, message: "[bsColorUpdAjax rgb] 颜色名称不正确 必须是6位RGB字符"});
 			}
+		} else if(field == "weight") {
+			val = parseInt(val);
+			if(isNaN(val)) return res.json({status: 500, message: "[bsColorUpdAjax weight] 排序为数字, 请传递正确的参数"});
 		}
 		Color[field] = val;
 
 		const ColorSave = Color.save();
-		return res.json({status: 200})
+		return res.json({status: 200, message: "修改完成"})
 	} catch(error) {
 		console.log(error);
 		return res.json({status: 500, message: error});
@@ -94,26 +94,22 @@ exports.bsColorUpdAjax = async(req, res) => {
 }
 
 
-exports.bsColorNewAjax = async(req, res) => {
-	// console.log("/bsColorNewAjax");
+exports.bsColorDel = async(req, res) => {
+	// console.log("/bsColorDel");
 	try{
 		const crUser = req.session.crUser;
 
-		const code = req.body.code.replace(/^\s*/g,"").toUpperCase();
-		if(!code) return res.json({status: 500, message: "请输入颜色标识, 请刷新重试"});
+		const id = req.params.id;
+		const ColorExist = await ColorDB.findOne({_id: id});
+		if(!ColorExist) return res.json({status: 500, message: "此颜色已经不存在, 请刷新重试"});
 
-		const ColorSame = await ColorDB.findOne({code: code});
-		if(ColorSame) return res.json({status: 500, message: "已经存在, 请刷新重试"});
+		const Pdspu = await PdspuDB.findOne({Colors: id});
+		if(Pdspu) return res.redirect("/bsColors?info=在 ["+Pdspu.code+"] 等产品已经使用此颜色, 不可删除。 除非把相应产品删除");
 
-		const obj = new Object();
-		obj.Firm = crUser.Firm;
-		obj.code = code;
-
-		const _object = new ColorDB(obj);
-		const ColorSave = await _object.save();
-		return res.json({status: 200})
+		const ColorDel = await ColorDB.deleteOne({_id: id});
+		return res.redirect("/bsColors");
 	} catch(error) {
 		console.log(error);
-		return res.json({status: 500, message: error});
+		return res.redirect("/error?info=bsColorDel,Error&error="+error);
 	}
 }

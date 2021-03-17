@@ -1,4 +1,6 @@
-0.0.85	Pdsku 完成
+0.0.91	Color删除优化
+0.0.85	3fe6aec66822279aa0bd92c43a2ce290aa28cad8
+			Pdsku 完成
 0.0.8	15ef5339b5ac552363837fa38f6e78842e0475d9
 			完成 MtFirm PtFirm PtCateg
 0.0.75	26cd54805228f88329124e6ba8daf44d0e4dcb49

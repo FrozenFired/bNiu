@@ -1,11 +1,14 @@
+-  toup = 1;
+if toUp
+	- toup = toUp;
 if fieldDesp
 	-a;
 	span.mr-3.jsUpd-field.text-info(data-field=field, data-subid=subid, data-id=object._id) #{fieldDesp}
-if type != "img"
+if !valueHide
 	-a;
 	span.bg-white.text-info.jsUpd-span(class="jsUpd-span-"+field+"-"+subid+"-"+object._id, data-field=field, data-subid=subid, data-id=object._id) [ #{value} ]
 input.form-control(class="jsUpd-org-"+field+"-"+subid+"-"+object._id, type="hidden", value=value)
-input.jsUpd-ipt.form-control(class="jsUpd-ipt-"+field+"-"+subid+"-"+object._id, type="text", data-field=field, data-subid=subid, data-id=object._id, data-url=getUrl, data-type=type, value=value, style="display:none")
+input.jsUpd-ipt.form-control(class="jsUpd-ipt-"+field+"-"+subid+"-"+object._id, type="text", data-field=field, data-subid=subid, data-id=object._id, data-url=getUrl, data-toup=toup, value=value, style="display:none")
 //- if field == "rgb"
 	-a;
 	.rgb.border(class="jsColor-"+field+"-"+subid+"-"+object._id, style="width: 100px; height: 30px; background-color: #"+value)

@@ -137,6 +137,7 @@ module.exports = app => {
 	/* ------------------------ Color ------------------------ */
 	app.get('/bsColors', bserIsLogin, Color.bsColors);
 	app.get('/bsColorAdd', bserIsLogin, Color.bsColorAdd);
+	app.get('/bsColorDel/:id', bserIsLogin, Color.bsColorDel);
 	app.post('/bsColorNew', bserIsLogin, postForm, Color.bsColorNew);
 	app.post('/bsColorUpdAjax', bserIsLogin, Color.bsColorUpdAjax);
 	/* ============================================= attr ============================================= */

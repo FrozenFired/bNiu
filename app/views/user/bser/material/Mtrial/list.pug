@@ -22,9 +22,9 @@ block content
 							.col-6
 								.jsImg-clickUpd.text-info(id="clickUpd-"+Mtrial._id+"-photo-sub") [点击]
 							.col-6
-								- field="photo", value=Mtrial.photo, subid="photo", type="img", fieldDesp="[upd]";
+								- field="photo", value=Mtrial.photo, subid="photo", valueHide=1, toUp=-1, fieldDesp="[upd]";
 								include ../../../../aaPlugin/ajaxInputUpd
-								- fieldDesp = null;
+								- fieldDesp = null, valueHide = null, toUp = null;
 						.row(class="jsImg-clickAfter-"+Mtrial._id+"-photo-sub", style="display:none")
 							.col-6
 								.jsImg-cancel.btn.btn-secondary(id="clickUpd-"+Mtrial._id+"-photo-sub") [取消]
@@ -38,7 +38,7 @@ block content
 										input.btn.btn-success(type="submit" value="确认")
 						.card-body
 							.code
-								- field="code", value=Mtrial.code, subid="code", type="String", fieldDesp="编号:";
+								- field="code", value=Mtrial.code, subid="code", fieldDesp="编号:";
 								include ../../../../aaPlugin/ajaxInputUpd
 							.MtFirm
 								if Mtrial.MtFirm
@@ -53,7 +53,7 @@ block content
 								else
 									span 未分类
 							.weight.mt-2
-								- field="weight", value=Mtrial.weight, subid="weight", type="Int", fieldDesp="权重:";
+								- field="weight", value=Mtrial.weight, subid="weight", fieldDesp="权重:";
 								include ../../../../aaPlugin/ajaxInputUpd
 							.text-right.mt-3
 								a(href="/bsMtrial/"+Mtrial._id) [查看]

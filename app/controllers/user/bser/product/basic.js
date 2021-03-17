@@ -151,26 +151,22 @@ exports.bsPdspuUpdAjax = async(req, res) => {
 		if(!Pdspu) return res.json({status: 500, message: "没有找到此产品信息, 请刷新重试"});
 
 		let val = req.body.val;		// 数据的值
-		const type = req.body.type;	// 传输数据的类型
-		if(type == "Int") {
-			val = parseInt(val);
-			if(isNaN(val)) return res.json({status: 500, message: "updAjax 参数为整数, 请传递正确的参数"});
-		} else {
-			// type == "String"
-			val = String(val).replace(/^\s*/g,"").toUpperCase();
-		}
 
-		const isFile = ["photo"];
 		const field = req.body.field;
 		if(field == "code") {
+			val = String(val).replace(/^\s*/g,"").toUpperCase();
 			if(val.length < 1) return res.json({status: 500, message: "编号填写错误"});
 			const PdspuSame = await PdspuDB.findOne({code: val});
 			if(PdspuSame) return res.json({status: 500, message: "有相同的编号"});
-		} else if(isFile.includes(field) && Pdspu[field]) {
+		} else if(field == "photo") {
+			val = String(val).replace(/^\s*/g,"");
 			if(val != Pdspu[field]) {
 				MdFile.delFile(Pdspu[field]);
 				if(!val) val = Conf.photo.Pdspu.def;
 			}
+		} else if(field == "weight") {
+			val = parseInt(val);
+			if(isNaN(val)) return res.json({status: 500, message: "[bsPdspuUpdAjax weight] 排序为数字, 请传递正确的参数"});
 		}
 
 		Pdspu[field] = val;

@@ -468,16 +468,14 @@ exports.bsPdspuPdCostMtUpdAjax = async(req, res) => {
 		if(!PdCostMt) return res.json({status: 500, message: "没有找到此颜色信息, 请刷新重试"});
 
 		let val = req.body.val;		// 数据的值
-		const type = req.body.type;	// 传输数据的类型
-		if(type == "Float") {
+
+		const field = req.body.field;
+		if(field == "dosage") {
 			val = parseFloat(val);
 			if(isNaN(val) || val<0) return res.json({status: 500, message: "请传递正确的数值"});
 		} else {
-			// type == "String"
-			val = String(val).replace(/^\s*/g,"").toUpperCase();
+			return res.json({status: 500, message: "[bsPdspuPdCostMtUpdAjax field] 参数传递错误"});
 		}
-
-		const field = req.body.field;
 
 		PdCostMt[field] = val;
 
