@@ -12,12 +12,18 @@ block content
 		form.mt-5#objForm(method="post", action="/bsMtrialUpd", enctype="multipart/form-data")
 			input(type="hidden", name="obj[_id]", value=Mtrial._id)
 			.form-group.row
-				label.col-3.col-sm-2.col-form-label(for="codeIpt") code
+				label.col-3.col-sm-2.col-form-label(for="MtFirmIpt") MtFirm
 				.col-9.col-sm-6
-					input#codeIpt.form-control(type="text", name="obj[code]", value=Mtrial.code)
-				.offset-3.col-9.col-form-label#codeDanger.text-danger(style="display:none") 请输入正确的编号
+					select#MtFirmIpt.form-control(name="obj[MtFirm]", data-style="btn-info")
+						option(value="") 无
+						each MtFirm in MtFirms
+							if String(Mtrial.MtFirm) == String(MtFirm._id)
+								-a;
+								option(value=MtFirm._id, selected="selected") #{MtFirm.code}
+							else
+								option(value=MtFirm._id) #{MtFirm.code}
 			.form-group.row
-				label.col-3.col-sm-2.col-form-label(for="isBottomIpt") 底层
+				label.col-3.col-sm-2.col-form-label(for="isBottomIpt") 分类
 				.col-9.col-sm-6
 					select#isBottomIpt.form-control(name="obj[MtCateg]", data-style="btn-info")
 						option(value="") 不分类
@@ -33,6 +39,11 @@ block content
 								option(value=MtCateg._id, selected="selected") #{code}
 							else
 								option(value=MtCateg._id) #{code}
+			.form-group.row
+				label.col-3.col-sm-2.col-form-label(for="codeIpt") code
+				.col-9.col-sm-6
+					input#codeIpt.form-control(type="text", name="obj[code]", value=Mtrial.code)
+				.offset-3.col-9.col-form-label#codeDanger.text-danger(style="display:none") 请输入正确的编号
 			.form-group.row
 				label.col-3.col-sm-2.col-form-label(for="weightIpt") weight
 				.col-9.col-sm-6

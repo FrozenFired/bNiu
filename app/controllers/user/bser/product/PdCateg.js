@@ -10,15 +10,15 @@ exports.bsPdCategs = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const PdCategFirs = await PdCategDB.find({level: 1})
-		.populate({
-			path: "PdCategSons",
-			options: { sort: { weight: -1 }},
-			populate: {
+			.populate({
 				path: "PdCategSons",
-				options: { sort: { weight: -1 }}
-			}
-		})
-		.sort({"weight": -1})
+				options: { sort: { weight: -1 }},
+				populate: {
+					path: "PdCategSons",
+					options: { sort: { weight: -1 }}
+				}
+			})
+			.sort({"weight": -1})
 		return res.render("./user/bser/product/PdCateg/list", {title: "产品分类管理", PdCategFirs, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPdCategs,Error&error="+error);
@@ -30,8 +30,8 @@ exports.bsPdCateg = async(req, res) => {
 		const crUser = req.session.crUser;
 		const id = req.params.id;
 		const PdCateg = await PdCategDB.findOne({_id: id})
-		.populate("PdCategFar")
-		.populate("PdCategSons")
+			.populate("PdCategFar")
+			.populate("PdCategSons")
 		if(!PdCateg) return res.redirect("/error?info=不存在此分类");
 		return res.render("./user/bser/product/PdCateg/detail", {title: "产品分类详情", PdCateg, crUser});
 	} catch(error) {
@@ -140,8 +140,8 @@ exports.bsPdCategDel = async(req, res) => {
 		const crUser = req.session.crUser;
 		const id = req.params.id;
 		const PdCateg = await PdCategDB.findOne({_id: id})
-		.populate("PdCategFar")
-		.populate("PdCategSons")
+			.populate("PdCategFar")
+			.populate("PdCategSons")
 		if(!PdCateg) return res.redirect("/error?info=不存在此分类");
 
 		if(PdCateg.PdCategSons && PdCateg.PdCategSons.length > 0) return res.redirect("/error?info=请先删除子分类");
@@ -152,9 +152,9 @@ exports.bsPdCategDel = async(req, res) => {
 			PdCategFar.save();
 		}
 
-		PdspuDB.updateMany({PdCateg: id }, {PdCateg: null});
+		const PdspuUpdMany = await PdspuDB.updateMany({PdCateg: id }, {PdCateg: null});
 
-		const PdCategRm = await PdCategDB.deleteOne({_id: id});
+		const PdCategDel = await PdCategDB.deleteOne({_id: id});
 		return res.redirect("/bsPdCategs");
 	} catch(error) {
 		return res.redirect("/error?info=bsPdCategAdd,Error&error="+error);

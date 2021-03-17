@@ -10,7 +10,7 @@ exports.adUsers = async(req, res) => {
 	try{
 		const crAder = req.session.crAder;
 		const Users = await UserDB.find()
-		.populate('Firm')
+			.populate('Firm')
 		.sort({'shelf': -1, 'Firm': 1, 'role': 1})
 		return res.render('./ader/User/list', {title: '用户列表', crAder, Users });
 	} catch(error) {
@@ -110,7 +110,8 @@ exports.adUser = async(req, res) => {
 	try{
 		const crAder = req.session.crAder;
 		const id = req.params.id;
-		const User = await UserDB.findOne({'_id': id}).populate('Firm', 'code nome');
+		const User = await UserDB.findOne({'_id': id})
+			.populate('Firm', 'code nome');
 		if(!User) return res.redirect('/error?info=adUser,没有找到此账号');
 		return res.render('./ader/User/detail', {title: '用户详情', crAder, User});
 	} catch(error) {

@@ -26,9 +26,9 @@ const dbSchema = new Schema({
 
 dbSchema.pre('save', function(next) {
 	if(this.isNew) {
-		if(!this.level) this.level = 1;
 		if(!this.shelf) this.shelf = 1;
 		if(!this.weight) this.weight = 1;
+		if(!this.level) this.level = 1;
 		if(!this.isBottom) this.isBottom = -1;
 		if(this.level == 3) this.isBottom = 1;
 	}

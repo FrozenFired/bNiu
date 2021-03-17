@@ -4,8 +4,11 @@ const Size = require('../controllers/user/bser/attr/Size');
 const Color = require('../controllers/user/bser/attr/Color');
 
 const Ptern = require('../controllers/user/bser/pattern/Ptern');
+const PtFirm = require('../controllers/user/bser/pattern/PtFirm');
+const PtCateg = require('../controllers/user/bser/pattern/PtCateg');
 
 const MtCateg = require('../controllers/user/bser/material/MtCateg');
+const MtFirm = require('../controllers/user/bser/material/MtFirm');
 const Mtrial = require('../controllers/user/bser/material/Mtrial');
 
 const PdCateg = require('../controllers/user/bser/product/PdCateg');
@@ -50,7 +53,7 @@ module.exports = app => {
 	app.post('/bsPdSpusPhotosNew', bserIsLogin, postForm, MdFile.newFiles, PdspuAttr.bsPdSpusPhotosNew);
 	app.get('/bsPdSpusPhotosDel/:id', bserIsLogin, PdspuAttr.bsPdSpusPhotosDel);
 
-	app.post('/bsPdspuMtDosageUpdAjax', bserIsLogin, PdspuAttr.bsPdspuMtDosageUpdAjax);
+	app.post('/bsPdspuPdCostMtUpdAjax', bserIsLogin, PdspuAttr.bsPdspuPdCostMtUpdAjax);
 
 	/* ------------------------ PdNome ------------------------ */
 	app.get('/bsPdNomes', bserIsLogin, PdNome.bsPdNomes);
@@ -79,6 +82,12 @@ module.exports = app => {
 	app.post('/bsMtrialUpdAjax', bserIsLogin, Mtrial.bsMtrialUpdAjax);
 	app.post('/bsMtrialPhotoUpd', bserIsLogin, postForm, MdFile.newFiles, Mtrial.bsMtrialPhotoUpd);
 
+	/* ------------------------ MtFirm 供货商 ----------------------- */
+	app.get('/bsMtFirms', bserIsLogin, MtFirm.bsMtFirms);
+	app.get('/bsMtFirmAdd', bserIsLogin, MtFirm.bsMtFirmAdd);
+	app.post('/bsMtFirmNew', bserIsLogin, postForm, MtFirm.bsMtFirmNew);
+	app.post('/bsMtFirmUpdAjax', bserIsLogin, MtFirm.bsMtFirmUpdAjax);
+
 	/* ------------------------ MtCateg 材质分类 ----------------------- */
 	app.get('/bsMtCategs', bserIsLogin, MtCateg.bsMtCategs);
 	app.get('/bsMtCategAdd', bserIsLogin, MtCateg.bsMtCategAdd);
@@ -93,9 +102,26 @@ module.exports = app => {
 	/* ------------------------ Ptern ------------------------ */
 	app.get('/bsPterns', bserIsLogin, Ptern.bsPterns);
 	app.get('/bsPternAdd', bserIsLogin, Ptern.bsPternAdd);
+	app.get('/bsPtern/:id', bserIsLogin, Ptern.bsPtern);
+	app.get('/bsPternUp/:id', bserIsLogin, Ptern.bsPternUp);
 	app.post('/bsPternNew', bserIsLogin, postForm, Ptern.bsPternNew);
+	app.post('/bsPternUpd', bserIsLogin, postForm, Ptern.bsPternUpd);
 	app.post('/bsPternUpdAjax', bserIsLogin, Ptern.bsPternUpdAjax);
 	app.post('/bsPternPhotoUpd', bserIsLogin, postForm, MdFile.newFiles, Ptern.bsPternPhotoUpd);
+
+	/* ------------------------ PtFirm 印花厂 ----------------------- */
+	app.get('/bsPtFirms', bserIsLogin, PtFirm.bsPtFirms);
+	app.get('/bsPtFirmAdd', bserIsLogin, PtFirm.bsPtFirmAdd);
+	app.post('/bsPtFirmNew', bserIsLogin, postForm, PtFirm.bsPtFirmNew);
+	app.post('/bsPtFirmUpdAjax', bserIsLogin, PtFirm.bsPtFirmUpdAjax);
+	/* ------------------------ PtCateg 印花分类 ----------------------- */
+	app.get('/bsPtCategs', bserIsLogin, PtCateg.bsPtCategs);
+	app.get('/bsPtCategAdd', bserIsLogin, PtCateg.bsPtCategAdd);
+	app.get('/bsPtCateg/:id', bserIsLogin, PtCateg.bsPtCateg);
+	app.get('/bsPtCategUp/:id', bserIsLogin, PtCateg.bsPtCategUp);
+	app.get('/bsPtCategDel/:id', bserIsLogin, PtCateg.bsPtCategDel);
+	app.post('/bsPtCategNew', bserIsLogin, postForm, PtCateg.bsPtCategNew);
+	app.post('/bsPtCategUpd', bserIsLogin, postForm, PtCateg.bsPtCategUpd);
 	/* ============================================= pattern ============================================= */
 
 	/* ============================================= attr ============================================= */

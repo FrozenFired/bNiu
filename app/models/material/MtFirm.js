@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const ObjectId = Schema.Types.ObjectId;
+
 const colection = 'MtFirm';
 const dbSchema = new Schema({
 	// type: Number,			// 公司所属类型 Conf中有
@@ -20,12 +22,18 @@ const dbSchema = new Schema({
 	iban: String,
 	resp: String,// 负责人
 
+	shelf: Number,										// req
+	weight: Number,										// req
+	/* ------------------ 自动生成 ------------------ */
+	Firm: {type: ObjectId, ref: 'Firm'},
 	crtAt: Date,
 	updAt: Date,
 });
 dbSchema.pre('save', function(next) {	
 	if(this.isNew) {
-		tthis.crtAt = Date.now();
+		if(!this.shelf) this.shelf = 1;
+		if(!this.weight) this.weight = 1;
+		this.crtAt = Date.now();
 	}
 	this.updAt = Date.now();
 	next();

@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 const Float = require('mongoose-float').loadType(mongoose, 2);
 
-const colection = 'MtDosage';
+const colection = 'PdCostMt';
 const dbSchema = new Schema({
 	/* ------------------ Basic ------------------ */
 	Pdspu: {type: ObjectId, ref: 'Pdspu'},

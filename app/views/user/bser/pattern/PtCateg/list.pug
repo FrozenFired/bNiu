@@ -1,0 +1,40 @@
+extends ../../../aalayout/layout
+
+block content
+	.container
+		nav(aria-label="breadcrumb")
+			ol.breadcrumb
+				li.breadcrumb-item: a(href="/bser") Home
+				li.breadcrumb-item.active(aria-current="page") #{title}
+		.row.my-3
+			.col-12.text-right
+				a.btn.btn-warning(href="/bsPtCategAdd") +
+
+		- getUrl = "/bsPtCategUpdAjax";
+		each PtCategFir in PtCategFirs
+			- object = PtCategFir;
+			.row
+				.col-6.border.rounded.my-3.p-2
+					a.btn.border.border-primary.text-primary(href="/bsPtCateg/"+PtCategFir._id) #{PtCategFir.code}
+				if PtCategFir.isBottom == Conf.isBottom.n.num
+					-a;
+					.col-4.my-3
+						a.btn.border.border-primary.text-primary(href="/bsPtCategAdd?PtCategFar="+PtCategFir._id) +
+					.col-2.my-3.p-2.text-right 展开
+			each PtCategSec in PtCategFir.PtCategSons
+				- object = PtCategSec;
+				.row
+					.col-1
+					.col-6.border.rounded.my-3.p-2
+						a.btn.border.border-primary.text-primary(href="/bsPtCateg/"+PtCategSec._id) #{PtCategSec.code}
+					if PtCategSec.isBottom == Conf.isBottom.n.num
+						-a;
+						.col-3.my-3
+							a.btn.border.border-primary.text-primary(href="/bsPtCategAdd?PtCategFar="+PtCategSec._id) +
+						.col-2.my-3.p-2.text-right 展开
+				each PtCategThd in PtCategSec.PtCategSons
+					- object = PtCategThd;
+					.row
+						.col-2
+						.col-6.border.rounded.my-3.p-2
+							a.btn.border.border-primary.text-primary(href="/bsPtCateg/"+PtCategThd._id) #{PtCategThd.code}

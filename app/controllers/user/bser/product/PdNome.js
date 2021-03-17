@@ -64,8 +64,8 @@ exports.bsPdNomeUpdAjax = async(req, res) => {
 					首先要判断是否有子分类 如果没有则继续删除
 					再 把父分类中的此类删除 也要把相应的[材质]数据库中的分类变为不分类
 				*/
-				PdspuDB.updateMany({PdNome: id }, {PdNome: null});
-				const PdNomeRm = await PdNomeDB.deleteOne({_id: id});
+				const PdspuUpdMany = await PdspuDB.updateMany({PdNome: id }, {PdNome: null});
+				const PdNomeDel = await PdNomeDB.deleteOne({_id: id});
 				return res.json({status: 200})
 			}
 			const PdNomeSame = await PdNomeDB.findOne({code: val});

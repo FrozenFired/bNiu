@@ -20,7 +20,7 @@ const dbSchema = new Schema({
 
 	Mtrials: [{type: ObjectId, ref: 'Mtrial'}],
 	/* 用料: 根据尺寸 确定所有用料 比如 布料1 不料2 扣子1 腰带 要显示在商品详情页下*/
-	MtDosages: [{type: ObjectId, ref: 'MtDosage'}],
+	PdCostMts: [{type: ObjectId, ref: 'PdCostMt'}],
 
 	/* ------------------ Attr sku ------------------ */
 	Pterns: [{type: ObjectId, ref: 'Ptern'}],

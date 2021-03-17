@@ -13,7 +13,7 @@ const dbSchema = new Schema({
 	size: Number,
 
 	/* 用料: 根据尺寸 确定所有用料 比如 布料1 不料2 扣子1 腰带 , 订单查询比较方便*/
-	MtDosages: [{type: ObjectId, ref: 'MtDosage'}],
+	PdCostMts: [{type: ObjectId, ref: 'PdCostMt'}],
 
 	/* ------------------ 库存 ------------------ */
 	stock: Number,

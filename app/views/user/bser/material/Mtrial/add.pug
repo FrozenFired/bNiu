@@ -10,6 +10,14 @@ block content
 		hr
 		form.mt-5#objForm(method="post", action="/bsMtrialNew", enctype="multipart/form-data")
 			.form-group.row
+				label.col-3.col-sm-2.col-form-label(for="MtFirmIpt") MtFirm
+				.col-9.col-sm-6
+					select#MtFirmIpt.form-control(name="obj[MtFirm]", data-style="btn-info")
+						option(value="") 无
+						each MtFirm in MtFirms
+							- a;
+							option(value=MtFirm._id) #{MtFirm.code}
+			.form-group.row
 				label.col-3.col-sm-2.col-form-label(for="MtCategIpt") MtCateg
 				.col-9.col-sm-6
 					select#MtCategIpt.form-control(name="obj[MtCateg]", data-style="btn-info")

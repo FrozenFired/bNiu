@@ -63,8 +63,8 @@ exports.bsSizeSystUpdAjax = async(req, res) => {
 		let val = String(req.body.val).replace(/^\s*/g,"").toUpperCase();		// 数据的值
 		if(field == "code") {
 			if(!val) {
-				const SizeSystRm = await SizeSystDB.deleteOne({_id: id});
-				const SizesRm = await SizeDB.deleteMany({SizeSyst: id});
+				const SizeSystDel = await SizeSystDB.deleteOne({_id: id});
+				const SizesDelMany = await SizeDB.deleteMany({SizeSyst: id});
 				return res.json({status: 200})
 			} else {
 				const SizeSystSame = await SizeSystDB.findOne({code: val});
@@ -121,7 +121,7 @@ exports.bsSizeUpdAjax = async(req, res) => {
 		const field = req.body.field;	// 传输数据的类型
 		const val = String(req.body.val).replace(/^\s*/g,"").toUpperCase();		// 数据的值
 		if(!val) {
-			const SizeRm = await SizeDB.deleteOne({_id: id});
+			const SizeDel = await SizeDB.deleteOne({_id: id});
 		} else {
 			Size[field] = val;
 			const SizeSave = Size.save();

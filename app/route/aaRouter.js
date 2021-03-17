@@ -7,14 +7,14 @@ module.exports = app => {
 	// app.post('/loginUser', Index.loginUser);
 	app.post('/loginUser', async(req, res) => {
 		// console.log("/loginUser");
-		const User = require('../models/login/User');
+		const UserDB = require('../models/login/User');
 		const bcrypt = require('bcryptjs');
 		try {
 			const code = req.body.code.replace(/(\s*$)/g, "").replace( /^\s*/, '').toUpperCase();
 			let pwd = String(req.body.pwd).replace(/(\s*$)/g, "").replace( /^\s*/, '');
 			if(pwd.length == 0) pwd = " ";
 
-			const User = await User.findOne({code: code});
+			const User = await UserDB.findOne({code: code});
 			if(!User) return res.redirect("/error?info=loginUser,Error.!User");
 			
 			const isMatch = await bcrypt.compare(pwd, User.pwd);

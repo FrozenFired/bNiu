@@ -7,12 +7,21 @@ const Float = require('mongoose-float').loadType(mongoose, 2);
 const colection = 'Ptern';
 const dbSchema = new Schema({
 	code: String,
+
+	PtCateg: {type: ObjectId, ref: 'PtCateg'},
+	PtFirm: {type: ObjectId, ref: 'PtFirm'},
+
 	langs: [{
 		Lang: {type: ObjectId, ref: 'Lang'},
-		nome: String
+		nome: String,
+		desp: String,
 	}],
 	photo: String,
 
+	/* ------------------ 价格 ------------------ */
+	cost: Float,
+
+	shelf: Number,
 	weight: Number,
 	/* ------------------ 自动生成 ------------------ */
 	Firm: {type: ObjectId, ref: 'Firm'},

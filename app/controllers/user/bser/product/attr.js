@@ -15,7 +15,7 @@ const PternDB = require('../../../../models/pattern/Ptern');
 
 const MtrialDB = require('../../../../models/material/Mtrial');
 
-const MtDosageDB = require('../../../../models/material/MtDosage');
+const PdCostMtDB = require('../../../../models/product/PdCostMt');
 const PdskuDB = require('../../../../models/product/Pdsku');
 
 exports.bsPdspuSizeUp = async(req, res) => {
@@ -59,22 +59,22 @@ exports.bsPdspuSizeUpdAjax = async(req, res) => {
 				Pdspu.sizes.push(sizeNew);
 			}
 		}
-		// 在Pdspu下 为每个没有 size值的 MtDosages 添加一个含有 size = sizeNew 的 MtDosage;
+		// 在Pdspu下 为每个没有 size值的 PdCostMts 添加一个含有 size = sizeNew 的 PdCostMt;
 		const crtObjParam = {Pdspu: id, size: null};
 		const crtObj = {size: sizeNew};
-		const MtDosages = await MtDosageDB.find(crtObjParam);
-		for(let i=0; i<MtDosages.length; i++) {
-			const MtDosage = MtDosages[i];
-			const objMtDosage = new Object();
-			objMtDosage.Firm = MtDosage.Firm;
-			objMtDosage.Pdspu = MtDosage.Pdspu;
-			if(crtObj.size) {objMtDosage.size = crtObj.size; } else{objMtDosage.size = MtDosage.size; }
-			if(crtObj.Mtrial) {objMtDosage.Mtrial = crtObj.Mtrial; } else {objMtDosage.Mtrial = MtDosage.Mtrial; }
-			const MtDosageSame = await MtDosageDB.findOne({Pdspu: id, size: objMtDosage.size, Mtrial: objMtDosage.Mtrial});
-			if(!MtDosageSame) {
-				const _objMtDosage = new MtDosageDB(objMtDosage);
-				const MtDosageSave = await _objMtDosage.save();
-				Pdspu.MtDosages.push(MtDosageSave._id);
+		const PdCostMts = await PdCostMtDB.find(crtObjParam);
+		for(let i=0; i<PdCostMts.length; i++) {
+			const PdCostMt = PdCostMts[i];
+			const objPdCostMt = new Object();
+			objPdCostMt.Firm = PdCostMt.Firm;
+			objPdCostMt.Pdspu = PdCostMt.Pdspu;
+			if(crtObj.size) {objPdCostMt.size = crtObj.size; } else{objPdCostMt.size = PdCostMt.size; }
+			if(crtObj.Mtrial) {objPdCostMt.Mtrial = crtObj.Mtrial; } else {objPdCostMt.Mtrial = PdCostMt.Mtrial; }
+			const PdCostMtSame = await PdCostMtDB.findOne({Pdspu: id, size: objPdCostMt.size, Mtrial: objPdCostMt.Mtrial});
+			if(!PdCostMtSame) {
+				const _objPdCostMt = new PdCostMtDB(objPdCostMt);
+				const PdCostMtSave = await _objPdCostMt.save();
+				Pdspu.PdCostMts.push(PdCostMtSave._id);
 			}
 		}
 
@@ -104,13 +104,13 @@ exports.bsPdspuSizeDelAjax = async(req, res) => {
 			sizeDel = Pdspu.sizes[Pdspu.sizes.length-1]
 			Pdspu.sizes.pop();
 		}
-		// 删除Pdspu下 MtDosages中 所有包含 size: sizeDel MtDosages
+		// 删除Pdspu下 PdCostMts中 所有包含 size: sizeDel PdCostMts
 		const delObjParam = {Pdspu: id, size: sizeDel};
-		const MtDosages = await MtDosageDB.find(delObjParam, {_id: 1});
-		for(let i=0; i<MtDosages.length; i++) {
-			Pdspu.MtDosages.remove(MtDosages[i]._id);
+		const PdCostMts = await PdCostMtDB.find(delObjParam, {_id: 1});
+		for(let i=0; i<PdCostMts.length; i++) {
+			Pdspu.PdCostMts.remove(PdCostMts[i]._id);
 		}
-		const MtDosagesRm = await MtDosageDB.deleteMany(delObjParam);
+		const PdCostMtsDelMany = await PdCostMtDB.deleteMany(delObjParam);
 
 		const PdspuSave = await Pdspu.save()
 		return res.json({status: 200});
@@ -126,7 +126,8 @@ exports.bsPdspuColorUp = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const id = req.params.id;
-		const Pdspu = await PdspuDB.findOne({_id: id}).populate("Colors");
+		const Pdspu = await PdspuDB.findOne({_id: id})
+			.populate("Colors");
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
 		const Colors = await ColorDB.find();
 
@@ -166,7 +167,8 @@ exports.bsPdspuPternUp = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const id = req.params.id;
-		const Pdspu = await PdspuDB.findOne({_id: id}).populate("Pterns");
+		const Pdspu = await PdspuDB.findOne({_id: id})
+			.populate("Pterns");
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
 		const Pterns = await PternDB.find();
 		return res.render("./user/bser/product/Pdspu/update/pdPternsUp", {title: "产品印花更新", Pdspu, Pterns, crUser});
@@ -205,7 +207,8 @@ exports.bsPdspuMtrialUp = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const id = req.params.id;
-		const Pdspu = await PdspuDB.findOne({_id: id}).populate("Mtrials");
+		const Pdspu = await PdspuDB.findOne({_id: id})
+			.populate("Mtrials");
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
 		const Mtrials = await MtrialDB.find();
 		return res.render("./user/bser/product/Pdspu/update/pdMtrialsUp", {title: "产品印花更新", Pdspu, Mtrials, crUser});
@@ -219,41 +222,41 @@ exports.bsPdspuMtrialUpdAjax = async(req, res) => {
 		const PdspuId = req.query.PdspuId;
 		const MtrialId = req.query.MtrialId;
 		const option = parseInt(req.query.option);
-		const Pdspu = await PdspuDB.findOne({_id: PdspuId, Firm: crUser.Firm}, {Mtrials: 1, MtDosages: 1});
+		const Pdspu = await PdspuDB.findOne({_id: PdspuId, Firm: crUser.Firm}, {Mtrials: 1, PdCostMts: 1});
 		if(!Pdspu) return res.json({status: 500, message: "没有找到此印花图案"});
 
 		const isExist = Pdspu.Mtrials.includes(MtrialId);
 		if(option == 1) {
 			if(isExist == true) return res.json({status: 500, message: "已经有此印花图案, 不可重复添加, 请刷新重试"});
 			Pdspu.Mtrials.unshift(MtrialId);
-			// 在Pdspu下 为每个没有 Mtrial值的 MtDosages 添加一个含有 Mtrial = MtrialId 的 MtDosage;
+			// 在Pdspu下 为每个没有 Mtrial值的 PdCostMts 添加一个含有 Mtrial = MtrialId 的 PdCostMt;
 			const crtObjParam = {Pdspu: PdspuId, Mtrial: null};
 			const crtObj = {Mtrial: MtrialId};
-			const MtDosages = await MtDosageDB.find(crtObjParam);
-			for(let i=0; i<MtDosages.length; i++) {
-				const MtDosage = MtDosages[i];
-				const objMtDosage = new Object();
-				objMtDosage.Firm = MtDosage.Firm;
-				objMtDosage.Pdspu = MtDosage.Pdspu;
-				if(crtObj.size) {objMtDosage.size = crtObj.size; } else{objMtDosage.size = MtDosage.size; }
-				if(crtObj.Mtrial) {objMtDosage.Mtrial = crtObj.Mtrial; } else {objMtDosage.Mtrial = MtDosage.Mtrial; }
-				const MtDosageSame = await MtDosageDB.findOne({Pdspu: PdspuId, size: objMtDosage.size, Mtrial: objMtDosage.Mtrial});
-				if(!MtDosageSame) {
-					const _objMtDosage = new MtDosageDB(objMtDosage);
-					const MtDosageSave = await _objMtDosage.save();
-					Pdspu.MtDosages.push(MtDosageSave._id);
+			const PdCostMts = await PdCostMtDB.find(crtObjParam);
+			for(let i=0; i<PdCostMts.length; i++) {
+				const PdCostMt = PdCostMts[i];
+				const objPdCostMt = new Object();
+				objPdCostMt.Firm = PdCostMt.Firm;
+				objPdCostMt.Pdspu = PdCostMt.Pdspu;
+				if(crtObj.size) {objPdCostMt.size = crtObj.size; } else{objPdCostMt.size = PdCostMt.size; }
+				if(crtObj.Mtrial) {objPdCostMt.Mtrial = crtObj.Mtrial; } else {objPdCostMt.Mtrial = PdCostMt.Mtrial; }
+				const PdCostMtSame = await PdCostMtDB.findOne({Pdspu: PdspuId, size: objPdCostMt.size, Mtrial: objPdCostMt.Mtrial});
+				if(!PdCostMtSame) {
+					const _objPdCostMt = new PdCostMtDB(objPdCostMt);
+					const PdCostMtSave = await _objPdCostMt.save();
+					Pdspu.PdCostMts.push(PdCostMtSave._id);
 				}
 			}
 		} else {
 			if(isExist == false) return res.json({status: 500, message: "此印花图案已被删除, 请刷新查看"});
 			Pdspu.Mtrials.remove(MtrialId)
-			// 删除Pdspu下 MtDosages中 所有包含 Mtrial: MtrialId的 MtDosages
+			// 删除Pdspu下 PdCostMts中 所有包含 Mtrial: MtrialId的 PdCostMts
 			const delObjParam = {Pdspu: PdspuId, Mtrial: MtrialId};
-			const MtDosages = await MtDosageDB.find(delObjParam, {_id: 1});
-			for(let i=0; i<MtDosages.length; i++) {
-				Pdspu.MtDosages.remove(MtDosages[i]._id);
+			const PdCostMts = await PdCostMtDB.find(delObjParam, {_id: 1});
+			for(let i=0; i<PdCostMts.length; i++) {
+				Pdspu.PdCostMts.remove(PdCostMts[i]._id);
 			}
-			const MtDosagesRm = await MtDosageDB.deleteMany(delObjParam);
+			const PdCostMtsDelMany = await PdCostMtDB.deleteMany(delObjParam);
 		}
 		const PdspuSave = await Pdspu.save();
 		return res.json({status: 200});
@@ -301,48 +304,48 @@ exports.bsPdSpusPhotosDel = async(req, res) => {
 	}
 }
 
-/* 在Pdspu下 为每个没有 Mtrial值的 MtDosages 添加一个含有 Mtrial = MtrialId 的 MtDosage; */
-// const crtMtDosagePdspu_FuncProm = async(crtObjParam, crtObj) => {
+/* 在Pdspu下 为每个没有 Mtrial值的 PdCostMts 添加一个含有 Mtrial = MtrialId 的 PdCostMt; */
+// const crtPdCostMtPdspu_FuncProm = async(crtObjParam, crtObj) => {
 // 	try {
 // 		return new Promise(async(resolve, reject) => {
-// 			const newMtDosages = new Array();
-// 			const MtDosages = await MtDosageDB.find(crtObjParam);
+// 			const newPdCostMts = new Array();
+// 			const PdCostMts = await PdCostMtDB.find(crtObjParam);
 // 			console.log('s')
-// 			for(let i=0; i<MtDosages.length; i++) {
+// 			for(let i=0; i<PdCostMts.length; i++) {
 // 			console.log(i)
-// 				const MtDosage = MtDosages[i];
-// 				const objMtDosage = new Object();
-// 				objMtDosage.Firm = MtDosage.Firm;
-// 				objMtDosage.Pdspu = MtDosage.Pdspu;
+// 				const PdCostMt = PdCostMts[i];
+// 				const objPdCostMt = new Object();
+// 				objPdCostMt.Firm = PdCostMt.Firm;
+// 				objPdCostMt.Pdspu = PdCostMt.Pdspu;
 
 // 				if(crtObj.size) {
-// 					objMtDosage.size = crtObj.size;
+// 					objPdCostMt.size = crtObj.size;
 // 				} else{
-// 					objMtDosage.size = MtDosage.size;
+// 					objPdCostMt.size = PdCostMt.size;
 // 				}
 // 				if(crtObj.Mtrial) {
-// 					objMtDosage.Mtrial = crtObj.Mtrial;
+// 					objPdCostMt.Mtrial = crtObj.Mtrial;
 // 				} else {
-// 					objMtDosage.Mtrial = MtDosage.Mtrial;
+// 					objPdCostMt.Mtrial = PdCostMt.Mtrial;
 // 				}
-// 				const _objMtDosage = new MtDosageDB(objMtDosage);
-// 				const MtDosageSave = await _objMtDosage.save();
-// 				newMtDosages.push(MtDosageSave._id);
+// 				const _objPdCostMt = new PdCostMtDB(objPdCostMt);
+// 				const PdCostMtSave = await _objPdCostMt.save();
+// 				newPdCostMts.push(PdCostMtSave._id);
 // 			}
 // 			console.log('e')
-// 			resolve(newMtDosages);
+// 			resolve(newPdCostMts);
 // 		})
 // 	} catch(error) {
 // 		reject(error);
 // 	}
 // }
 
-exports.bsPdspuMtDosageUpdAjax = async(req, res) => {
-		// console.log("/bsPdspuMtDosageUpdAjax");
+exports.bsPdspuPdCostMtUpdAjax = async(req, res) => {
+		// console.log("/bsPdspuPdCostMtUpdAjax");
 	try{
 		const id = req.body.id;		// 所要更改的Color的id
-		const MtDosage = await MtDosageDB.findOne({'_id': id})
-		if(!MtDosage) return res.json({status: 500, message: "没有找到此颜色信息, 请刷新重试"});
+		const PdCostMt = await PdCostMtDB.findOne({'_id': id})
+		if(!PdCostMt) return res.json({status: 500, message: "没有找到此颜色信息, 请刷新重试"});
 
 		let val = req.body.val;		// 数据的值
 		const type = req.body.type;	// 传输数据的类型
@@ -356,9 +359,9 @@ exports.bsPdspuMtDosageUpdAjax = async(req, res) => {
 
 		const field = req.body.field;
 
-		MtDosage[field] = val;
+		PdCostMt[field] = val;
 
-		const MtDosageSave = MtDosage.save();
+		const PdCostMtSave = PdCostMt.save();
 		return res.json({status: 200})
 	} catch(error) {
 		console.log(error);

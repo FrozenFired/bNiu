@@ -6,6 +6,7 @@ const Conf = require('../../../../config/conf.js');
 const MdFile = require('../../../../middle/MdFile');
 const _ = require('underscore');
 
+const MtFirmDB = require('../../../../models/material/MtFirm');
 const MtCategDB = require('../../../../models/material/MtCateg');
 const MtrialDB = require('../../../../models/material/Mtrial');
 
@@ -14,8 +15,9 @@ exports.bsMtrials = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const Mtrials = await MtrialDB.find()
-		.populate("MtCateg")
-		.sort({"weight": -1});
+			.populate("MtCateg")
+			.populate("MtFirm")
+			.sort({"weight": -1});
 		return res.render("./user/bser/material/Mtrial/list", {title: "材料管理", Mtrials, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsMtrials,Error&error="+error);
@@ -27,9 +29,10 @@ exports.bsMtrialAdd = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const MtCategs = await MtCategDB.find({isBottom: 1})
-		.populate({path: "MtCategFar", populate: {path: "MtCategFar"}})
-		.sort({"weight": -1});
-		return res.render("./user/bser/material/Mtrial/add", {title: "添加新材料", crUser, MtCategs});
+			.populate({path: "MtCategFar", populate: {path: "MtCategFar"}})
+			.sort({"weight": -1});
+		const MtFirms = await MtFirmDB.find({})
+		return res.render("./user/bser/material/Mtrial/add", {title: "添加新材料", crUser, MtCategs, MtFirms});
 	} catch(error) {
 		return res.redirect("/error?info=bsMtrialAdd,Error&error="+error);
 	}
@@ -57,6 +60,12 @@ exports.bsMtrialNew = async(req, res) => {
 			if(!MtCateg) return res.redirect("/error?info=bsMtrialNew,没有此分类");
 		} else {
 			obj.MtCateg = null;
+		}
+		if(obj.MtFirm) {
+			const MtFirm = await MtFirmDB.findOne({_id: obj.MtFirm});
+			if(!MtFirm) return res.redirect("/error?info=bsMtrialNew,没有此分类");
+		} else {
+			obj.MtFirm = null;
 		}
 
 		const _object = new MtrialDB(obj);
@@ -88,6 +97,12 @@ exports.bsMtrialUpd = async(req, res) => {
 			if(!MtCateg) return res.redirect("/error?info=bsMtrialUpd,没有此分类");
 		} else {
 			obj.MtCateg = null;
+		}
+		if(obj.MtFirm) {
+			const MtFirm = await MtFirmDB.findOne({_id: obj.MtFirm});
+			if(!MtFirm) return res.redirect("/error?info=bsMtrialNew,没有此分类");
+		} else {
+			obj.MtFirm = null;
 		}
 
 		const _object = _.extend(Mtrial, obj);
@@ -154,13 +169,15 @@ exports.bsMtrialPhotoUpd = async(req, res) => {
 		return res.redirect("/error?info=bsMtrialPhotoUpd,Error&error="+error);
 	}
 }
+
 exports.bsMtrial = async(req, res) => {
 	// console.log("/bsMtrial");
 	try{
 		const crUser = req.session.crUser;
 		const id = req.params.id;
 		const Mtrial = await MtrialDB.findOne({_id: id})
-		.populate("MtCateg")
+			.populate("MtCateg")
+			.populate("MtFirm")
 		if(!Mtrial) return res.redirect("/error?info=不存在此分类");
 		return res.render("./user/bser/material/Mtrial/detail", {title: "材料详情", Mtrial, crUser});
 	} catch(error) {
@@ -176,10 +193,10 @@ exports.bsMtrialUp = async(req, res) => {
 		if(!Mtrial) return res.redirect("/error?info=不存在此分类");
 
 		const MtCategs = await MtCategDB.find({isBottom: 1})
-		.populate({path: "MtCategFar", populate: {path: "MtCategFar"}})
-		.sort({"weight": -1});
-
-		return res.render("./user/bser/material/Mtrial/update", {title: "材料更新", Mtrial, MtCategs, crUser});
+			.populate({path: "MtCategFar", populate: {path: "MtCategFar"}})
+			.sort({"weight": -1});
+		const MtFirms = await MtFirmDB.find({});
+		return res.render("./user/bser/material/Mtrial/update", {title: "材料更新", Mtrial, MtCategs, MtFirms, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsMtrialUp,Error&error="+error);
 	}

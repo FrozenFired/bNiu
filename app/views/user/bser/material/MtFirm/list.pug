@@ -1,0 +1,26 @@
+extends ../../../aalayout/layout
+
+block content
+	.container
+		nav(aria-label="breadcrumb")
+			ol.breadcrumb
+				li.breadcrumb-item: a(href="/bser") Home
+				li.breadcrumb-item.active(aria-current="page") #{title}
+		.row.my-3
+			.col-12.text-right
+				a.btn.btn-warning(href="/bsMtFirmAdd") +
+
+		- getUrl = "/bsMtFirmUpdAjax";
+		.row
+			each MtFirm in MtFirms
+				- object = MtFirm;
+				.col-6.col-lg-3.mt-4
+					.card.text-center(style="width: 100%;")
+						.card-body
+							.code
+								- field="code", value=MtFirm.code, subid="code", type="String";
+								include ../../../../aaPlugin/ajaxInputUpd
+							.weight.mt-3
+								- field="weight", value=MtFirm.weight, subid="weight", type="Int";
+								include ../../../../aaPlugin/ajaxInputUpd
+

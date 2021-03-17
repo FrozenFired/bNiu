@@ -13,8 +13,8 @@ const dbSchema = new Schema({
 	}],
 
 	level: Number,										// 分类层级
-	MtCategFar: {type: ObjectId, ref: 'MtCateg'},		// req
-	MtCategSons: [{type: ObjectId, ref: 'MtCateg'}],
+	PtCategFar: {type: ObjectId, ref: 'PtCateg'},		// req
+	PtCategSons: [{type: ObjectId, ref: 'PtCateg'}],
 	isBottom: Number,									// 是否是最底层分类 req
 
 	shelf: Number,										// req

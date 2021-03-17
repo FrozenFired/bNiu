@@ -13,7 +13,7 @@ const SizeSystDB = require('../../../../models/attr/SizeSyst');
 
 const SizeDB = require('../../../../models/attr/Size');
 
-const MtDosageDB = require('../../../../models/material/MtDosage');
+const PdCostMtDB = require('../../../../models/product/PdCostMt');
 const PdskuDB = require('../../../../models/product/Pdsku');
 
 exports.bsPdspus = async(req, res) => {
@@ -32,8 +32,8 @@ exports.bsPdspuAdd = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const PdCategs = await PdCategDB.find({isBottom: 1})
-		.populate({path: "PdCategFar", populate: {path: "PdCategFar"}})
-		.sort({"weight": -1})
+			.populate({path: "PdCategFar", populate: {path: "PdCategFar"}})
+			.sort({"weight": -1})
 		const PdNomes = await PdNomeDB.find().sort({"weight": -1});
 		const SizeSysts = await SizeSystDB.find().sort({"weight": -1});
 		return res.render("./user/bser/product/Pdspu/add", {title: "添加新产品", PdCategs, PdNomes, SizeSysts, crUser});
@@ -78,12 +78,12 @@ exports.bsPdspuNew = async(req, res) => {
 		if(PdspuSame) return res.redirect("/error?info=bsPdspuNew,PdspuSame");
 
 		const _object = new PdspuDB(obj);
-		// 自动添加 MtDosage
-		const objMtDosage = new Object();
-		objMtDosage.Firm = crUser.Firm;
-		objMtDosage.Pdspu = _object._id;
-		const _objMtDosage = new MtDosageDB(objMtDosage);
-		_object.MtDosages.push(_objMtDosage._id);
+		// 自动添加 PdCostMt
+		const objPdCostMt = new Object();
+		objPdCostMt.Firm = crUser.Firm;
+		objPdCostMt.Pdspu = _object._id;
+		const _objPdCostMt = new PdCostMtDB(objPdCostMt);
+		_object.PdCostMts.push(_objPdCostMt._id);
 		// 自动添加 Pdsku
 		const objPdsku = new Object();
 		objPdsku.Firm = crUser.Firm;
@@ -92,7 +92,7 @@ exports.bsPdspuNew = async(req, res) => {
 		_object.Pdskus.push(_objPdsku._id);
 
 		const PdspuSave = await _object.save();
-		const MtDosageSave = await _objMtDosage.save();
+		const PdCostMtSave = await _objPdCostMt.save();
 		const PdskuSave = await _objPdsku.save();
 
 		return res.redirect("/bsPdspus");
@@ -205,20 +205,20 @@ exports.bsPdspu = async(req, res) => {
 		const crUser = req.session.crUser;
 		const id = req.params.id;
 		const Pdspu = await PdspuDB.findOne({_id: id})
-		.populate("PdCateg")
-		.populate("PdNome")
-		.populate("Mtrials")
-		.populate("SizeSyst")
-		.populate("Colors")
-		.populate("Pterns")
-		.populate("MtDosages")
-		.populate("Pdskus")
+			.populate("PdCateg")
+			.populate("PdNome")
+			.populate("Mtrials")
+			.populate("SizeSyst")
+			.populate("Colors")
+			.populate("Pterns")
+			.populate("PdCostMts")
+			.populate("Pdskus")
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
 
 		const Sizes = await SizeDB.find({SizeSyst: Pdspu.SizeSyst._id});
 
-		// const MtDosages = await MtDosageDB.find({Pdspu: id, Mtrial: null});
-		// console.log(MtDosages)
+		// const PdCostMts = await PdCostMtDB.find({Pdspu: id, Mtrial: null});
+		// console.log(PdCostMts)
 
 		return res.render("./user/bser/product/Pdspu/detail", {title: "产品详情", Pdspu, Sizes, crUser});
 	} catch(error) {
@@ -234,8 +234,8 @@ exports.bsPdspuUp = async(req, res) => {
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
 
 		const PdCategs = await PdCategDB.find({isBottom: 1})
-		.populate({path: "PdCategFar", populate: {path: "PdCategFar"}})
-		.sort({"weight": -1})
+			.populate({path: "PdCategFar", populate: {path: "PdCategFar"}})
+			.sort({"weight": -1})
 		const PdNomes = await PdNomeDB.find().sort({"weight": -1});
 		const SizeSysts = await SizeSystDB.find().sort({"weight": -1});
 		return res.render("./user/bser/product/Pdspu/update/basicUp", {title: "产品更新", Pdspu, PdCategs, PdNomes, SizeSysts, crUser});

@@ -6,9 +6,10 @@ const Float = require('mongoose-float').loadType(mongoose, 2);
 
 const colection = 'Mtrial';
 const dbSchema = new Schema({
-	/* ------------------ 创建时 ------------------ */
+	code: String,
+
 	MtCateg: {type: ObjectId, ref: 'MtCateg'},
-	code: String,	// 类型下唯一
+	MtFirm: {type: ObjectId, ref: 'MtFirm'},
 
 	langs: [{
 		Lang: {type: ObjectId, ref: 'Lang'},
@@ -18,7 +19,7 @@ const dbSchema = new Schema({
 	photo: String,
 
 	/* ------------------ 价格 ------------------ */
-	cost: Float,	// 默认采购价
+	cost: Float,
 
 	shelf: Number,
 	weight: Number,

@@ -132,13 +132,13 @@ exports.adFirmDel = async(req, res)=> {
 	// console.log("/adFirmDel");
 	try{
 		const id = req.params.id;
-		const FirmDel = await FirmDB.findOne({_id: id});
-		if(!FirmDel) return res.redirect('/error?info=adFirmDel,这个公司已经被删除');
+		const FirmExist = await FirmDB.findOne({_id: id});
+		if(!FirmExist) return res.redirect('/error?info=adFirmDel,这个公司已经被删除');
 		
 		const existUsers = await UserDB.countDocuments({Firm: id});
 		if(existUsers > 0) return res.redirect('/error?info=adFirmDel,此公司中还有员工，请先删除此公司的员工');
 
-		const FirmRm = await FirmDB.deleteOne({_id: id});
+		const FirmDel = await FirmDB.deleteOne({_id: id});
 		return res.redirect("/adFirms");
 	} catch(error) {
 		return res.redirect('/error?info=adFirmDel,Error&error='+error);
@@ -155,7 +155,7 @@ exports.adFirmDelAjax = async(req, res) => {
 		const existUsers = await UserDB.countDocuments({Firm: id});
 		if(existUsers > 0) return res.json({status: 500, message: "此公司中还有员工，请先删除此公司的员工. adFirmDelAjax"});
 
-		const FirmRm = FirmDB.deleteOne({_id: id});
+		const FirmDel = FirmDB.deleteOne({_id: id});
 		return res.json({status: 200});
 	} catch(error) {
 		return res.json({status: 400, message: '公司删除错误, 请联系管理员。 错误码: adFirmDelAjax'});

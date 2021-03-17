@@ -142,7 +142,7 @@ block content
 				- let widthTr = 100/(Pdspu.sizes.length+1);
 
 				- type ="Float";
-				- getUrl = "/bsPdspuMtDosageUpdAjax"
+				- getUrl = "/bsPdspuPdCostMtUpdAjax"
 				- field="dosage", subid='dosage';
 				table.table.table-hover.table-bordered.text-center
 					thead
@@ -165,10 +165,10 @@ block content
 									- a;
 									td
 										- let Dosage = {};
-										each MtDosage in Pdspu.MtDosages
-											if MtDosage.size == size && String(MtDosage.Mtrial) == String(Mtrial._id)
-												- Dosage = MtDosage;
+										each PdCostMt in Pdspu.PdCostMts
+											if PdCostMt.size == size && String(PdCostMt.Mtrial) == String(Mtrial._id)
+												- Dosage = PdCostMt;
 												- break;
 										- object=Dosage, value=Dosage.dosage;
-										include ../../../aaPlugin/ajaxInputUpd
+										include ../../../../aaPlugin/ajaxInputUpd
 		div(style="height: 200px")

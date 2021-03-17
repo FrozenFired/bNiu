@@ -18,7 +18,13 @@ block content
 					img.card-img-top.border-bottom.js-click-imgEnlarge(id="img-"+Mtrial._id+"-photo-sub", src=Mtrial.photo, alt="Mtrial Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
 					h5.card-title 编号: #{Mtrial.code}
 					.card-body
-						.far
+						.MtFirm
+							if Mtrial.MtFirm
+								- MtFirm = Mtrial.MtFirm;
+								span.mr-3 供货商: #{MtFirm.code}
+							else
+								span 未选择供货商
+						.MtCateg
 							if Mtrial.MtCateg
 								- MtCateg = Mtrial.MtCateg;
 								span.mr-3 分类: #{MtCateg.code}

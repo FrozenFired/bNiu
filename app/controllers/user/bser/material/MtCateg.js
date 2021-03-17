@@ -10,15 +10,15 @@ exports.bsMtCategs = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const MtCategFirs = await MtCategDB.find({level: 1})
-		.populate({
-			path: "MtCategSons",
-			options: { sort: { weight: -1 }},
-			populate: {
+			.populate({
 				path: "MtCategSons",
-				options: { sort: { weight: -1 }}
-			}
-		})
-		.sort({"weight": -1})
+				options: { sort: { weight: -1 }},
+				populate: {
+					path: "MtCategSons",
+					options: { sort: { weight: -1 }}
+				}
+			})
+			.sort({"weight": -1})
 		return res.render("./user/bser/material/MtCateg/list", {title: "材料分类管理", MtCategFirs, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsMtCategs,Error&error="+error);
@@ -30,8 +30,8 @@ exports.bsMtCateg = async(req, res) => {
 		const crUser = req.session.crUser;
 		const id = req.params.id;
 		const MtCateg = await MtCategDB.findOne({_id: id})
-		.populate("MtCategFar")
-		.populate("MtCategSons")
+			.populate("MtCategFar")
+			.populate("MtCategSons")
 		if(!MtCateg) return res.redirect("/error?info=不存在此分类");
 		return res.render("./user/bser/material/MtCateg/detail", {title: "材料分类详情", MtCateg, crUser});
 	} catch(error) {
@@ -140,8 +140,8 @@ exports.bsMtCategDel = async(req, res) => {
 		const crUser = req.session.crUser;
 		const id = req.params.id;
 		const MtCateg = await MtCategDB.findOne({_id: id})
-		.populate("MtCategFar")
-		.populate("MtCategSons")
+			.populate("MtCategFar")
+			.populate("MtCategSons")
 		if(!MtCateg) return res.redirect("/error?info=不存在此分类");
 
 		if(MtCateg.MtCategSons && MtCateg.MtCategSons.length > 0) return res.redirect("/error?info=请先删除子分类");
@@ -152,9 +152,9 @@ exports.bsMtCategDel = async(req, res) => {
 			MtCategFar.save();
 		}
 
-		MtrialDB.updateMany({MtCateg: id }, {MtCateg: null});
+		const MtrialUpdMany = await MtrialDB.updateMany({MtCateg: id }, {MtCateg: null});
 
-		const MtCategRm = await MtCategDB.deleteOne({_id: id});
+		const MtCategDel = await MtCategDB.deleteOne({_id: id});
 		return res.redirect("/bsMtCategs");
 	} catch(error) {
 		return res.redirect("/error?info=bsMtCategAdd,Error&error="+error);

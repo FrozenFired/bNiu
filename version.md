@@ -1,4 +1,6 @@
-0.0.75	调整文件结构
+0.0.8	完成 MtFirm PtFirm PtCateg
+0.0.75	26cd54805228f88329124e6ba8daf44d0e4dcb49
+		调整文件结构
 0.0.71	6fe4ea39a2e580f9ab91a795a24dc94e9056ccef
 		attr/Pattern -> pattern/Ptern; SizeStandard -> SizeSyst
 		建立 PtCateg PtFirm MtFirm

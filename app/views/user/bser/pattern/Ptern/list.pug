@@ -40,7 +40,20 @@ block content
 							.code
 								- field="code", value=Ptern.code, subid="code", type="String";
 								include ../../../../aaPlugin/ajaxInputUpd
+							.PtFirm
+								if Ptern.PtFirm
+									- PtFirm = Ptern.PtFirm;
+									span.mr-3 印花厂: #{PtFirm.code}
+								else
+									span 未选择印花厂
+							.PtCateg.mt-2
+								if Ptern.PtCateg
+									- PtCateg = Ptern.PtCateg;
+									span #{PtCateg.code}
+								else
+									span 未分类
 							.weight.mt-3
 								- field="weight", value=Ptern.weight, subid="weight", type="Int";
 								include ../../../../aaPlugin/ajaxInputUpd
-
+							.text-right.mt-3
+								a(href="/bsPtern/"+Ptern._id) [查看]

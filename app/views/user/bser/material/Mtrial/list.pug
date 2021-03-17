@@ -40,6 +40,12 @@ block content
 							.code
 								- field="code", value=Mtrial.code, subid="code", type="String", fieldDesp="编号:";
 								include ../../../../aaPlugin/ajaxInputUpd
+							.MtFirm
+								if Mtrial.MtFirm
+									- MtFirm = Mtrial.MtFirm;
+									span.mr-3 供货商: #{MtFirm.code}
+								else
+									span 未选择供货商
 							.MtCateg.mt-2
 								if Mtrial.MtCateg
 									- MtCateg = Mtrial.MtCateg;

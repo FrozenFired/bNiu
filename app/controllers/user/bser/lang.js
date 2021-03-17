@@ -12,7 +12,8 @@ exports.bsLangs = async(req, res) => {
 	// console.log("/bsLangs");
 	try{
 		const crUser = req.session.crUser;
-		const Langs = await LangDB.find().populate("langs.Lang");
+		const Langs = await LangDB.find()
+			.populate("langs.Lang");
 		// Langs.forEach((item) => {console.log(item); });
 		return res.render("./user/bser/lang/list", {title: "语言管理", Langs, crUser});
 	} catch(error) {

@@ -6,13 +6,18 @@ const Conf = require('../../../../config/conf.js');
 const MdFile = require('../../../../middle/MdFile');
 const _ = require('underscore');
 
+const PtFirmDB = require('../../../../models/pattern/PtFirm');
+const PtCategDB = require('../../../../models/pattern/PtCateg');
 const PternDB = require('../../../../models/pattern/Ptern');
 
 exports.bsPterns = async(req, res) => {
 	// console.log("/bsPterns");
 	try{
 		const crUser = req.session.crUser;
-		const Pterns = await PternDB.find().sort({"weight": -1});
+		const Pterns = await PternDB.find()
+			.populate("PtCateg")
+			.populate("PtFirm")
+			.sort({"weight": -1});
 		return res.render("./user/bser/pattern/Ptern/list", {title: "印花管理", Pterns, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPterns,Error&error="+error);
@@ -23,7 +28,11 @@ exports.bsPternAdd = async(req, res) => {
 	// console.log("/bsPternAdd");
 	try{
 		const crUser = req.session.crUser;
-		return res.render("./user/bser/pattern/Ptern/add", {title: "添加新印花", crUser});
+		const PtCategs = await PtCategDB.find({isBottom: 1})
+			.populate({path: "PtCategFar", populate: {path: "PtCategFar"}})
+			.sort({"weight": -1});
+		const PtFirms = await PtFirmDB.find({})
+		return res.render("./user/bser/pattern/Ptern/add", {title: "添加新印花", crUser, PtCategs, PtFirms});
 	} catch(error) {
 		return res.redirect("/error?info=bsPternAdd,Error&error="+error);
 	}
@@ -37,9 +46,27 @@ exports.bsPternNew = async(req, res) => {
 		obj.Firm = crUser.Firm;
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 		if(obj.code.length < 1) return res.redirect("/error?info=bsPternNew,objCode");
+		if(obj.cost) {
+			obj.cost = parseFloat(obj.cost);
+			if(isNaN(obj.cost)) return res.redirect("/error?info=bsPternNew,采购价格格式不对, 可以不输入");
+		}
 		obj.photo = Conf.photo.Ptern.def;
+
 		const PternSame = await PternDB.findOne({code: obj.code});
 		if(PternSame) return res.redirect("/error?info=bsPternNew,PternSame");
+
+		if(obj.PtCateg) {
+			const PtCateg = await PtCategDB.findOne({_id: obj.PtCateg});
+			if(!PtCateg) return res.redirect("/error?info=bsPternNew,没有此分类");
+		} else {
+			obj.PtCateg = null;
+		}
+		if(obj.PtFirm) {
+			const PtFirm = await PtFirmDB.findOne({_id: obj.PtFirm});
+			if(!PtFirm) return res.redirect("/error?info=bsPternNew,没有此分类");
+		} else {
+			obj.PtFirm = null;
+		}
 
 		const _object = new PternDB(obj);
 		const PternSave = await _object.save();
@@ -48,6 +75,44 @@ exports.bsPternNew = async(req, res) => {
 		return res.redirect("/error?info=bsPternNew,Error&error="+error);
 	}
 }
+exports.bsPternUpd = async(req, res) => {
+	// console.log("/bsPternUpd");
+	try{
+		const crUser = req.session.crUser;
+		const obj = req.body.obj;
+		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
+		if(obj.code.length < 1) return res.redirect("/error?info=bsPternUpd,objCode");
+		if(obj.cost) {
+			obj.cost = parseFloat(obj.cost);
+			if(isNaN(obj.cost)) return res.redirect("/error?info=bsPternUpd,请输入正确采购价, 可以不输入");
+		}
+		const Ptern = await PternDB.findOne({_id: obj._id});
+		if(!Ptern) return res.redirect("/error?info=bsPternUpd,没有找到此材料信息");
+
+		const PternSame = await PternDB.findOne({_id: {"$ne": obj._id}, code: obj.code});
+		if(PternSame) return res.redirect("/error?info=bsPternUpd,有相同的编号");
+
+		if(obj.PtCateg) {
+			const PtCateg = await PtCategDB.findOne({_id: obj.PtCateg});
+			if(!PtCateg) return res.redirect("/error?info=bsPternUpd,没有此分类");
+		} else {
+			obj.PtCateg = null;
+		}
+		if(obj.PtFirm) {
+			const PtFirm = await PtFirmDB.findOne({_id: obj.PtFirm});
+			if(!PtFirm) return res.redirect("/error?info=bsPternNew,没有此分类");
+		} else {
+			obj.PtFirm = null;
+		}
+
+		const _object = _.extend(Ptern, obj);
+		const PternSave = await _object.save();
+		return res.redirect("/bsPtern/"+PternSave._id);
+	} catch(error) {
+		return res.redirect("/error?info=bsPternUpd,Error&error="+error);
+	}
+}
+
 exports.bsPternUpdAjax = async(req, res) => {
 	// console.log("/bsPternUpdAjax");
 	try{
@@ -105,27 +170,34 @@ exports.bsPternPhotoUpd = async(req, res) => {
 	}
 }
 
-
-exports.bsPternNewAjax = async(req, res) => {
-	// console.log("/bsPternNewAjax");
+exports.bsPtern = async(req, res) => {
+	// console.log("/bsPtern");
 	try{
 		const crUser = req.session.crUser;
-
-		const code = req.body.code.replace(/^\s*/g,"").toUpperCase();
-		if(!code) return res.json({status: 500, message: "请输入印花标识, 请刷新重试"});
-
-		const PternSame = await PternDB.findOne({code: code});
-		if(PternSame) return res.json({status: 500, message: "已经存在, 请刷新重试"});
-
-		const obj = new Object();
-		obj.Firm = crUser.Firm;
-		obj.code = code;
-
-		const _object = new PternDB(obj);
-		const PternSave = await _object.save();
-		return res.json({status: 200})
+		const id = req.params.id;
+		const Ptern = await PternDB.findOne({_id: id})
+			.populate("PtCateg")
+			.populate("PtFirm")
+		if(!Ptern) return res.redirect("/error?info=不存在此分类");
+		return res.render("./user/bser/pattern/Ptern/detail", {title: "材料详情", Ptern, crUser});
 	} catch(error) {
-		console.log(error);
-		return res.json({status: 500, message: error});
+		return res.redirect("/error?info=bsPtern,Error&error="+error);
+	}
+}
+exports.bsPternUp = async(req, res) => {
+	// console.log("/bsPternUp");
+	try{
+		const crUser = req.session.crUser;
+		const id = req.params.id;
+		const Ptern = await PternDB.findOne({_id: id});
+		if(!Ptern) return res.redirect("/error?info=不存在此分类");
+
+		const PtCategs = await PtCategDB.find({isBottom: 1})
+			.populate({path: "PtCategFar", populate: {path: "PtCategFar"}})
+			.sort({"weight": -1});
+		const PtFirms = await PtFirmDB.find({});
+		return res.render("./user/bser/pattern/Ptern/update", {title: "材料更新", Ptern, PtCategs, PtFirms, crUser});
+	} catch(error) {
+		return res.redirect("/error?info=bsPternUp,Error&error="+error);
 	}
 }
