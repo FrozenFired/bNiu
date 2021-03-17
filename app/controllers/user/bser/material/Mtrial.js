@@ -32,9 +32,28 @@ exports.bsMtrialAdd = async(req, res) => {
 			.populate({path: "MtCategFar", populate: {path: "MtCategFar"}})
 			.sort({"weight": -1});
 		const MtFirms = await MtFirmDB.find({})
+		if(!MtFirms || MtFirms.length < 1) return res.redirect("./error?info=请先添加材料供应商");
 		return res.render("./user/bser/material/Mtrial/add", {title: "添加新材料", crUser, MtCategs, MtFirms});
 	} catch(error) {
 		return res.redirect("/error?info=bsMtrialAdd,Error&error="+error);
+	}
+}
+exports.bsMtrialUp = async(req, res) => {
+	// console.log("/bsMtrialUp");
+	try{
+		const crUser = req.session.crUser;
+		const id = req.params.id;
+		const Mtrial = await MtrialDB.findOne({_id: id});
+		if(!Mtrial) return res.redirect("/error?info=不存在此分类");
+
+		const MtCategs = await MtCategDB.find({isBottom: 1})
+			.populate({path: "MtCategFar", populate: {path: "MtCategFar"}})
+			.sort({"weight": -1});
+		const MtFirms = await MtFirmDB.find({});
+		if(!MtFirms || MtFirms.length < 1) return res.redirect("./error?info=请先添加材料供应商");
+		return res.render("./user/bser/material/Mtrial/update", {title: "材料更新", Mtrial, MtCategs, MtFirms, crUser});
+	} catch(error) {
+		return res.redirect("/error?info=bsMtrialUp,Error&error="+error);
 	}
 }
 
@@ -55,17 +74,15 @@ exports.bsMtrialNew = async(req, res) => {
 		const MtrialSame = await MtrialDB.findOne({code: obj.code});
 		if(MtrialSame) return res.redirect("/error?info=bsMtrialNew,编号相同");
 
+		if(!obj.MtFirm) return res.redirect("/error?info=bsMtrialNew,请选择供应商");
+		const MtFirm = await MtFirmDB.findOne({_id: obj.MtFirm});
+		if(!MtFirm) return res.redirect("/error?info=bsMtrialNew,没有此供应商");
+
 		if(obj.MtCateg) {
 			const MtCateg = await MtCategDB.findOne({_id: obj.MtCateg});
 			if(!MtCateg) return res.redirect("/error?info=bsMtrialNew,没有此分类");
 		} else {
 			obj.MtCateg = null;
-		}
-		if(obj.MtFirm) {
-			const MtFirm = await MtFirmDB.findOne({_id: obj.MtFirm});
-			if(!MtFirm) return res.redirect("/error?info=bsMtrialNew,没有此分类");
-		} else {
-			obj.MtFirm = null;
 		}
 
 		const _object = new MtrialDB(obj);
@@ -92,17 +109,15 @@ exports.bsMtrialUpd = async(req, res) => {
 		const MtrialSame = await MtrialDB.findOne({_id: {"$ne": obj._id}, code: obj.code});
 		if(MtrialSame) return res.redirect("/error?info=bsMtrialUpd,有相同的编号");
 
+		if(!obj.MtFirm) return res.redirect("/error?info=bsMtrialUpd,请选择供应商");
+		const MtFirm = await MtFirmDB.findOne({_id: obj.MtFirm});
+		if(!MtFirm) return res.redirect("/error?info=bsMtrialUpd,没有此供应商");
+
 		if(obj.MtCateg) {
 			const MtCateg = await MtCategDB.findOne({_id: obj.MtCateg});
 			if(!MtCateg) return res.redirect("/error?info=bsMtrialUpd,没有此分类");
 		} else {
 			obj.MtCateg = null;
-		}
-		if(obj.MtFirm) {
-			const MtFirm = await MtFirmDB.findOne({_id: obj.MtFirm});
-			if(!MtFirm) return res.redirect("/error?info=bsMtrialNew,没有此分类");
-		} else {
-			obj.MtFirm = null;
 		}
 
 		const _object = _.extend(Mtrial, obj);
@@ -178,22 +193,5 @@ exports.bsMtrial = async(req, res) => {
 		return res.render("./user/bser/material/Mtrial/detail", {title: "材料详情", Mtrial, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsMtrial,Error&error="+error);
-	}
-}
-exports.bsMtrialUp = async(req, res) => {
-	// console.log("/bsMtrialUp");
-	try{
-		const crUser = req.session.crUser;
-		const id = req.params.id;
-		const Mtrial = await MtrialDB.findOne({_id: id});
-		if(!Mtrial) return res.redirect("/error?info=不存在此分类");
-
-		const MtCategs = await MtCategDB.find({isBottom: 1})
-			.populate({path: "MtCategFar", populate: {path: "MtCategFar"}})
-			.sort({"weight": -1});
-		const MtFirms = await MtFirmDB.find({});
-		return res.render("./user/bser/material/Mtrial/update", {title: "材料更新", Mtrial, MtCategs, MtFirms, crUser});
-	} catch(error) {
-		return res.redirect("/error?info=bsMtrialUp,Error&error="+error);
 	}
 }

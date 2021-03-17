@@ -71,8 +71,12 @@ exports.bsPdspuNew = async(req, res) => {
 		} else {
 			obj.PdNome = null;
 		}
-		const SizeSyst = await SizeSystDB.findOne({_id: obj.SizeSyst});
-		if(!SizeSyst) return res.redirect("/error?info=bsPdspuNew,没有此尺寸标准");
+		if(obj.SizeSyst) {
+			const SizeSyst = await SizeSystDB.findOne({_id: obj.SizeSyst});
+			if(!SizeSyst) return res.redirect("/error?info=bsPdspuNew,没有此尺寸标准");
+		} else {
+			obj.PdNome = null;
+		}
 
 		const PdspuSame = await PdspuDB.findOne({code: obj.code});
 		if(PdspuSame) return res.redirect("/error?info=bsPdspuNew,PdspuSame");
@@ -113,7 +117,7 @@ exports.bsPdspuUpd = async(req, res) => {
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 		if(obj.code.length < 3) return res.redirect("/error?info=bsPdspuUpd,objCode");
 		obj.price = parseFloat(obj.price);
-		if(isNaN(obj.price)) return res.redirect("/error?info=bsPdspuNew,请输入正确售价");
+		if(isNaN(obj.price)) return res.redirect("/error?info=bsPdspuUpd,请输入正确售价");
 		if(obj.cost) {
 			obj.cost = parseFloat(obj.cost);
 			if(isNaN(obj.cost)) return res.redirect("/error?info=bsPdspuUpd,请输入正确采购价, 可以不输入");
@@ -130,8 +134,12 @@ exports.bsPdspuUpd = async(req, res) => {
 		} else {
 			obj.PdNome = null;
 		}
-		const SizeSyst = await SizeSystDB.findOne({_id: obj.SizeSyst});
-		if(!SizeSyst) return res.redirect("/error?info=bsPdspuNew,没有此尺寸标准");
+		if(obj.SizeSyst) {
+			const SizeSyst = await SizeSystDB.findOne({_id: obj.SizeSyst});
+			if(!SizeSyst) return res.redirect("/error?info=bsPdspuUpd,没有此尺寸标准");
+		} else {
+			obj.PdNome = null;
+		}
 
 		const PdspuSame = await PdspuDB.findOne({_id: {"$ne": obj._id}, code: obj.code});
 		if(PdspuSame) return res.redirect("/error?info=bsPdspuUpd,有相同的编号");
@@ -212,13 +220,16 @@ exports.bsPdspu = async(req, res) => {
 			.populate("Pdskus")
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
 
-		const Sizes = await SizeDB.find({SizeSyst: Pdspu.SizeSyst._id});
+		let SizeSystId = null;
+		if(Pdspu.SizeSyst) SizeSystId = Pdspu.SizeSyst._id;
+		const Sizes = await SizeDB.find({SizeSyst: SizeSystId});
 
 		// const PdCostMts = await PdCostMtDB.find({Pdspu: id, Mtrial: null});
 		// console.log(PdCostMts)
 
 		return res.render("./user/bser/product/Pdspu/detail", {title: "产品详情", Pdspu, Sizes, crUser});
 	} catch(error) {
+		console.log(error)
 		return res.redirect("/error?info=bsPdspu,Error&error="+error);
 	}
 }

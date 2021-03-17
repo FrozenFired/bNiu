@@ -15,7 +15,6 @@ block content
 				label.col-3.col-sm-2.col-form-label(for="MtFirmIpt") MtFirm
 				.col-9.col-sm-6
 					select#MtFirmIpt.form-control(name="obj[MtFirm]", data-style="btn-info")
-						option(value="") 无
 						each MtFirm in MtFirms
 							if String(Mtrial.MtFirm) == String(MtFirm._id)
 								-a;

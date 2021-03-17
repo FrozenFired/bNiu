@@ -8,6 +8,7 @@ block content
 				li.breadcrumb-item.active(aria-current="page") #{title}
 		.row.my-3
 			.col-12.text-right
+				button.btn.btn-danger.jsDel-btnClick.mr-5(type="button") -
 				a.btn.btn-warning(href="/bsSizeSystAdd") +
 
 		- let widthTr = 100/(SizeNums.length+1);
@@ -26,7 +27,8 @@ block content
 							- getUrl = "/bsSizeSystUpdAjax", object = SizeSyst;
 							- field="code", value=SizeSyst.code, subid='code';
 							include ../../../../aaPlugin/ajaxInputUpd
-
+							.mt-3.jsDel-objElem(style="display:none")
+								a.text-danger(href="/bsSizeSystDel/"+SizeSyst._id) [删除]
 						each sizeNum in SizeNums
 							- size = null;
 							td

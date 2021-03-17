@@ -11,6 +11,8 @@ const LangDB = require('../../../../models/login/Lang');
 const SizeDB = require('../../../../models/attr/Size');
 const SizeSystDB = require('../../../../models/attr/SizeSyst');
 
+const PdspuDB = require('../../../../models/product/Pdspu');
+
 exports.bsSizes = async(req, res) => {
 	// console.log("/bsSizes");
 	try{
@@ -62,20 +64,15 @@ exports.bsSizeSystUpdAjax = async(req, res) => {
 		const field = req.body.field;	// 传输数据的类型
 		let val = String(req.body.val).replace(/^\s*/g,"").toUpperCase();		// 数据的值
 		if(field == "code") {
-			if(!val) {
-				const SizeSystDel = await SizeSystDB.deleteOne({_id: id});
-				const SizesDelMany = await SizeDB.deleteMany({SizeSyst: id});
-				return res.json({status: 200})
-			} else {
-				const SizeSystSame = await SizeSystDB.findOne({code: val});
-				if(SizeSystSame) return res.json({status: 500, message: "有相同的编号"});
-				SizeSyst[field] = val;
-			}
+			val = String(val).replace(/^\s*/g,"").toUpperCase();
+			if(val.length < 1) return res.json({status: 500, message: "[bsSizeSystUpdAjax code] 尺寸标准名称不正确"});
+			const SizeSystSame = await SizeSystDB.findOne({code: val});
+			if(SizeSystSame) return res.json({status: 500, message: "有相同的编号"});			
 		} else if(field == "weight"){
 			val = parseInt(val);
 			if(isNaN(val)) val = 1;
-			SizeSyst[field] = val;
 		}
+		SizeSyst[field] = val;
 		const SizeSystSave = SizeSyst.save();
 		return res.json({status: 200})
 	} catch(error) {
@@ -130,5 +127,26 @@ exports.bsSizeUpdAjax = async(req, res) => {
 	} catch(error) {
 		console.log(error);
 		return res.json({status: 500, message: error});
+	}
+}
+
+exports.bsSizeSystDel = async(req, res) => {
+	// console.log("/bsColorDel");
+	try{
+		const crUser = req.session.crUser;
+
+		const id = req.params.id;
+		const SizeSystExist = await SizeSystDB.findOne({_id: id});
+		if(!SizeSystExist) return res.json({status: 500, message: "此尺寸标准已经不存在, 请刷新重试"});
+
+
+		const SizesDelMany = await SizeDB.deleteMany({SizeSyst: id});
+		const SizeSystDel = await SizeSystDB.deleteOne({_id: id});
+		const PdspuUpdMany = await PdspuDB.updateMany({SizeSyst: id }, {SizeSyst: null});
+
+		return res.redirect("/bsSizes");
+	} catch(error) {
+		console.log(error);
+		return res.redirect("/error?info=bsColorDel,Error&error="+error);
 	}
 }

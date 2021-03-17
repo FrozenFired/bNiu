@@ -7,9 +7,10 @@ const MtrialDB = require('../../../../models/material/Mtrial');
 exports.bsMtFirms = async(req, res) => {
 	// console.log("/bsMtFirms");
 	try{
+		const info = req.query.info;
 		const crUser = req.session.crUser;
 		const MtFirms = await MtFirmDB.find().sort({"weight": -1});
-		return res.render("./user/bser/material/MtFirm/list", {title: "供货商列表", MtFirms, crUser});
+		return res.render("./user/bser/material/MtFirm/list", {title: "供货商列表", info, MtFirms, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsMtFirms,Error&error="+error);
 	}
@@ -56,16 +57,7 @@ exports.bsMtFirmUpdAjax = async(req, res) => {
 		const field = req.body.field;
 		if(field == "code") {
 			val = String(val).replace(/^\s*/g,"").toUpperCase();
-			if(val.length < 1) {
-				/*
-					[团供货商]数据库 删除
-					首先要判断是否有子分类 如果没有则继续删除
-					再 把父分类中的此类删除 也要把相应的[材质]数据库中的分类变为不分类
-				*/
-				const MtrialUpdMany = await MtrialDB.updateMany({MtFirm: id }, {MtFirm: null});
-				const MtFirmDel = await MtFirmDB.deleteOne({_id: id});
-				return res.json({status: 200})
-			}
+			if(val.length < 1) return res.json({status: 500, message: "[bsMtFirmUpdAjax code] 供应商名称不正确"});
 			const MtFirmSame = await MtFirmDB.findOne({code: val});
 			if(MtFirmSame) return res.json({status: 500, message: "有相同的编号"});
 		} else if(field == "weight") {
@@ -80,5 +72,25 @@ exports.bsMtFirmUpdAjax = async(req, res) => {
 	} catch(error) {
 		console.log(error);
 		return res.json({status: 500, message: error});
+	}
+}
+
+exports.bsMtFirmDel = async(req, res) => {
+	// console.log("/bsMtFirmDel");
+	try{
+		const crUser = req.session.crUser;
+
+		const id = req.params.id;
+		const MtFirmExist = await MtFirmDB.findOne({_id: id});
+		if(!MtFirmExist) return res.json({status: 500, message: "此颜色已经不存在, 请刷新重试"});
+
+		const Mtrial = await MtrialDB.findOne({MtFirm: id});
+		if(Mtrial) return res.redirect("/bsMtFirms?info=在 ["+Mtrial.code+"] 等材料已经使用此供应商, 不可删除。 除非把相应材料删除");
+
+		const MtFirmDel = await MtFirmDB.deleteOne({_id: id});
+		return res.redirect("/bsMtFirms");
+	} catch(error) {
+		console.log(error);
+		return res.redirect("/error?info=bsMtFirmDel,Error&error="+error);
 	}
 }

@@ -85,6 +85,7 @@ module.exports = app => {
 	/* ------------------------ MtFirm 供货商 ----------------------- */
 	app.get('/bsMtFirms', bserIsLogin, MtFirm.bsMtFirms);
 	app.get('/bsMtFirmAdd', bserIsLogin, MtFirm.bsMtFirmAdd);
+	app.get('/bsMtFirmDel/:id', bserIsLogin, MtFirm.bsMtFirmDel);
 	app.post('/bsMtFirmNew', bserIsLogin, postForm, MtFirm.bsMtFirmNew);
 	app.post('/bsMtFirmUpdAjax', bserIsLogin, MtFirm.bsMtFirmUpdAjax);
 
@@ -133,6 +134,7 @@ module.exports = app => {
 	
 	app.post('/bsSizeNewAjax', bserIsLogin, Size.bsSizeNewAjax);
 	app.post('/bsSizeUpdAjax', bserIsLogin, Size.bsSizeUpdAjax);
+	app.get('/bsSizeSystDel/:id', bserIsLogin, Size.bsSizeSystDel);
 
 	/* ------------------------ Color ------------------------ */
 	app.get('/bsColors', bserIsLogin, Color.bsColors);
