@@ -88,6 +88,7 @@ exports.bsPdspuNew = async(req, res) => {
 		const objPdsku = new Object();
 		objPdsku.Firm = crUser.Firm;
 		objPdsku.Pdspu = _object._id;
+		objPdsku.PdCostMts = [_objPdCostMt._id];
 		const _objPdsku = new PdskuDB(objPdsku);
 		_object.Pdskus.push(_objPdsku._id);
 

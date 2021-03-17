@@ -1,9 +1,11 @@
-0.0.8	完成 MtFirm PtFirm PtCateg
+0.0.85	Pdsku 完成
+0.0.8	15ef5339b5ac552363837fa38f6e78842e0475d9
+			完成 MtFirm PtFirm PtCateg
 0.0.75	26cd54805228f88329124e6ba8daf44d0e4dcb49
-		调整文件结构
+			调整文件结构
 0.0.71	6fe4ea39a2e580f9ab91a795a24dc94e9056ccef
-		attr/Pattern -> pattern/Ptern; SizeStandard -> SizeSyst
-		建立 PtCateg PtFirm MtFirm
+			attr/Pattern -> pattern/Ptern; SizeStandard -> SizeSyst
+			建立 PtCateg PtFirm MtFirm
 0.0.7	d588da6c4dc11718e3c2570e355b33287d8faf78
 			MtDosage
 0.0.6	0ae25c7e23200f2b31e835e696281191bf691993
