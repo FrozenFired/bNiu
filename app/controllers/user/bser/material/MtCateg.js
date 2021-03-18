@@ -24,40 +24,17 @@ exports.bsMtCategs = async(req, res) => {
 		return res.redirect("/error?info=bsMtCategs,Error&error="+error);
 	}
 }
-exports.bsMtCateg = async(req, res) => {
-	// console.log("/bsMtCategAdd");
-	try{
-		const crUser = req.session.crUser;
-		const id = req.params.id;
-		const MtCateg = await MtCategDB.findOne({_id: id})
-			.populate("MtCategFar")
-			.populate("MtCategSons")
-		if(!MtCateg) return res.redirect("/error?info=不存在此分类");
-		return res.render("./user/bser/material/MtCateg/detail", {title: "材料分类详情", MtCateg, crUser});
-	} catch(error) {
-		return res.redirect("/error?info=bsMtCategAdd,Error&error="+error);
-	}
-}
-exports.bsMtCategUp = async(req, res) => {
-	// console.log("/bsMtCategAdd");
-	try{
-		const crUser = req.session.crUser;
-		const id = req.params.id;
-		const MtCateg = await MtCategDB.findOne({_id: id})
-		if(!MtCateg) return res.redirect("/error?info=不存在此分类");
 
-		return res.render("./user/bser/material/MtCateg/update", {title: "材料分类详情", MtCateg, crUser});
-	} catch(error) {
-		return res.redirect("/error?info=bsMtCategAdd,Error&error="+error);
-	}
-}
 
 exports.bsMtCategAdd = async(req, res) => {
 	// console.log("/bsMtCategAdd");
 	try{
 		const crUser = req.session.crUser;
 		let MtCategFar = null;
-		if(req.query.MtCategFar) MtCategFar = await MtCategDB.findOne({_id: req.query.MtCategFar});
+		if(req.query.MtCategFar) {
+			MtCategFar = await MtCategDB.findOne({_id: req.query.MtCategFar});
+			if(MtCategFar.level == 3 || MtCategFar.isBottom == 1) res.redirect("/error?info=bsMtCategAdd, 已经是底层, 不可再划分分类");
+		}
 		return res.render("./user/bser/material/MtCateg/add", {title: "添加新材料分类", MtCategFar, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsMtCategAdd,Error&error="+error);
@@ -94,6 +71,123 @@ exports.bsMtCategNew = async(req, res) => {
 		return res.redirect("/error?info=bsMtCategNew,Error&error="+error);
 	}
 }
+
+
+
+exports.bsMtCategUpdAjax = async(req, res) => {
+	// console.log("/bsMtCategUpdAjax");
+	try{
+		const id = req.body.id;		// 所要更改的MtCateg的id
+		const MtCateg = await MtCategDB.findOne({_id: id})
+		if(!MtCateg) return res.json({status: 500, message: "没有找到此材料信息, 请刷新重试"});
+
+		let val = req.body.val;		// 数据的值
+
+		const field = req.body.field;
+		if(field == "code") {
+			val = String(val).replace(/^\s*/g,"").toUpperCase();
+			if(val.length < 1) return res.json({status: 500, message: "编号填写错误"});
+			const MtCategSame = await MtCategDB.findOne({code: val});
+			if(MtCategSame) return res.json({status: 500, message: "有相同的编号"});
+		} else if(field == "weight") {
+			val = parseInt(val);
+			if(isNaN(val)) return res.json({status: 500, message: "[bsMtCategUpdAjax weight] 排序为数字, 请传递正确的参数"});
+		} else if(field == "isBottom") {
+			console.log(val)
+			val = parseInt(val);
+			if(val == 1) {
+				if(MtCateg.MtCategSons.length > 0) return res.json({status: 500, message: "[bsMtCategUpdAjax weight] 请先删除子分类"});
+			} else if(val == -1){
+				if(MtCateg.level == 3) return res.json({status: 500, message: "[bsMtCategUpdAjax weight] 只能是最底层"});
+			} else {
+				return res.json({status: 500, message: "[bsMtCategUpdAjax weight] 底层参数错误"});
+			}
+		} else {
+			return res.json({status: 500, message: "[bsMtCategUpdAjax weight] 您操作错误, 如果坚持操作, 请联系管理员"});
+		}
+
+		MtCateg[field] = val;
+
+		const MtCategSave = MtCateg.save();
+		return res.json({status: 200})
+	} catch(error) {
+		console.log(error);
+		return res.json({status: 500, message: error});
+	}
+}
+
+
+
+/*
+	[材质分类]数据库 删除
+	首先要判断是否有子分类 如果没有则继续删除
+	再 把父分类中的此类删除 也要把相应的[材质]数据库中的分类变为不分类
+*/
+exports.bsMtCategDel = async(req, res) => {
+	// console.log("/bsMtCategAdd");
+	try{
+		const crUser = req.session.crUser;
+		const id = req.params.id;
+		const MtCateg = await MtCategDB.findOne({_id: id})
+			.populate("MtCategFar")
+			.populate("MtCategSons")
+		if(!MtCateg) return res.redirect("/error?info=不存在此分类");
+
+		if(MtCateg.MtCategSons && MtCateg.MtCategSons.length > 0) return res.redirect("/error?info=请先删除子分类");
+
+		if(MtCateg.MtCategFar) {
+			const MtCategFar = MtCateg.MtCategFar;
+			MtCategFar.MtCategSons.remove(id);
+			const MtCategFarSave = await MtCategFar.save();
+		}
+
+		const MtrialUpdMany = await MtrialDB.updateMany({MtCateg: id }, {MtCateg: null});
+
+		const MtCategDel = await MtCategDB.deleteOne({_id: id});
+		return res.redirect("/bsMtCategs");
+	} catch(error) {
+		return res.redirect("/error?info=bsMtCategAdd,Error&error="+error);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+exports.bsMtCateg = async(req, res) => {
+	// console.log("/bsMtCategAdd");
+	try{
+		const crUser = req.session.crUser;
+		const id = req.params.id;
+		const MtCateg = await MtCategDB.findOne({_id: id})
+			.populate("MtCategFar")
+			.populate("MtCategSons")
+		if(!MtCateg) return res.redirect("/error?info=不存在此分类");
+		return res.render("./user/bser/material/MtCateg/detail", {title: "材料分类详情", MtCateg, crUser});
+	} catch(error) {
+		return res.redirect("/error?info=bsMtCategAdd,Error&error="+error);
+	}
+}
+exports.bsMtCategUp = async(req, res) => {
+	// console.log("/bsMtCategAdd");
+	try{
+		const crUser = req.session.crUser;
+		const id = req.params.id;
+		const MtCateg = await MtCategDB.findOne({_id: id})
+		if(!MtCateg) return res.redirect("/error?info=不存在此分类");
+
+		return res.render("./user/bser/material/MtCateg/update", {title: "材料分类详情", MtCateg, crUser});
+	} catch(error) {
+		return res.redirect("/error?info=bsMtCategAdd,Error&error="+error);
+	}
+}
 /*
 	[材质分类]数据库 修改
 	改变是否为底层 要作一个判断
@@ -126,37 +220,5 @@ exports.bsMtCategUpd = async(req, res) => {
 		return res.redirect("/bsMtCateg/"+MtCategSave._id);
 	} catch(error) {
 		return res.redirect("/error?info=bsMtCategNew,Error&error="+error);
-	}
-}
-
-/*
-	[材质分类]数据库 删除
-	首先要判断是否有子分类 如果没有则继续删除
-	再 把父分类中的此类删除 也要把相应的[材质]数据库中的分类变为不分类
-*/
-exports.bsMtCategDel = async(req, res) => {
-	// console.log("/bsMtCategAdd");
-	try{
-		const crUser = req.session.crUser;
-		const id = req.params.id;
-		const MtCateg = await MtCategDB.findOne({_id: id})
-			.populate("MtCategFar")
-			.populate("MtCategSons")
-		if(!MtCateg) return res.redirect("/error?info=不存在此分类");
-
-		if(MtCateg.MtCategSons && MtCateg.MtCategSons.length > 0) return res.redirect("/error?info=请先删除子分类");
-
-		if(MtCateg.MtCategFar) {
-			const MtCategFar = MtCateg.MtCategFar;
-			MtCategFar.MtCategSons.remove(id);
-			MtCategFar.save();
-		}
-
-		const MtrialUpdMany = await MtrialDB.updateMany({MtCateg: id }, {MtCateg: null});
-
-		const MtCategDel = await MtCategDB.deleteOne({_id: id});
-		return res.redirect("/bsMtCategs");
-	} catch(error) {
-		return res.redirect("/error?info=bsMtCategAdd,Error&error="+error);
 	}
 }

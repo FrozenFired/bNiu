@@ -15,13 +15,15 @@ block content
 		.row.my-3
 			.col-12.text-right
 				button.btn.btn-danger.jsDel-btnClick.mr-5(type="button") -
-				a.btn.btn-warning(href="/bsMtrialAdd") +
+				a.btn.btn-info(href="/bsMtrialAdd") +
 
 		- getUrl = "/bsMtrialUpdAjax";
+		- fieldMtFirm = MtFirms.map((item) => {return {val: item._id, text: item.code} });
+		- fieldMtCateg = MtCategs.map((item) => {return {val: item._id, text: item.code} });
 		.row
 			each Mtrial in Mtrials
 				- object = Mtrial;
-				.col-6.col-lg-3.mt-4
+				.col-sm-6.col-md-4.col-xl-3.mt-4
 					.card.text-center(style="width: 100%;")
 						img.card-img-top.border-bottom.js-click-imgEnlarge(id="img-"+Mtrial._id+"-photo-sub", src=Mtrial.photo, alt="Mtrial Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
 						
@@ -48,19 +50,29 @@ block content
 								- field="code", value=Mtrial.code, subid="code", fieldDesp="编号:";
 								include ../../../../aaPlugin/ajaxInputUpd
 							.MtFirm
+								- fieldSels = fieldMtFirm;
+								- field="MtFirm", subid="MtFirm", nullDesp = false;
 								if Mtrial.MtFirm
-									- MtFirm = Mtrial.MtFirm;
-									span.mr-3 供货商: #{MtFirm.code}
+									- selectedVal = Mtrial.MtFirm._id;
+									- value=object[field].code, fieldDesp="供货商:";
 								else
-									span 未选择供货商
+									- selectedVal = "", value="", valueHide=1, fieldDesp="未选择供货商";
+								include ../../../../aaPlugin/ajaxSelectUpd
+								- fieldDesp = null, valueHide = null;
 							.MtCateg.mt-2
+								- fieldSels = fieldMtCateg, nullDesp = "不分类";
+								- field="MtCateg", subid="MtCateg";
 								if Mtrial.MtCateg
-									- MtCateg = Mtrial.MtCateg;
-									span #{MtCateg.code}
+									- selectedVal = Mtrial.MtCateg._id;
+									- value=object[field].code, fieldDesp="分类:";
 								else
-									span 未分类
+									- selectedVal = "", value="", valueHide=1, fieldDesp="未分类";
+								include ../../../../aaPlugin/ajaxSelectUpd
+								- fieldDesp = null, valueHide = null;
 							.weight.mt-2
 								- field="weight", value=Mtrial.weight, subid="weight", fieldDesp="权重:";
 								include ../../../../aaPlugin/ajaxInputUpd
-							.text-right.mt-3
-								a(href="/bsMtrial/"+Mtrial._id) [查看]
+							.text-right.mt-3.jsDel-objElem(style="display:none")
+								a.text-danger(href="/bsMtrialDel/"+Mtrial._id) [删除]
+							//- .text-right.mt-3
+							//- 	a(href="/bsMtrial/"+Mtrial._id) [详情]

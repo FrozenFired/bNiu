@@ -75,12 +75,15 @@ module.exports = app => {
 	/* ------------------------ Mtrial 材质 ------------------------ */
 	app.get('/bsMtrials', bserIsLogin, Mtrial.bsMtrials);
 	app.get('/bsMtrialAdd', bserIsLogin, Mtrial.bsMtrialAdd);
+	app.post('/bsMtrialNew', bserIsLogin, postForm, Mtrial.bsMtrialNew);
+	app.post('/bsMtrialUpdAjax', bserIsLogin, Mtrial.bsMtrialUpdAjax);
+	app.get('/bsMtrialDel/:id', bserIsLogin, Mtrial.bsMtrialDel);
+
+	app.post('/bsMtrialPhotoUpd', bserIsLogin, postForm, MdFile.newFiles, Mtrial.bsMtrialPhotoUpd);
+
 	app.get('/bsMtrial/:id', bserIsLogin, Mtrial.bsMtrial);
 	app.get('/bsMtrialUp/:id', bserIsLogin, Mtrial.bsMtrialUp);
-	app.post('/bsMtrialNew', bserIsLogin, postForm, Mtrial.bsMtrialNew);
 	app.post('/bsMtrialUpd', bserIsLogin, postForm, Mtrial.bsMtrialUpd);
-	app.post('/bsMtrialUpdAjax', bserIsLogin, Mtrial.bsMtrialUpdAjax);
-	app.post('/bsMtrialPhotoUpd', bserIsLogin, postForm, MdFile.newFiles, Mtrial.bsMtrialPhotoUpd);
 
 	/* ------------------------ MtFirm 供货商 ----------------------- */
 	app.get('/bsMtFirms', bserIsLogin, MtFirm.bsMtFirms);
@@ -92,10 +95,12 @@ module.exports = app => {
 	/* ------------------------ MtCateg 材质分类 ----------------------- */
 	app.get('/bsMtCategs', bserIsLogin, MtCateg.bsMtCategs);
 	app.get('/bsMtCategAdd', bserIsLogin, MtCateg.bsMtCategAdd);
+	app.post('/bsMtCategNew', bserIsLogin, postForm, MtCateg.bsMtCategNew);
+	app.get('/bsMtCategDel/:id', bserIsLogin, MtCateg.bsMtCategDel);
+	app.post('/bsMtCategUpdAjax', bserIsLogin, MtCateg.bsMtCategUpdAjax);
+
 	app.get('/bsMtCateg/:id', bserIsLogin, MtCateg.bsMtCateg);
 	app.get('/bsMtCategUp/:id', bserIsLogin, MtCateg.bsMtCategUp);
-	app.get('/bsMtCategDel/:id', bserIsLogin, MtCateg.bsMtCategDel);
-	app.post('/bsMtCategNew', bserIsLogin, postForm, MtCateg.bsMtCategNew);
 	app.post('/bsMtCategUpd', bserIsLogin, postForm, MtCateg.bsMtCategUpd);
 	/* ============================================= matrial ============================================= */
 
