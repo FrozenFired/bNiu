@@ -2,19 +2,28 @@ extends ../../../aalayout/layout
 
 block content
 	.container
+		if info
+			-a;
+			.border.p-2.my-3.rounded.text-center.text-warning
+				h3 #{info}
+				.text-right
+					a.btn.btn-default(href="/bsPterns") 确认
 		nav(aria-label="breadcrumb")
 			ol.breadcrumb
 				li.breadcrumb-item: a(href="/bser") Home
 				li.breadcrumb-item.active(aria-current="page") #{title}
 		.row.my-3
 			.col-12.text-right
+				button.btn.btn-danger.jsDel-btnClick.mr-5(type="button") -
 				a.btn.btn-warning(href="/bsPternAdd") +
 
 		- getUrl = "/bsPternUpdAjax";
+		- fieldPtFirm = PtFirms.map((item) => {return {val: item._id, text: item.code} });
+		- fieldPtCateg = PtCategs.map((item) => {return {val: item._id, text: item.code} });
 		.row
 			each Ptern in Pterns
 				- object = Ptern;
-				.col-6.col-lg-3.mt-4
+				.col-sm-6.col-md-4.col-xl-3.mt-4
 					.card.text-center(style="width: 100%;")
 						img.card-img-top.border-bottom.js-click-imgEnlarge(id="img-"+Ptern._id+"-photo-sub", src=Ptern.photo, alt="Ptern Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
 						
@@ -22,7 +31,7 @@ block content
 							.col-6
 								.jsImg-clickUpd.text-info(id="clickUpd-"+Ptern._id+"-photo-sub") [点击]
 							.col-6
-								- field="photo", value=Ptern.photo, subid="photo", valueHide=true, toUp=-1, fieldDesp="[upd]";
+								- field="photo", value=Ptern.photo, subid="photo", valueHide=1, toUp=-1, fieldDesp="[upd]";
 								include ../../../../aaPlugin/ajaxInputUpd
 								- fieldDesp = null, valueHide = null, toUp = null;
 						.row(class="jsImg-clickAfter-"+Ptern._id+"-photo-sub", style="display:none")
@@ -38,22 +47,32 @@ block content
 										input.btn.btn-success(type="submit" value="确认")
 						.card-body
 							.code
-								- field="code", value=Ptern.code, subid="code";
+								- field="code", value=Ptern.code, subid="code", fieldDesp="编号:";
 								include ../../../../aaPlugin/ajaxInputUpd
 							.PtFirm
+								- fieldSels = fieldPtFirm;
+								- field="PtFirm", subid="PtFirm", nullDesp = false;
 								if Ptern.PtFirm
-									- PtFirm = Ptern.PtFirm;
-									span.mr-3 印花厂: #{PtFirm.code}
+									- selectedVal = Ptern.PtFirm._id;
+									- value=object[field].code, fieldDesp="印花厂:";
 								else
-									span 未选择印花厂
+									- selectedVal = "", value="", valueHide=1, fieldDesp="未选择印花厂";
+								include ../../../../aaPlugin/ajaxSelectUpd
+								- fieldDesp = null, valueHide = null;
 							.PtCateg.mt-2
+								- fieldSels = fieldPtCateg, nullDesp = "不分类";
+								- field="PtCateg", subid="PtCateg";
 								if Ptern.PtCateg
-									- PtCateg = Ptern.PtCateg;
-									span #{PtCateg.code}
+									- selectedVal = Ptern.PtCateg._id;
+									- value=object[field].code, fieldDesp="分类:";
 								else
-									span 未分类
+									- selectedVal = "", value="", valueHide=1, fieldDesp="未分类";
+								include ../../../../aaPlugin/ajaxSelectUpd
+								- fieldDesp = null, valueHide = null;
 							.weight.mt-3
-								- field="weight", value=Ptern.weight, subid="weight";
+								- field="weight", value=Ptern.weight, subid="weight", fieldDesp="权重:";
 								include ../../../../aaPlugin/ajaxInputUpd
-							.text-right.mt-3
-								a(href="/bsPtern/"+Ptern._id) [查看]
+							.text-right.mt-3.jsDel-objElem(style="display:none")
+								a.text-danger(href="/bsPternDel/"+Ptern._id) [删除]
+							//- .text-right.mt-3
+							//- 	a(href="/bsPtern/"+Ptern._id) [详情]

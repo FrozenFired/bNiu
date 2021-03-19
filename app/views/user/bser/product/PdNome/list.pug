@@ -2,12 +2,19 @@ extends ../../../aalayout/layout
 
 block content
 	.container
+		if info
+			-a;
+			.border.p-2.my-3.rounded.text-center.text-warning
+				h3 #{info}
+				.text-right
+					a.btn.btn-default(href="/bsPdNomes") 确认
 		nav(aria-label="breadcrumb")
 			ol.breadcrumb
 				li.breadcrumb-item: a(href="/bser") Home
 				li.breadcrumb-item.active(aria-current="page") #{title}
 		.row.my-3
 			.col-12.text-right
+				button.btn.btn-danger.jsDel-btnClick.mr-5(type="button") -
 				a.btn.btn-warning(href="/bsPdNomeAdd") +
 
 		- getUrl = "/bsPdNomeUpdAjax";
@@ -23,4 +30,5 @@ block content
 							.weight.mt-3
 								- field="weight", value=PdNome.weight, subid="weight";
 								include ../../../../aaPlugin/ajaxInputUpd
-
+							.text-right.mt-3.jsDel-objElem(style="display:none")
+								a.text-danger(href="/bsPdNomeDel/"+PdNome._id) [删除]

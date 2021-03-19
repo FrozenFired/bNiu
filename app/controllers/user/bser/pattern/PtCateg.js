@@ -24,40 +24,16 @@ exports.bsPtCategs = async(req, res) => {
 		return res.redirect("/error?info=bsPtCategs,Error&error="+error);
 	}
 }
-exports.bsPtCateg = async(req, res) => {
-	// console.log("/bsPtCategAdd");
-	try{
-		const crUser = req.session.crUser;
-		const id = req.params.id;
-		const PtCateg = await PtCategDB.findOne({_id: id})
-			.populate("PtCategFar")
-			.populate("PtCategSons")
-		if(!PtCateg) return res.redirect("/error?info=不存在此分类");
-		return res.render("./user/bser/pattern/PtCateg/detail", {title: "印花分类详情", PtCateg, crUser});
-	} catch(error) {
-		return res.redirect("/error?info=bsPtCategAdd,Error&error="+error);
-	}
-}
-exports.bsPtCategUp = async(req, res) => {
-	// console.log("/bsPtCategAdd");
-	try{
-		const crUser = req.session.crUser;
-		const id = req.params.id;
-		const PtCateg = await PtCategDB.findOne({_id: id})
-		if(!PtCateg) return res.redirect("/error?info=不存在此分类");
-
-		return res.render("./user/bser/pattern/PtCateg/update", {title: "印花分类详情", PtCateg, crUser});
-	} catch(error) {
-		return res.redirect("/error?info=bsPtCategAdd,Error&error="+error);
-	}
-}
 
 exports.bsPtCategAdd = async(req, res) => {
 	// console.log("/bsPtCategAdd");
 	try{
 		const crUser = req.session.crUser;
 		let PtCategFar = null;
-		if(req.query.PtCategFar) PtCategFar = await PtCategDB.findOne({_id: req.query.PtCategFar});
+		if(req.query.PtCategFar) {
+			PtCategFar = await PtCategDB.findOne({_id: req.query.PtCategFar});
+			if(PtCategFar.level == 3 || PtCategFar.isBottom == 1) res.redirect("/error?info=bsPtCategAdd, 已经是底层, 不可再划分分类");
+		}
 		return res.render("./user/bser/pattern/PtCateg/add", {title: "添加新印花分类", PtCategFar, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPtCategAdd,Error&error="+error);
@@ -94,38 +70,46 @@ exports.bsPtCategNew = async(req, res) => {
 		return res.redirect("/error?info=bsPtCategNew,Error&error="+error);
 	}
 }
-/*
-	[材质分类]数据库 修改
-	改变是否为底层 要作一个判断
-		如果有子分类 则不可为底层
-		如果本身层级为3 则只能为底层
-*/
-exports.bsPtCategUpd = async(req, res) => {
-	// console.log("/bsPtCategNew");
+
+exports.bsPtCategUpdAjax = async(req, res) => {
+	// console.log("/bsPtCategUpdAjax");
 	try{
-		const crUser = req.session.crUser;
-		const obj = req.body.obj;
-		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
-		if(obj.code.length < 1) return res.redirect("/error?info=bsPtCategNew,objCode");
+		const id = req.body.id;		// 所要更改的PtCateg的id
+		const PtCateg = await PtCategDB.findOne({_id: id})
+		if(!PtCateg) return res.json({status: 500, message: "没有找到此印花分类信息, 请刷新重试"});
 
-		const PtCateg = await PtCategDB.findOne({_id: obj._id});
-		if(!PtCateg) return res.redirect("/error?info=bsPtCategNew,不存在此分类");
+		let val = req.body.val;		// 数据的值
 
-		const PtCategSame = await PtCategDB.findOne({_id: {"$ne": obj._id}, code: obj.code, PtCategFar: obj.PtCategFar});
-		if(PtCategSame) return res.redirect("/error?info=bsPtCategNew,有相同的编号");
-
-		if(obj.isBottom == Conf.isBottom.y.num) {
-			if(PtCateg.PtCategSons && PtCateg.PtCategSons.length > 0) return res.redirect("/error?info=bsPtCategNew,有子分类, 不可变为底层");
+		const field = req.body.field;
+		if(field == "code") {
+			val = String(val).replace(/^\s*/g,"").toUpperCase();
+			if(val.length < 1) return res.json({status: 500, message: "编号填写错误"});
+			const PtCategSame = await PtCategDB.findOne({code: val});
+			if(PtCategSame) return res.json({status: 500, message: "有相同的编号"});
+		} else if(field == "weight") {
+			val = parseInt(val);
+			if(isNaN(val)) return res.json({status: 500, message: "[bsPtCategUpdAjax weight] 排序为数字, 请传递正确的参数"});
+		} else if(field == "isBottom") {
+			console.log(val)
+			val = parseInt(val);
+			if(val == 1) {
+				if(PtCateg.PtCategSons.length > 0) return res.json({status: 500, message: "[bsPtCategUpdAjax weight] 请先删除子分类"});
+			} else if(val == -1){
+				if(PtCateg.level == 3) return res.json({status: 500, message: "[bsPtCategUpdAjax weight] 只能是最底层"});
+			} else {
+				return res.json({status: 500, message: "[bsPtCategUpdAjax weight] 底层参数错误"});
+			}
+		} else {
+			return res.json({status: 500, message: "[bsPtCategUpdAjax weight] 您操作错误, 如果坚持操作, 请联系管理员"});
 		}
-		else if(obj.isBottom == Conf.isBottom.n.num) {
-			if(PtCateg.level == 3) return res.redirect("/error?info=bsPtCategNew,已经是level3底层, 不可变为非底层")
-		}
 
-		const _object = _.extend(PtCateg, obj);
-		const PtCategSave = await _object.save();
-		return res.redirect("/bsPtCateg/"+PtCategSave._id);
+		PtCateg[field] = val;
+
+		const PtCategSave = PtCateg.save();
+		return res.json({status: 200})
 	} catch(error) {
-		return res.redirect("/error?info=bsPtCategNew,Error&error="+error);
+		console.log(error);
+		return res.json({status: 500, message: error});
 	}
 }
 
@@ -158,5 +142,79 @@ exports.bsPtCategDel = async(req, res) => {
 		return res.redirect("/bsPtCategs");
 	} catch(error) {
 		return res.redirect("/error?info=bsPtCategAdd,Error&error="+error);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+exports.bsPtCateg = async(req, res) => {
+	// console.log("/bsPtCategAdd");
+	try{
+		const crUser = req.session.crUser;
+		const id = req.params.id;
+		const PtCateg = await PtCategDB.findOne({_id: id})
+			.populate("PtCategFar")
+			.populate("PtCategSons")
+		if(!PtCateg) return res.redirect("/error?info=不存在此分类");
+		return res.render("./user/bser/pattern/PtCateg/detail", {title: "印花分类详情", PtCateg, crUser});
+	} catch(error) {
+		return res.redirect("/error?info=bsPtCategAdd,Error&error="+error);
+	}
+}
+exports.bsPtCategUp = async(req, res) => {
+	// console.log("/bsPtCategAdd");
+	try{
+		const crUser = req.session.crUser;
+		const id = req.params.id;
+		const PtCateg = await PtCategDB.findOne({_id: id})
+		if(!PtCateg) return res.redirect("/error?info=不存在此分类");
+
+		return res.render("./user/bser/pattern/PtCateg/update", {title: "印花分类详情", PtCateg, crUser});
+	} catch(error) {
+		return res.redirect("/error?info=bsPtCategAdd,Error&error="+error);
+	}
+}
+/*
+	[印花分类]数据库 修改
+	改变是否为底层 要作一个判断
+		如果有子分类 则不可为底层
+		如果本身层级为3 则只能为底层
+*/
+exports.bsPtCategUpd = async(req, res) => {
+	// console.log("/bsPtCategNew");
+	try{
+		const crUser = req.session.crUser;
+		const obj = req.body.obj;
+		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
+		if(obj.code.length < 1) return res.redirect("/error?info=bsPtCategNew,objCode");
+
+		const PtCateg = await PtCategDB.findOne({_id: obj._id});
+		if(!PtCateg) return res.redirect("/error?info=bsPtCategNew,不存在此分类");
+
+		const PtCategSame = await PtCategDB.findOne({_id: {"$ne": obj._id}, code: obj.code, PtCategFar: obj.PtCategFar});
+		if(PtCategSame) return res.redirect("/error?info=bsPtCategNew,有相同的编号");
+
+		if(obj.isBottom == Conf.isBottom.y.num) {
+			if(PtCateg.PtCategSons && PtCateg.PtCategSons.length > 0) return res.redirect("/error?info=bsPtCategNew,有子分类, 不可变为底层");
+		}
+		else if(obj.isBottom == Conf.isBottom.n.num) {
+			if(PtCateg.level == 3) return res.redirect("/error?info=bsPtCategNew,已经是level3底层, 不可变为非底层")
+		}
+
+		const _object = _.extend(PtCateg, obj);
+		const PtCategSave = await _object.save();
+		return res.redirect("/bsPtCateg/"+PtCategSave._id);
+	} catch(error) {
+		return res.redirect("/error?info=bsPtCategNew,Error&error="+error);
 	}
 }

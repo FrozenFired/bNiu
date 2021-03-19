@@ -25,7 +25,6 @@ exports.bsMtCategs = async(req, res) => {
 	}
 }
 
-
 exports.bsMtCategAdd = async(req, res) => {
 	// console.log("/bsMtCategAdd");
 	try{
@@ -72,14 +71,12 @@ exports.bsMtCategNew = async(req, res) => {
 	}
 }
 
-
-
 exports.bsMtCategUpdAjax = async(req, res) => {
 	// console.log("/bsMtCategUpdAjax");
 	try{
 		const id = req.body.id;		// 所要更改的MtCateg的id
 		const MtCateg = await MtCategDB.findOne({_id: id})
-		if(!MtCateg) return res.json({status: 500, message: "没有找到此材料信息, 请刷新重试"});
+		if(!MtCateg) return res.json({status: 500, message: "没有找到此材料分类信息, 请刷新重试"});
 
 		let val = req.body.val;		// 数据的值
 
@@ -115,7 +112,6 @@ exports.bsMtCategUpdAjax = async(req, res) => {
 		return res.json({status: 500, message: error});
 	}
 }
-
 
 
 /*

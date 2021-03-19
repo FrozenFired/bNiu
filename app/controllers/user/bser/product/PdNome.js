@@ -7,9 +7,10 @@ const PdspuDB = require('../../../../models/product/Pdspu');
 exports.bsPdNomes = async(req, res) => {
 	// console.log("/bsPdNomes");
 	try{
+		const info = req.query.info;
 		const crUser = req.session.crUser;
 		const PdNomes = await PdNomeDB.find().sort({"weight": -1});
-		return res.render("./user/bser/product/PdNome/list", {title: "名称管理", PdNomes, crUser});
+		return res.render("./user/bser/product/PdNome/list", {title: "名称列表", info, PdNomes, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPdNomes,Error&error="+error);
 	}
@@ -55,16 +56,7 @@ exports.bsPdNomeUpdAjax = async(req, res) => {
 		const field = req.body.field;
 		if(field == "code") {
 			val = String(val).replace(/^\s*/g,"").toUpperCase();
-			if(val.length < 1) {
-				/*
-					[产品名称]数据库 删除
-					首先要判断是否有子分类 如果没有则继续删除
-					再 把父分类中的此类删除 也要把相应的[材质]数据库中的分类变为不分类
-				*/
-				const PdspuUpdMany = await PdspuDB.updateMany({PdNome: id }, {PdNome: null});
-				const PdNomeDel = await PdNomeDB.deleteOne({_id: id});
-				return res.json({status: 200})
-			}
+			if(val.length < 1) return res.json({status: 500, message: "[bsPdNomeUpdAjax code] 名称不正确"});
 			const PdNomeSame = await PdNomeDB.findOne({code: val});
 			if(PdNomeSame) return res.json({status: 500, message: "有相同的编号"});
 		} else if(field == "weight") {
@@ -82,6 +74,25 @@ exports.bsPdNomeUpdAjax = async(req, res) => {
 	}
 }
 
+exports.bsPdNomeDel = async(req, res) => {
+	// console.log("/bsPdNomeDel");
+	try{
+		const crUser = req.session.crUser;
+
+		const id = req.params.id;
+		const PdNomeExist = await PdNomeDB.findOne({_id: id});
+		if(!PdNomeExist) return res.json({status: 500, message: "此名称已经不存在, 请刷新重试"});
+
+		const Pdspu = await PdspuDB.findOne({PdNome: id});
+		if(Pdspu) return res.redirect("/bsPdNomes?info=["+Pdspu.code+"] 等产品正在使用此名称, 不可删除。 除非把相应产品删除");
+
+		const PdNomeDel = await PdNomeDB.deleteOne({_id: id});
+		return res.redirect("/bsPdNomes");
+	} catch(error) {
+		console.log(error);
+		return res.redirect("/error?info=bsPdNomeDel,Error&error="+error);
+	}
+}
 exports.bsPdNomeNewAjax = async(req, res) => {
 	// console.log("/bsPdNomeNewAjax");
 	try{

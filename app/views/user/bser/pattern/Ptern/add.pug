@@ -13,7 +13,6 @@ block content
 				label.col-3.col-sm-2.col-form-label(for="PtFirmIpt") PtFirm
 				.col-9.col-sm-6
 					select#PtFirmIpt.form-control(name="obj[PtFirm]", data-style="btn-info")
-						option(value="") 无
 						each PtFirm in PtFirms
 							- a;
 							option(value=PtFirm._id) #{PtFirm.code}

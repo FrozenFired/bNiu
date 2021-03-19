@@ -1,4 +1,8 @@
-0.0.93	Mtrial 修改/删除->优化 MtCateg 修改/删除->优化
+0.0.94	
+			PdNome PdCateg 修改删除优化
+			Ptern PtCateg PtFirm 修改/删除->优化
+0.0.93	9659c09a3bae98cc2ce70340dfc24be1069a7e4a
+			Mtrial 修改/删除->优化 MtCateg 修改/删除->优化
 0.0.92	a3676d5b4c82a31bcd82659968d468a31a86f94b
 			sizeSyst MtFirm 删除优化
 0.0.91	cf76543d47228c4d846d3a5090f2ceb0e444412f

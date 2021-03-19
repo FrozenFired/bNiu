@@ -82,7 +82,7 @@ exports.bsMtFirmDel = async(req, res) => {
 
 		const id = req.params.id;
 		const MtFirmExist = await MtFirmDB.findOne({_id: id});
-		if(!MtFirmExist) return res.json({status: 500, message: "此颜色已经不存在, 请刷新重试"});
+		if(!MtFirmExist) return res.json({status: 500, message: "此供应商已经不存在, 请刷新重试"});
 
 		const Mtrial = await MtrialDB.findOne({MtFirm: id});
 		if(Mtrial) return res.redirect("/bsMtFirms?info=在 ["+Mtrial.code+"] 等材料已经使用此供应商, 不可删除。 除非把相应材料删除");

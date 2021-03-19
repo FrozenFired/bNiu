@@ -46,7 +46,6 @@ exports.bsMtrialAdd = async(req, res) => {
 	}
 }
 
-
 exports.bsMtrialNew = async(req, res) => {
 	// console.log("/bsMtrialNew");
 	try{
@@ -141,10 +140,10 @@ exports.bsMtrialDel = async(req, res) => {
 
 		const id = req.params.id;
 		const MtrialExist = await MtrialDB.findOne({_id: id});
-		if(!MtrialExist) return res.json({status: 500, message: "此颜色已经不存在, 请刷新重试"});
+		if(!MtrialExist) return res.json({status: 500, message: "此材料已经不存在, 请刷新重试"});
 
 		const Pdspu = await PdspuDB.findOne({Mtrials: id});
-		if(Pdspu) return res.redirect("/bsMtrials?info=在 ["+Pdspu.code+"] 等产品已经使用此颜色, 不可删除。 除非把相应产品删除");
+		if(Pdspu) return res.redirect("/bsMtrials?info=在 ["+Pdspu.code+"] 等产品已经使用此材料, 不可删除。 除非把相应产品删除");
 
 		const MtrialDel = await MtrialDB.deleteOne({_id: id});
 		return res.redirect("/bsMtrials");
