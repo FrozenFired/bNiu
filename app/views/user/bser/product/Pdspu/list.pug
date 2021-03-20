@@ -38,10 +38,10 @@ block content
 										input.btn.btn-success(type="submit" value="确认")
 						.card-body
 							.code
-								- field="code", value=Pdspu.code, subid="code";
+								- field="code", value=Pdspu.code, subid="code", fieldDesp="编号:";
 								include ../../../../aaPlugin/ajaxInputUpd
 							.weight.mt-3
-								- field="weight", value=Pdspu.weight, subid="weight";
+								- field="weight", value=Pdspu.weight, subid="weight", fieldDesp="排序:";
 								include ../../../../aaPlugin/ajaxInputUpd
 							.text-right.mt-3
 								a(href="/bsPdspu/"+Pdspu._id) [查看]

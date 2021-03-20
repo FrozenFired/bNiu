@@ -6,7 +6,7 @@ $(() => {
 		const id = target.data('id');
 		$.ajax({
 			type: "GET",
-			url: '/bsPdspuSizeUpdAjax?id='+id+'&size='+size,
+			url: '/bsPdspuSizeNewAjax?id='+id+'&size='+size,
 			success: function(results) {
 				if(results.status == 200) {
 					location.reload();

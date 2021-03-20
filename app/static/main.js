@@ -155,7 +155,7 @@ const imgShowFront = (outerdiv, innerdiv, zoomImg, _this) => {
 
 /* ============ 是否是小数 ============ */
 const jsFunc_isFloat = num => {
-	num = String(num);
+	num = String(num).replace(/^\s*/g,"");
 	if(num.length == 0) return false;
 	const nums = num.split('.');
 	if(nums.length > 2) return false;

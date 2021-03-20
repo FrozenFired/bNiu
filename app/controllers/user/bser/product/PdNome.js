@@ -1,6 +1,8 @@
 const Conf = require('../../../../config/conf.js');
 const _ = require('underscore');
 
+const MdFilter = require('../../../../middle/MdFilter');
+
 const PdNomeDB = require('../../../../models/product/PdNome');
 const PdspuDB = require('../../../../models/product/Pdspu');
 
@@ -15,6 +17,67 @@ exports.bsPdNomes = async(req, res) => {
 		return res.redirect("/error?info=bsPdNomes,Error&error="+error);
 	}
 }
+
+exports.bsPdNomesAjax = async(req, res) => {
+	// console.log("/bsPdNomes");
+	try{
+		const crUser = req.session.crUser;
+
+
+		const {param, filter, sortBy, page, pagesize, skip} = PdNomesParamFilter(req, crUser);
+		const count = await PdNomeDB.countDocuments(param);
+		const PdNomes = await PdNomeDB.find(param, filter)
+			.skip(skip).limit(pagesize)
+			.sort(sortBy);
+
+		let PdNome = null;
+		if(PdNomes.length > 0) {
+			const code = req.query.code.replace(/^\s*/g,"").toUpperCase();
+			PdNome = await PdNomeDB.findOne({code: code}, filter);
+		}
+
+		return res.status(200).json({
+			status: 200,
+			message: '成功获取',
+			data: {PdNome, PdNomes, count, page, pagesize}
+		});
+	} catch(error) {
+		console.log(error)
+		return res.json({status: 500, message: "bsPdNomesAjax Error!"});
+	}
+}
+const PdNomesParamFilter = (req, crUser) => {
+	let param = {
+		"firm": crUser.firm,
+	};
+	const filter = {};
+	const sortBy = {};
+
+	if(req.query.code) {
+		let symbConb = String(req.query.code)
+		symbConb = symbConb.replace(/^\s*/g,"").toUpperCase();
+		symbConb = new RegExp(symbConb + '.*');
+		param["code"] = {'$in': symbConb};
+	}
+
+	if(req.query.sortKey && req.query.sortVal) {
+		let sortKey = req.query.sortKey;
+		let sortVal = parseInt(req.query.sortVal);
+		if(!isNaN(sortVal) && (sortVal == 1 || sortVal == -1)) {
+			sortBy[sortKey] = sortVal;
+		}
+	}
+
+	sortBy['weight'] = -1;
+	sortBy['updAt'] = -1;
+
+	const {page, pagesize, skip} = MdFilter.page_Filter(req);
+	return {param, filter, sortBy, page, pagesize, skip};
+}
+
+
+
+
 
 exports.bsPdNomeAdd = async(req, res) => {
 	// console.log("/bsPdNomeAdd");
@@ -34,6 +97,7 @@ exports.bsPdNomeNew = async(req, res) => {
 		obj.Firm = crUser.Firm;
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 		if(obj.code.length < 1) return res.redirect("/error?info=bsPdNomeNew,objCode");
+
 		const PdNomeSame = await PdNomeDB.findOne({code: obj.code});
 		if(PdNomeSame) return res.redirect("/error?info=bsPdNomeNew,PdNomeSame");
 
@@ -93,6 +157,8 @@ exports.bsPdNomeDel = async(req, res) => {
 		return res.redirect("/error?info=bsPdNomeDel,Error&error="+error);
 	}
 }
+
+
 exports.bsPdNomeNewAjax = async(req, res) => {
 	// console.log("/bsPdNomeNewAjax");
 	try{

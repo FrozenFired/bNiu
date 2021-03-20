@@ -37,7 +37,7 @@ const dbSchema = new Schema({
 	price: Float,
 	cost: Float,
 
-
+	Odspus: [{type: ObjectId, ref: 'Odspu'}],
 
 	// status: Number,		// 其他标识
 	shelf: Number,		// 上下架

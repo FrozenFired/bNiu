@@ -34,6 +34,17 @@ block content
 							else
 								option(value=PdCateg._id) #{code}
 			.form-group.row
+				- let PdNome = new Object();
+				if Pdspu.PdNome
+					- PdNome = Pdspu.PdNome;
+				label.col-3.col-sm-2.col-form-label(for="PdNomeIpt") PdNome
+				.col-9.col-sm-6
+					input#PdNomeIpt.form-control(type="hidden", name="obj[PdNome]" , value=PdNome._id, autocomplete="off")
+					input#PdNomeReq.form-control(type="text", list="PdNomeDatalist", name="codePdNome", value=PdNome.code, autocomplete="off")
+					datalist#PdNomeDatalist
+				.offset-3.col-9.col-form-label#PdNomeDanger.text-danger(style="display:none") 请输入产品名称
+
+			//- .form-group.row
 				label.col-3.col-sm-2.col-form-label(for="PdNomeIpt") 名称
 				.col-9.col-sm-6
 					select#PdNomeIpt.form-control(name="obj[PdNome]", data-style="btn-info")
@@ -73,3 +84,4 @@ block content
 			.form-group.row
 				.offset-sm-6.col-sm-2
 					input.btn.btn-success.btn-block(type="submit" value="确认")
+	script(src="/js/bser/product/Pdspu/edit.js")

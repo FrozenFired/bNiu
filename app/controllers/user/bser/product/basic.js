@@ -16,6 +16,8 @@ const SizeDB = require('../../../../models/attr/Size');
 const PdCostMtDB = require('../../../../models/product/PdCostMt');
 const PdskuDB = require('../../../../models/product/Pdsku');
 
+const OdspuDB = require('../../../../models/order/Odspu');
+
 exports.bsPdspus = async(req, res) => {
 	// console.log("/bsPdspus");
 	try{
@@ -34,9 +36,8 @@ exports.bsPdspuAdd = async(req, res) => {
 		const PdCategs = await PdCategDB.find({isBottom: 1})
 			.populate({path: "PdCategFar", populate: {path: "PdCategFar"}})
 			.sort({"weight": -1})
-		const PdNomes = await PdNomeDB.find().sort({"weight": -1});
 		const SizeSysts = await SizeSystDB.find().sort({"weight": -1});
-		return res.render("./user/bser/product/Pdspu/add", {title: "添加新产品", PdCategs, PdNomes, SizeSysts, crUser});
+		return res.render("./user/bser/product/Pdspu/add", {title: "添加新产品", PdCategs, SizeSysts, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPdspuAdd,Error&error="+error);
 	}
@@ -68,8 +69,20 @@ exports.bsPdspuNew = async(req, res) => {
 		if(obj.PdNome) {
 			const PdNome = await PdNomeDB.findOne({_id: obj.PdNome});
 			if(!PdNome) return res.redirect("/error?info=bsPdspuNew,没有此名称");
-		} else {
-			obj.PdNome = null;
+		} else {	// 如果没有此名称 则自动添加
+			const codePdNome = req.body.codePdNome.replace(/^\s*/g,"").toUpperCase();
+			if(codePdNome.length < 1) return res.redirect("/error?info=bsPdNomeNew,codePdNome");
+			const PdNomeSame = await PdNomeDB.findOne({code: codePdNome});
+			if(PdNomeSame) {
+				obj.PdNome = PdNomeSame._id;
+			} else {
+				const objPdNome = new Object();
+				objPdNome.Firm = crUser.Firm;
+				objPdNome.code = codePdNome;
+				const _objectPdNome = new PdNomeDB(objPdNome);
+				const PdNomeSave = await _objectPdNome.save();
+				obj.PdNome = PdNomeSave._id;
+			}
 		}
 		if(obj.SizeSyst) {
 			const SizeSyst = await SizeSystDB.findOne({_id: obj.SizeSyst});
@@ -130,9 +143,21 @@ exports.bsPdspuUpd = async(req, res) => {
 		}
 		if(obj.PdNome) {
 			const PdNome = await PdNomeDB.findOne({_id: obj.PdNome});
-			if(!PdNome) return res.redirect("/error?info=bsPdspuUpd,没有此名称");
-		} else {
-			obj.PdNome = null;
+			if(!PdNome) return res.redirect("/error?info=bsPdspuNew,没有此名称");
+		} else {	// 如果没有此名称 则自动添加
+			const codePdNome = req.body.codePdNome.replace(/^\s*/g,"").toUpperCase();
+			if(codePdNome.length < 1) return res.redirect("/error?info=bsPdNomeNew,codePdNome");
+			const PdNomeSame = await PdNomeDB.findOne({code: codePdNome});
+			if(PdNomeSame) {
+				obj.PdNome = PdNomeSame._id;
+			} else {
+				const objPdNome = new Object();
+				objPdNome.Firm = crUser.Firm;
+				objPdNome.code = codePdNome;
+				const _objectPdNome = new PdNomeDB(objPdNome);
+				const PdNomeSave = await _objectPdNome.save();
+				obj.PdNome = PdNomeSave._id;
+			}
 		}
 		if(obj.SizeSyst) {
 			const SizeSyst = await SizeSystDB.findOne({_id: obj.SizeSyst});
@@ -238,16 +263,38 @@ exports.bsPdspuUp = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const id = req.params.id;
-		const Pdspu = await PdspuDB.findOne({_id: id});
+		const Pdspu = await PdspuDB.findOne({_id: id})
+			.populate("PdNome");
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
 
 		const PdCategs = await PdCategDB.find({isBottom: 1})
 			.populate({path: "PdCategFar", populate: {path: "PdCategFar"}})
 			.sort({"weight": -1})
-		const PdNomes = await PdNomeDB.find().sort({"weight": -1});
 		const SizeSysts = await SizeSystDB.find().sort({"weight": -1});
-		return res.render("./user/bser/product/Pdspu/update/basicUp", {title: "产品更新", Pdspu, PdCategs, PdNomes, SizeSysts, crUser});
+		return res.render("./user/bser/product/Pdspu/update/basicUp", {title: "产品更新", Pdspu, PdCategs, SizeSysts, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPdspuUp,Error&error="+error);
+	}
+}
+
+exports.bsPdspuDel = async(req, res) => {
+	// console.log("/bsPdNomeDel");
+	try{
+		const crUser = req.session.crUser;
+
+		const id = req.params.id;
+		const PdspuExist = await PdspuDB.findOne({_id: id})
+			.populate("Odspus");
+		if(!PdspuExist) return res.json({status: 500, message: "此产品已经不存在, 请刷新重试"});
+		if(!PdspuExist.Odspus || PdspuExist.Odspus.length > 0) return res.json({status: 500, message: "此产品还有订单, 不可删除"});
+
+		const PdskuDelMany = await PdskuDB.deleteMany({Pdspu: id});
+		const PdCostMtDelMany = await PdCostMtDB.deleteMany({Pdspu: id});
+
+		const PdspuDel = await PdspuDB.deleteOne({_id: id});
+		return res.redirect("/bsPdspus");
+	} catch(error) {
+		console.log(error);
+		return res.redirect("/error?info=bsPdNomeDel,Error&error="+error);
 	}
 }

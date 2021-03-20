@@ -31,6 +31,7 @@ module.exports = app => {
 
 	app.get('/bsPdspus', bserIsLogin, PdspuBasic.bsPdspus);
 	app.get('/bsPdspu/:id', bserIsLogin, PdspuBasic.bsPdspu);
+	app.get('/bsPdspuDel/:id', bserIsLogin, PdspuBasic.bsPdspuDel);
 	app.get('/bsPdspuUp/:id', bserIsLogin, PdspuBasic.bsPdspuUp);
 	app.post('/bsPdspuUpd', bserIsLogin, postForm, PdspuBasic.bsPdspuUpd);
 	app.post('/bsPdspuUpdAjax', bserIsLogin, PdspuBasic.bsPdspuUpdAjax);
@@ -38,7 +39,7 @@ module.exports = app => {
 
 	/* ------------------------ attr ------------------------ */
 	app.get('/bsPdspuSizeUp/:id', bserIsLogin, PdspuAttr.bsPdspuSizeUp);
-	app.get('/bsPdspuSizeUpdAjax', bserIsLogin, PdspuAttr.bsPdspuSizeUpdAjax);
+	app.get('/bsPdspuSizeNewAjax', bserIsLogin, PdspuAttr.bsPdspuSizeNewAjax);
 	app.get('/bsPdspuSizeDelAjax', bserIsLogin, PdspuAttr.bsPdspuSizeDelAjax);
 
 	app.get('/bsPdspuColorUp/:id', bserIsLogin, PdspuAttr.bsPdspuColorUp);
@@ -57,6 +58,7 @@ module.exports = app => {
 
 	/* ------------------------ PdNome ------------------------ */
 	app.get('/bsPdNomes', bserIsLogin, PdNome.bsPdNomes);
+	app.get('/bsPdNomesAjax', bserIsLogin, PdNome.bsPdNomesAjax);
 	app.get('/bsPdNomeAdd', bserIsLogin, PdNome.bsPdNomeAdd);
 	app.post('/bsPdNomeNew', bserIsLogin, postForm, PdNome.bsPdNomeNew);
 	app.get('/bsPdNomeDel/:id', bserIsLogin, PdNome.bsPdNomeDel);

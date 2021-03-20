@@ -18,6 +18,7 @@ const MtrialDB = require('../../../../models/material/Mtrial');
 const PdCostMtDB = require('../../../../models/product/PdCostMt');
 const PdskuDB = require('../../../../models/product/Pdsku');
 
+const OdspuDB = require('../../../../models/order/Odspu');
 
 exports.bsPdspuMtrialUp = async(req, res) => {
 	// console.log("/bsPdspuUp");
@@ -119,8 +120,8 @@ exports.bsPdspuSizeUp = async(req, res) => {
 		return res.redirect("/error?info=bsPdspuUp,Error&error="+error);
 	}
 }
-exports.bsPdspuSizeUpdAjax = async(req, res) => {
-	// console.log("/bsPdspuSizeUpdAjax");
+exports.bsPdspuSizeNewAjax = async(req, res) => {
+	// console.log("/bsPdspuSizeNewAjax");
 	try{
 		const crUser = req.session.crUser;
 		const id = req.query.id;
@@ -194,7 +195,7 @@ exports.bsPdspuSizeUpdAjax = async(req, res) => {
 		return res.json({status: 200});
 	} catch(error) {
 		console.log(error)
-		return res.json({status: 500, message: "/bsPdspuSizeUpdAjax Error: "+error});
+		return res.json({status: 500, message: "/bsPdspuSizeNewAjax Error: "+error});
 	}
 }
 exports.bsPdspuSizeDelAjax = async(req, res) => {
@@ -204,7 +205,8 @@ exports.bsPdspuSizeDelAjax = async(req, res) => {
 		const id = req.query.id;
 		const size = req.query.size;
 
-		const Pdspu = await PdspuDB.findOne({_id: id});
+		const Pdspu = await PdspuDB.findOne({_id: id})
+			.populate("Odspus");
 		if(!Pdspu) return res.json({status: 500, message: "没有找到此模特"});
 		if(!Pdspu.sizes || Pdspu.sizes.length == 0) return res.json({status: 500, message: "此模特没有尺寸, 请添加"});
 
@@ -215,6 +217,15 @@ exports.bsPdspuSizeDelAjax = async(req, res) => {
 		} else {
 			sizeDel = Pdspu.sizes[Pdspu.sizes.length-1]
 			Pdspu.sizes.pop();
+		}
+
+		// 要作一个判断 如果此Pdspu下的 Odspus中 无论任何一个 只要包含 此 sizeDel 则不可删除
+		const Odspus = Pdspu.Odspus;
+		if(Odspus.length > 0) {
+			const result = Odspus.some((item) => {
+				return item.sizes.includes(sizeDel);
+			});
+			if(result) return res.json({status: 500, message: "还有未完成的订单 包含此尺寸, 暂时不可删除"});
 		}
 
 		const delObjParam = {Pdspu: id, size: sizeDel};
@@ -265,7 +276,8 @@ exports.bsPdspuColorUpdAjax = async(req, res) => {
 		const PdspuId = req.query.PdspuId;
 		const ColorId = req.query.ColorId;
 		const option = parseInt(req.query.option);
-		const Pdspu = await PdspuDB.findOne({_id: PdspuId, Firm: crUser.Firm});
+		const Pdspu = await PdspuDB.findOne({_id: PdspuId, Firm: crUser.Firm})
+			.populate("Odspus");
 		if(!Pdspu) return res.json({status: 500, message: "没有找到此模特"});
 
 		const isExist = Pdspu.Colors.includes(ColorId);
@@ -295,6 +307,16 @@ exports.bsPdspuColorUpdAjax = async(req, res) => {
 			}
 		} else {
 			// if(isExist == false) return res.json({status: 500, message: "此颜色已被删除, 请刷新查看"});
+
+			// 要作一个判断 如果此Pdspu下的 Odspus中 无论任何一个 只要包含 此 ColorId 则不可删除
+			const Odspus = Pdspu.Odspus;
+			if(Odspus.length > 0) {
+				const result = Odspus.some((item) => {
+					return item.Colors.includes(ColorId);
+				});
+				if(result) return res.json({status: 500, message: "还有未完成的订单 包含此颜色, 暂时不可删除"});
+			}
+
 			Pdspu.Colors.remove(ColorId)
 			const delObjParam = {Pdspu: PdspuId, Color: ColorId};
 			// 删除Pdspu下 Pdskus中 所有包含 ColorId 的 Pdskus
@@ -334,7 +356,8 @@ exports.bsPdspuPternUpdAjax = async(req, res) => {
 		const PdspuId = req.query.PdspuId;
 		const PternId = req.query.PternId;
 		const option = parseInt(req.query.option);
-		const Pdspu = await PdspuDB.findOne({_id: PdspuId, Firm: crUser.Firm});
+		const Pdspu = await PdspuDB.findOne({_id: PdspuId, Firm: crUser.Firm})
+			.populate("Odspus");
 		if(!Pdspu) return res.json({status: 500, message: "没有找到此印花图案"});
 
 		const isExist = Pdspu.Pterns.includes(PternId);
@@ -364,6 +387,16 @@ exports.bsPdspuPternUpdAjax = async(req, res) => {
 			}
 		} else {
 			// if(isExist == false) return res.json({status: 500, message: "此印花图案已被删除, 请刷新查看"});
+
+			// 要作一个判断 如果此Pdspu下的 Odspus中 无论任何一个 只要包含 此 PternId 则不可删除
+			const Odspus = Pdspu.Odspus;
+			if(Odspus.length > 0) {
+				const result = Odspus.some((item) => {
+					return String(item.Ptern) == PternId;
+				});
+				if(result) return res.json({status: 500, message: "还有未完成的订单 包含此印花, 暂时不可删除"});
+			}
+
 			Pdspu.Pterns.remove(PternId)
 
 			const delObjParam = {Pdspu: PdspuId, Ptern: PternId};
@@ -460,6 +493,7 @@ exports.bsPdSpusPhotosDel = async(req, res) => {
 // 	}
 // }
 
+// 更新用量的数值
 exports.bsPdspuPdCostMtUpdAjax = async(req, res) => {
 		// console.log("/bsPdspuPdCostMtUpdAjax");
 	try{

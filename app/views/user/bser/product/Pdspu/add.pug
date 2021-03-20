@@ -12,7 +12,7 @@ block content
 			.form-group.row
 				label.col-3.col-sm-2.col-form-label(for="codeIpt") code
 				.col-9.col-sm-6
-					input#codeIpt.form-control(type="text", name="obj[code]")
+					input#codeIpt.form-control(type="text", name="obj[code]", autocomplete="off")
 				.offset-3.col-9.col-form-label#codeDanger.text-danger(style="display:none") 请输入正确的编号
 			.form-group.row
 				label.col-3.col-sm-2.col-form-label(for="PdCategIpt") 分类
@@ -28,12 +28,19 @@ block content
 									- code = Far.PdCategFar.code+" -> "+code;
 							option(value=PdCateg._id) #{code}
 			.form-group.row
-				label.col-3.col-sm-2.col-form-label(for="PdNomeIpt") 名称
+				label.col-3.col-sm-2.col-form-label(for="PdNomeIpt") PdNome
 				.col-9.col-sm-6
-					select#PdNomeIpt.form-control(name="obj[PdNome]", data-style="btn-info")
-						each PdNome in PdNomes
-							- code = "["+PdNome.code+"]";
-							option(value=PdNome._id) #{code}
+					input#PdNomeIpt.form-control(type="hidden", name="obj[PdNome]" , autocomplete="off")
+					input#PdNomeReq.form-control(type="text", list="PdNomeDatalist", name="codePdNome" autocomplete="off")
+					datalist#PdNomeDatalist
+				.offset-3.col-9.col-form-label#PdNomeDanger.text-danger(style="display:none") 请输入产品名称
+			//- .form-group.row
+				//- label.col-3.col-sm-2.col-form-label(for="PdNomeIpt") 名称
+				//- .col-9.col-sm-6
+				//- 	select#PdNomeIpt.form-control(name="obj[PdNome]", data-style="btn-info")
+				//- 		each PdNome in PdNomes
+				//- 			- code = "["+PdNome.code+"]";
+				//- 			option(value=PdNome._id) #{code}
 			.form-group.row
 				label.col-3.col-sm-2.col-form-label(for="SizeSystIpt") 尺寸标准
 				.col-9.col-sm-6
@@ -59,3 +66,4 @@ block content
 			.form-group.row
 				.offset-sm-6.col-sm-2
 					input.btn.btn-success.btn-block(type="submit" value="确认")
+	script(src="/js/bser/product/Pdspu/edit.js")

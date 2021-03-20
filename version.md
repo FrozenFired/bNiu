@@ -1,4 +1,6 @@
-0.0.94	
+0.0.95		PdNome 在Pdspu界面的添加优化
+			Pdspu 删除优化 Pdspu[sizes Colors Pterns]删除优化
+0.0.94	49e106a4907b495993887f7060dbd11ac57673b9
 			PdNome PdCateg 修改删除优化
 			Ptern PtCateg PtFirm 修改/删除->优化
 0.0.93	9659c09a3bae98cc2ce70340dfc24be1069a7e4a
