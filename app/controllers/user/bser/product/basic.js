@@ -224,6 +224,7 @@ exports.bsPdspuUpd = async(req, res) => {
 exports.bsPdspuUpdAjax = async(req, res) => {
 	// console.log("/bsPdspuUpdAjax");
 	try{
+		const crUser = req.session.crUser;
 		const id = req.body.id;		// 所要更改的Pdspu的id
 		const Pdspu = await PdspuDB.findOne({_id: id})
 		if(!Pdspu) return res.json({status: 500, message: "没有找到此产品信息, 请刷新重试"});
@@ -231,6 +232,7 @@ exports.bsPdspuUpdAjax = async(req, res) => {
 		let val = req.body.val;		// 数据的值
 
 		const field = req.body.field;
+		console.log(field)
 		if(field == "code") {
 			val = String(val).replace(/^\s*/g,"").toUpperCase();
 			if(val.length < 1) return res.json({status: 500, message: "编号填写错误"});
@@ -242,9 +244,29 @@ exports.bsPdspuUpdAjax = async(req, res) => {
 				MdFile.delFile(Pdspu[field]);
 				if(!val) val = Conf.photo.Pdspu.def;
 			}
-		} else if(field == "weight") {
+		} else if(field == "PdNome") {
+			val = String(val).replace(/^\s*/g,"").toUpperCase();
+			if(val.length < 1) return res.json({status: 500, message: "名称填写错误"});
+			const PdNome = await PdNomeDB.findOne({Firm: crUser.Firm, code: val});
+			if(PdNome) {
+				val = PdNome._id;
+			} else {
+				const objPdNome = new Object();
+				objPdNome.Firm = crUser.Firm;
+				objPdNome.code = val;
+
+				const _objectPdNome = new PdNomeDB(objPdNome);
+				const PdNomeSave = await _objectPdNome.save();
+				val = PdNomeSave._id;
+			}
+
+		} else if(field == "SizeSyst") {
+			if(val.length != 24) return res.json({status: 500, message: "尺寸标准操作错误"});
+		}else if(field == "weight") {
 			val = parseInt(val);
 			if(isNaN(val)) return res.json({status: 500, message: "[bsPdspuUpdAjax weight] 排序为数字, 请传递正确的参数"});
+		} else {
+			return res.json({status: 500, message: "参数错误"});
 		}
 
 		Pdspu[field] = val;
@@ -252,6 +274,7 @@ exports.bsPdspuUpdAjax = async(req, res) => {
 		const PdspuSave = Pdspu.save();
 		return res.json({status: 200});
 	} catch(error) {
+		console.log(error)
 		return res.json({status: 500, message: error});
 	}
 }
@@ -294,10 +317,14 @@ exports.bsPdspu = async(req, res) => {
 		if(Pdspu.SizeSyst) SizeSystId = Pdspu.SizeSyst._id;
 		const Sizes = await SizeDB.find({SizeSyst: SizeSystId});
 
+		const PdCategs = await PdCategDB.find({isBottom: 1})
+			.populate({path: "PdCategFar", populate: {path: "PdCategFar"}})
+			.sort({"weight": -1})
+		const SizeSysts = await SizeSystDB.find().sort({"weight": -1});
 		// const PdCostMts = await PdCostMtDB.find({Pdspu: id, Mtrial: null});
 		// console.log(PdCostMts)
 
-		return res.render("./user/bser/product/Pdspu/detail", {title: "产品详情", Pdspu, Sizes, crUser});
+		return res.render("./user/bser/product/Pdspu/detail", {title: "产品详情", Pdspu, Sizes, PdCategs, SizeSysts, crUser});
 	} catch(error) {
 		console.log(error)
 		return res.redirect("/error?info=bsPdspu,Error&error="+error);

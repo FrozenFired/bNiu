@@ -8,195 +8,23 @@ block content
 				li.breadcrumb-item: a(href="/bsPdspus") 产品列表
 				li.breadcrumb-item.active(aria-current="page") #{title}
 		
-		- getUrl = "/bsPdspuUpdAjax";
-		- object = Pdspu;
 		.row
-			.col-sm-6.col-xl-4.mt-3.p-3
-				.card.text-center(style="width: 100%;")
-					img.card-img-top.border-bottom.js-click-imgEnlarge(id="img-"+Pdspu._id+"-photo-sub", src=Pdspu.photo, alt="Pdspu Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
-											
-					.row(class="jsImg-clickBefore-"+Pdspu._id+"-photo-sub")
-						.col-6
-							.jsImg-clickUpd.text-info(id="clickUpd-"+Pdspu._id+"-photo-sub") [点击]
-						.col-6
-							- field="photo", value=Pdspu.photo, subid="photo", valueHide=1, toUp=-1, fieldDesp="[upd]";
-							include ../../../../aaPlugin/ajaxInputUpd
-							- fieldDesp = null, valueHide = null, toUp = null;
-					.row(class="jsImg-clickAfter-"+Pdspu._id+"-photo-sub", style="display:none")
-						.col-6
-							.jsImg-cancel.btn.btn-secondary(id="clickUpd-"+Pdspu._id+"-photo-sub") [取消]
-						.col-6
-							form(method="post", action="/bsPdspuPhotoUpd", enctype="multipart/form-data")
-								input(type="hidden", name="obj[_id]", value=Pdspu._id)
-								input(type="hidden", name="flDir", value=Conf.photo.Pdspu.dir)
-								input(type="hidden", name="flName", value=crUser.Firm+"-"+Pdspu.code+"-"+crUser._id)
-								input.jsImg-ipt(id="ipt-"+Pdspu._id+"-photo-sub", type="file", name="fls", style="display:none")
-								.form-group
-									input.btn.btn-success(type="submit" value="确认")
-					.card-body
-						.code
-							- field="code", value=Pdspu.code, subid="code", fieldDesp="编号:";
-							include ../../../../aaPlugin/ajaxInputUpd
-						.PdNome
-							if Pdspu.PdNome
-								- PdNome = Pdspu.PdNome;
-								span.mr-3 名称: #{PdNome.code}
-							else
-								span 未命名
-						.far
-							if Pdspu.PdCateg
-								- PdCateg = Pdspu.PdCateg;
-								span.mr-3 分类: #{PdCateg.code}
-							else
-								span 未分类
-						.far
-							span 尺寸标准:
-							if Pdspu.SizeSyst
-								- SizeSyst = Pdspu.SizeSyst;
-								span.mr-3 #{SizeSyst.code}
-							else
-								span 错误
-						.price
-							- field="price", value=Pdspu.price, subid="price", fieldDesp="售价:";
-							include ../../../../aaPlugin/ajaxInputUpd
-						.cost
-							- field="cost", value=Pdspu.cost, subid="cost", fieldDesp="采购价:";
-							include ../../../../aaPlugin/ajaxInputUpd
-						.weight
-							- field="weight", value=Pdspu.weight, subid="weight", fieldDesp="排序:";
-							include ../../../../aaPlugin/ajaxInputUpd
-						.text-right
-							a.btn.btn-warning(href="/bsPdspuUp/"+Pdspu._id) 修改
-			.col-sm-6.col-xl-4.mt-3.p-3
-				.card.text-center(style="width: 100%;")
-					h5.mt-3.card-title 模特尺寸
-					.card-body
-						each size in Pdspu.sizes
-							- let val = size;
-							each Size in Sizes
-								if Size.size == size
-									- val = Size.symbol;
-									- break;
-							.mt-2 #{val}
-						.text-right
-							a.btn.btn-warning(href="/bsPdspuSizeUp/"+Pdspu._id) 修改
-			.col-sm-6.col-xl-4.mt-3.p-3
-				.card.text-center(style="width: 100%;")
-					h5.mt-3.card-title 模特颜色
-					.card-body
-						each Color in Pdspu.Colors
-							-a;
-							.mt-2 #{Color.code}
-						.text-right
-							a.btn.btn-warning(href="/bsPdspuColorUp/"+Pdspu._id) 修改
-		.row.border.rounded.p-2.mt-3
-			.col-6.my-2
-				h3 材质:
-			.col-6.my-2.text-right
-				a.btn.btn-warning(href="/bsPdspuMtrialUp/"+Pdspu._id) 修改
-			each Mtrial in Pdspu.Mtrials
-				-a;
-				.col-6.col-xl-3.mt-3
-					.card.text-center(style="width: 100%;")
-						img.card-img-top.border-bottom.js-click-imgEnlarge(src=Mtrial.photo, alt="Mtrial Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
-						h5.mt-3.card-title #{Mtrial.code}
+			.col-md-6.mt-3
+				button.btn.btn-success.pageBtn#pageBtn-Pdspu.mr-5(type="button") 信息
+				button.btn.btn-defalut.pageBtn#pageBtn-PdCostMt.mr-5(type="button") 用料
+				button.btn.btn-defalut.pageBtn#pageBtn-Pdsku(type="button") 库存
+			.col-md-6.text-right.mt-3
+				button.btn.btn-danger.jsDel-btnClick.mr-5(type="button") -
+				button.btn.btn-warning.jsUp-btnClick(type="button") 改
+		hr
+		.page#page-Pdspu
+			include ./detail/Pdspu
 
-		.row.border.rounded.p-2.mt-3
-			.col-6.my-2
-				h3 模特印花:
-			.col-6.my-2.text-right
-				a.btn.btn-warning(href="/bsPdspuPternUp/"+Pdspu._id) 修改
-			each Ptern in Pdspu.Pterns
-				-a;
-				.col-6.col-xl-3.mt-3
-					.card.text-center(style="width: 100%;")
-						img.card-img-top.border-bottom.js-click-imgEnlarge(src=Ptern.photo, alt="Ptern Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
-						h5.mt-3.card-title #{Ptern.code}
+		.page#page-PdCostMt(style="display:none")
+			include ./detail/PdCostMt
+		.page#page-Pdsku(style="display:none")
+			include ./detail/Pdsku
 
-		.row.border.rounded.p-2.mt-3
-			.col-6.my-2
-				h3 子图片:
-			.col-6.my-2.text-right
-					a.btn.btn-danger(href="#", data-toggle="modal", data-target="#delPost") 删除照片
-			each photo in Pdspu.photos
-				-a;
-				.col-6.col-xl-3.mt-3
-					img.js-click-imgEnlarge.border(src=photo, width="100%", height="150px", style="object-fit: scale-down;")
-			.col-6.col-xl-3.mt-3
-				a(href="#", data-toggle="modal", data-target="#addPost")
-					img(src="/media/indicate/crt.jpg", width="100%", height="150px")
-		#addPost.modal.fade
-			.modal-dialog
-				.modal-content
-					form#upGroup(method="post", action="/bsPdSpusPhotosNew", enctype="multipart/form-data")
-						.modal-header
-							h5 添加海报
-						.modal-body
-							input(type="hidden", name="id", value=Pdspu._id)
-							input(type="hidden", name="flDir", value=Conf.photo.Pdspu.dir)
-							input(type="hidden", name="flName", value=crUser.Firm+"-"+Pdspu.code+"-"+crUser._id)
-							.row
-								.col-12(align="center")
-									input#uploadPics.btn.btn-info.btn-block(type="file", name="fls", multiple)
-							.form-group.row#crtImgs
-						.modal-footer
-							.row
-								.col-6
-									button.btn.btn-secondary(type="button" data-dismiss="modal") 取消
-								.col-6.text-right
-									button.btn.btn-success(type="submit") 确定
-		#delPost.modal.fade
-			.modal-dialog
-				.modal-content
-					.modal-header
-						h5 删除海报
-					.modal-body
-						if Pdspu.photos
-							-a;
-							each photo in Pdspu.photos
-								-a;
-								.row.mt-5
-									.col-8
-										img(src=photo, width="60%")
-									.col-4.pt-5
-										a.btn.btn-danger(href="/bsPdSpusPhotosDel/"+Pdspu._id+"?photo="+photo) 删除
-								hr
-					.modal-footer
-						button.btn.btn-secondary(type="button" data-dismiss="modal") 取消
 
-		.row.border.rounded.p-2.mt-3
-			.col-12.mt-3
-				h3 用料管理
-			.col-12.mt-3
-				- let widthTr = 100/(Pdspu.sizes.length+1);
-
-				- getUrl = "/bsPdspuPdCostMtUpdAjax"
-				- field="dosage", subid='dosage';
-				table.table.table-hover.table-bordered.text-center
-					thead
-						tr
-							th(width=widthTr+"%")
-							each size in Pdspu.sizes
-								- let val = size;
-								each Size in Sizes
-									if Size.size == size
-										- val = Size.symbol;
-										- break;
-								th(width=widthTr+"%") #{val}
-					tbody
-						each Mtrial in Pdspu.Mtrials
-							- a;
-							tr
-								td #{Mtrial.code}
-
-								each size in Pdspu.sizes
-									- a;
-									td
-										- let Dosage = {};
-										each PdCostMt in Pdspu.PdCostMts
-											if PdCostMt.size == size && String(PdCostMt.Mtrial) == String(Mtrial._id)
-												- Dosage = PdCostMt;
-												- break;
-										- object=Dosage, value=Dosage.dosage;
-										include ../../../../aaPlugin/ajaxInputUpd
 		div(style="height: 200px")
+	script(src="/js/bser/product/Pdspu/detail.js")

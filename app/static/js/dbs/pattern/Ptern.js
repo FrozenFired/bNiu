@@ -49,8 +49,8 @@ const objectRender = (object, role) => {
 			elem += 'width="100%" height="150px" '
 			elem += 'style="object-fit: scale-down;"'
 		elem += '/>'
-		elem += '<h5>'+object.code+'</h5>'
-		elem += '<h5>'+object.PtFirm.code+'</h5>'
+		elem += '<h5>编号: '+object.code+'</h5>'
+		elem += '<h5>印花厂: '+object.PtFirm.code+'</h5>'
 		elem += '<div class="row">'
 			elem += '<div class="col-sm-6 text-left">'
 				elem += '<span class="bg-white text-info jsUpd-span jsUpd-span-weight-weight-'+object._id;

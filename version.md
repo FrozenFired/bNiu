@@ -1,4 +1,6 @@
-0.0.96		Pdspu Mtrial Ptern 列表优化
+0.0.97		Pdspu Detail 优化
+0.0.96	6cf5e45b6eb2f23c9c24d3aec12d9eabeb3baa8f
+			Pdspu Mtrial Ptern 列表优化
 0.0.95	3bd78aabfaa765d05376e04483ead8a663c3a26f
 			PdNome 在Pdspu界面的添加优化
 			Pdspu 删除优化 Pdspu[sizes Colors Pterns]删除优化

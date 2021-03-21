@@ -13,7 +13,9 @@ block content
 				li.breadcrumb-item: a(href="/bser") Home
 				li.breadcrumb-item.active(aria-current="page") #{title}
 		.row.my-3
-			.col-12.text-right
+			.col-6
+				input#codeSearch.form-control(type="text")
+			.col-6.text-right
 				button.btn.btn-danger.jsDel-btnClick.mr-5(type="button") -
 				a.btn.btn-info(href="/bsMtrialAdd") +
 		.MtFirmsList

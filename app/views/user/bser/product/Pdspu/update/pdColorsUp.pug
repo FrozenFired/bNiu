@@ -18,7 +18,7 @@ block content
 					if codeColor.length > 8
 						- codeColor = codeColor.slice(0,6) + '...';
 				.col-4.col-md-6.col-xl-1.mt-3(id="Colored-"+Color._id)
-					.toggleColor(style="background-Color:#"+Color.rgb+"; height: 30px", data-objid=Pdspu._id, data-subid=Color._id, data-rgb=Color.rgb, data-code=Color.code, data-option=-1, title=Color.code)
+					.toggleColor.border(style="background-Color:#"+Color.rgb+"; height: 30px", data-objid=Pdspu._id, data-subid=Color._id, data-rgb=Color.rgb, data-code=Color.code, data-option=-1, title=Color.code)
 					.code(class="text-success", style="Font-size: 8px", title=Color.code) #{codeColor}
 		hr
 		h4 颜色池(未选)

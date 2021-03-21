@@ -520,3 +520,30 @@ exports.bsPdspuPdCostMtUpdAjax = async(req, res) => {
 		return res.json({status: 500, message: error});
 	}
 }
+// 更新库存的数值
+exports.bsPdspuPdskuUpdAjax = async(req, res) => {
+		// console.log("/bsPdspuPdskuUpdAjax");
+	try{
+		const id = req.body.id;		// 所要更改的Color的id
+		const Pdsku = await PdskuDB.findOne({'_id': id})
+		if(!Pdsku) return res.json({status: 500, message: "没有找到此颜色信息, 请刷新重试"});
+
+		let val = req.body.val;		// 数据的值
+
+		const field = req.body.field;
+		if(field == "stock") {
+			val = parseInt(val);
+			if(isNaN(val) || val<0) return res.json({status: 500, message: "请传递正确的数值"});
+		} else {
+			return res.json({status: 500, message: "[bsPdspuPdskuUpdAjax field] 参数传递错误"});
+		}
+
+		Pdsku[field] = val;
+
+		const PdskuSave = Pdsku.save();
+		return res.json({status: 200})
+	} catch(error) {
+		console.log(error);
+		return res.json({status: 500, message: error});
+	}
+}

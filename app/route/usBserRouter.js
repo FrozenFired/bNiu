@@ -56,6 +56,7 @@ module.exports = app => {
 	app.get('/bsPdSpusPhotosDel/:id', bserIsLogin, PdspuAttr.bsPdSpusPhotosDel);
 
 	app.post('/bsPdspuPdCostMtUpdAjax', bserIsLogin, PdspuAttr.bsPdspuPdCostMtUpdAjax);
+	app.post('/bsPdspuPdskuUpdAjax', bserIsLogin, PdspuAttr.bsPdspuPdskuUpdAjax);
 
 	/* ------------------------ PdNome ------------------------ */
 	app.get('/bsPdNomes', bserIsLogin, PdNome.bsPdNomes);

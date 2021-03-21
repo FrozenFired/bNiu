@@ -134,6 +134,10 @@ $(() => {
 	$("body").on('click', '.jsDel-btnClick', function(e){
 		$(".jsDel-objElem").toggle();
 	})
+	/* ================================ toggle Up ================================ */
+	$("body").on('click', '.jsUp-btnClick', function(e){
+		$(".jsUp-objElem").toggle();
+	})
 	/* ================================ toggle Detail ================================ */
 	$("body").on('click', '.jsDetail-btnClick', function(e){
 		$(".jsDetail-objElem").toggle();
