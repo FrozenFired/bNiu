@@ -3,8 +3,9 @@
 	因为如果有其他数据库占据了 此颜色的id后 删除此颜色 其他数据库会不方便
 */
 const Conf = require('../../../../config/conf.js');
-const MdFile = require('../../../../middle/MdFile');
 const _ = require('underscore');
+const MdFile = require('../../../../middle/MdFile');
+const MdFilter = require('../../../../middle/MdFilter');
 
 const MtFirmDB = require('../../../../models/material/MtFirm');
 const MtCategDB = require('../../../../models/material/MtCateg');
@@ -17,19 +18,83 @@ exports.bsMtrials = async(req, res) => {
 	try{
 		const info = req.query.info;
 		const crUser = req.session.crUser;
-		const Mtrials = await MtrialDB.find()
-			.populate("MtCateg")
-			.populate("MtFirm")
-			.sort({"weight": -1});
 		const MtCategs = await MtCategDB.find({isBottom: 1})
 			.populate({path: "MtCategFar", populate: {path: "MtCategFar"}})
 			.sort({"weight": -1});
 		const MtFirms = await MtFirmDB.find();
-		return res.render("./user/bser/material/Mtrial/list", {title: "材料管理", info, MtCategs, MtFirms, Mtrials, crUser});
+		return res.render("./user/bser/material/Mtrial/list", {title: "材料管理", info, MtCategs, MtFirms, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsMtrials,Error&error="+error);
 	}
 }
+
+exports.bsMtrialsAjax = async(req, res) => {
+	// console.log("/bsMtrials");
+	try{
+		const crUser = req.session.crUser;
+
+		const {param, filter, sortBy, page, pagesize, skip} = MtrialsParamFilter(req, crUser);
+		const count = await MtrialDB.countDocuments(param);
+		const objects = await MtrialDB.find(param, filter)
+			.populate("MtFirm")
+			.skip(skip).limit(pagesize)
+			.sort(sortBy);
+
+		// 如果是编号查询 首先要看是否有与编号一致的产品
+		let object = null;
+		if(objects.length > 0 && req.query.code) {
+			const code = req.query.code.replace(/^\s*/g,"").toUpperCase();
+			object = await MtrialDB.findOne({code: code}, filter);
+		}
+
+		return res.status(200).json({
+			status: 200,
+			message: '成功获取',
+			data: {object, objects, count, page, pagesize}
+		});
+	} catch(error) {
+		console.log(error)
+		return res.json({status: 500, message: "bsMtrialsAjax Error!"});
+	}
+}
+const MtrialsParamFilter = (req, crUser) => {
+	let param = {
+		"Firm": crUser.Firm,
+	};
+	const filter = {};
+	const sortBy = {};
+
+	if(req.query.code) {
+		let symbConb = String(req.query.code)
+		symbConb = symbConb.replace(/(\s*$)/g, "").replace( /^\s*/, '').toUpperCase();
+		symbConb = new RegExp(symbConb + '.*');
+		param["code"] = symbConb;
+	}
+
+	if(req.query.MtFirm) {
+		let symbConb = req.query.MtFirm
+		if(symbConb.length == 24) {
+			param["MtFirm"] = {'$eq': symbConb};
+		}
+	}
+
+	if(req.query.sortKey && req.query.sortVal) {
+		let sortKey = req.query.sortKey;
+		let sortVal = parseInt(req.query.sortVal);
+		if(!isNaN(sortVal) && (sortVal == 1 || sortVal == -1)) {
+			sortBy[sortKey] = sortVal;
+		}
+	}
+
+	sortBy['weight'] = -1;
+	sortBy['updAt'] = -1;
+
+	const {page, pagesize, skip} = MdFilter.page_Filter(req);
+	return {param, filter, sortBy, page, pagesize, skip};
+}
+
+
+
 
 exports.bsMtrialAdd = async(req, res) => {
 	// console.log("/bsMtrialAdd");
@@ -173,9 +238,9 @@ exports.bsMtrialPhotoUpd = async(req, res) => {
 		if(!Mtrial) return res.redirect("/error?info=没有找到此材料信息");
 		const delPhoto = Mtrial.photo;
 		Mtrial.photo = photo;
-		const MtrialSave = Mtrial.save();
+		const MtrialSave = await Mtrial.save();
 		MdFile.delFile(delPhoto);
-		return res.redirect("/bsMtrials");
+		return res.redirect("/bsMtrial/"+MtrialSave._id);
 	} catch(error) {
 		return res.redirect("/error?info=bsMtrialPhotoUpd,Error&error="+error);
 	}
@@ -206,7 +271,11 @@ exports.bsMtrial = async(req, res) => {
 			.populate("MtCateg")
 			.populate("MtFirm")
 		if(!Mtrial) return res.redirect("/error?info=不存在此分类");
-		return res.render("./user/bser/material/Mtrial/detail", {title: "材料详情", Mtrial, crUser});
+		const MtCategs = await MtCategDB.find({isBottom: 1})
+			.populate({path: "MtCategFar", populate: {path: "MtCategFar"}})
+			.sort({"weight": -1});
+		const MtFirms = await MtFirmDB.find();
+		return res.render("./user/bser/material/Mtrial/detail", {title: "材料详情", Mtrial, MtCategs, MtFirms, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsMtrial,Error&error="+error);
 	}

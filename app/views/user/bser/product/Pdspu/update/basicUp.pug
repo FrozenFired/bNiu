@@ -43,18 +43,6 @@ block content
 					input#PdNomeReq.form-control(type="text", list="PdNomeDatalist", name="codePdNome", value=PdNome.code, autocomplete="off")
 					datalist#PdNomeDatalist
 				.offset-3.col-9.col-form-label#PdNomeDanger.text-danger(style="display:none") 请输入产品名称
-
-			//- .form-group.row
-				label.col-3.col-sm-2.col-form-label(for="PdNomeIpt") 名称
-				.col-9.col-sm-6
-					select#PdNomeIpt.form-control(name="obj[PdNome]", data-style="btn-info")
-						each PdNome in PdNomes
-							- code = "["+PdNome.code+"]";
-							if String(Pdspu.PdNome) == String(PdNome._id)
-								-a;
-								option(value=PdNome._id, selected="selected") #{code}
-							else
-								option(value=PdNome._id) #{code}
 			.form-group.row
 				label.col-3.col-sm-2.col-form-label(for="SizeSystIpt") 尺寸标准
 				.col-9.col-sm-6

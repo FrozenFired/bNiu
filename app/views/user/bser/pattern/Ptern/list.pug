@@ -16,63 +16,15 @@ block content
 			.col-12.text-right
 				button.btn.btn-danger.jsDel-btnClick.mr-5(type="button") -
 				a.btn.btn-warning(href="/bsPternAdd") +
+		.PtFirmsList
+			button.PtFirmClick.btn.mt-3(type="button" data-pdnome="") 供货商选择:
+			button.PtFirmClick#PtFirmAll.btn.btn-success.ml-5.mt-3(type="button" data-pdnome="") 全部
+			each PtFirm in PtFirms
+				-a;
+				button.PtFirmClick.btn.btn-default.ml-4.mt-3(type="button" data-pdnome=PtFirm._id) #{PtFirm.code}
 
-		- getUrl = "/bsPternUpdAjax";
-		- fieldPtFirm = PtFirms.map((item) => {return {val: item._id, text: item.code} });
-		- fieldPtCateg = PtCategs.map((item) => {return {val: item._id, text: item.code} });
-		.row
-			each Ptern in Pterns
-				- object = Ptern;
-				.col-sm-6.col-md-4.col-xl-3.mt-4
-					.card.text-center(style="width: 100%;")
-						img.card-img-top.border-bottom.js-click-imgEnlarge(id="img-"+Ptern._id+"-photo-sub", src=Ptern.photo, alt="Ptern Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
-						
-						.row(class="jsImg-clickBefore-"+Ptern._id+"-photo-sub")
-							.col-6
-								.jsImg-clickUpd.text-info(id="clickUpd-"+Ptern._id+"-photo-sub") [点击]
-							.col-6
-								- field="photo", value=Ptern.photo, subid="photo", valueHide=1, toUp=-1, fieldDesp="[upd]";
-								include ../../../../aaPlugin/ajaxInputUpd
-								- fieldDesp = null, valueHide = null, toUp = null;
-						.row(class="jsImg-clickAfter-"+Ptern._id+"-photo-sub", style="display:none")
-							.col-6
-								.jsImg-cancel.btn.btn-secondary(id="clickUpd-"+Ptern._id+"-photo-sub") [取消]
-							.col-6
-								form(method="post", action="/bsPternPhotoUpd", enctype="multipart/form-data")
-									input(type="hidden", name="obj[_id]", value=Ptern._id)
-									input(type="hidden", name="flDir", value=Conf.photo.Ptern.dir)
-									input(type="hidden", name="flName", value=crUser.Firm+"-"+Ptern.code+"-"+crUser._id)
-									input.jsImg-ipt(id="ipt-"+Ptern._id+"-photo-sub", type="file", name="fls", style="display:none")
-									.form-group
-										input.btn.btn-success(type="submit" value="确认")
-						.card-body
-							.code
-								- field="code", value=Ptern.code, subid="code", fieldDesp="编号:";
-								include ../../../../aaPlugin/ajaxInputUpd
-							.PtFirm
-								- fieldSels = fieldPtFirm;
-								- field="PtFirm", subid="PtFirm", nullDesp = false;
-								if Ptern.PtFirm
-									- selectedVal = Ptern.PtFirm._id;
-									- value=object[field].code, fieldDesp="印花厂:";
-								else
-									- selectedVal = "", value="", valueHide=1, fieldDesp="未选择印花厂";
-								include ../../../../aaPlugin/ajaxSelectUpd
-								- fieldDesp = null, valueHide = null;
-							.PtCateg.mt-2
-								- fieldSels = fieldPtCateg, nullDesp = "不分类";
-								- field="PtCateg", subid="PtCateg";
-								if Ptern.PtCateg
-									- selectedVal = Ptern.PtCateg._id;
-									- value=object[field].code, fieldDesp="分类:";
-								else
-									- selectedVal = "", value="", valueHide=1, fieldDesp="未分类";
-								include ../../../../aaPlugin/ajaxSelectUpd
-								- fieldDesp = null, valueHide = null;
-							.weight.mt-3
-								- field="weight", value=Ptern.weight, subid="weight", fieldDesp="权重:";
-								include ../../../../aaPlugin/ajaxInputUpd
-							.text-right.mt-3.jsDel-objElem(style="display:none")
-								a.text-danger(href="/bsPternDel/"+Ptern._id) [删除]
-							//- .text-right.mt-3
-							//- 	a(href="/bsPtern/"+Ptern._id) [详情]
+		.objectsList
+			input#objectFilterAjax(type="hidden", value="/bsPternsAjax?@#objectsElem@bs")
+			#objectsElem.mt-5
+	script(src="/js/bser/pattern/Ptern/list.js")
+	script(src="/js/dbs/pattern/Ptern.js")

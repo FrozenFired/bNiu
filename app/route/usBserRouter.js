@@ -30,6 +30,7 @@ module.exports = app => {
 	app.post('/bsPdspuNew', bserIsLogin, postForm, PdspuBasic.bsPdspuNew);
 
 	app.get('/bsPdspus', bserIsLogin, PdspuBasic.bsPdspus);
+	app.get('/bsPdspusAjax', bserIsLogin, PdspuBasic.bsPdspusAjax);
 	app.get('/bsPdspu/:id', bserIsLogin, PdspuBasic.bsPdspu);
 	app.get('/bsPdspuDel/:id', bserIsLogin, PdspuBasic.bsPdspuDel);
 	app.get('/bsPdspuUp/:id', bserIsLogin, PdspuBasic.bsPdspuUp);
@@ -66,6 +67,7 @@ module.exports = app => {
 
 	/* ------------------------ PdCateg 产品分类 ----------------------- */
 	app.get('/bsPdCategs', bserIsLogin, PdCateg.bsPdCategs);
+	app.get('/bsPdCategsAjax', bserIsLogin, PdCateg.bsPdCategsAjax);
 	app.get('/bsPdCategAdd', bserIsLogin, PdCateg.bsPdCategAdd);
 	app.post('/bsPdCategNew', bserIsLogin, postForm, PdCateg.bsPdCategNew);
 	app.get('/bsPdCategDel/:id', bserIsLogin, PdCateg.bsPdCategDel);
@@ -79,6 +81,7 @@ module.exports = app => {
 	/* ============================================= matrial ============================================= */
 	/* ------------------------ Mtrial 材质 ------------------------ */
 	app.get('/bsMtrials', bserIsLogin, Mtrial.bsMtrials);
+	app.get('/bsMtrialsAjax', bserIsLogin, Mtrial.bsMtrialsAjax);
 	app.get('/bsMtrialAdd', bserIsLogin, Mtrial.bsMtrialAdd);
 	app.post('/bsMtrialNew', bserIsLogin, postForm, Mtrial.bsMtrialNew);
 	app.post('/bsMtrialUpdAjax', bserIsLogin, Mtrial.bsMtrialUpdAjax);
@@ -92,6 +95,7 @@ module.exports = app => {
 
 	/* ------------------------ MtFirm 供货商 ----------------------- */
 	app.get('/bsMtFirms', bserIsLogin, MtFirm.bsMtFirms);
+	app.get('/bsMtFirmsAjax', bserIsLogin, MtFirm.bsMtFirmsAjax);
 	app.get('/bsMtFirmAdd', bserIsLogin, MtFirm.bsMtFirmAdd);
 	app.post('/bsMtFirmNew', bserIsLogin, postForm, MtFirm.bsMtFirmNew);
 	app.get('/bsMtFirmDel/:id', bserIsLogin, MtFirm.bsMtFirmDel);
@@ -112,6 +116,7 @@ module.exports = app => {
 	/* ============================================= pattern ============================================= */
 	/* ------------------------ Ptern ------------------------ */
 	app.get('/bsPterns', bserIsLogin, Ptern.bsPterns);
+	app.get('/bsPternsAjax', bserIsLogin, Ptern.bsPternsAjax);
 	app.get('/bsPternAdd', bserIsLogin, Ptern.bsPternAdd);
 	app.post('/bsPternNew', bserIsLogin, postForm, Ptern.bsPternNew);
 	app.post('/bsPternUpdAjax', bserIsLogin, Ptern.bsPternUpdAjax);
@@ -125,6 +130,7 @@ module.exports = app => {
 
 	/* ------------------------ PtFirm 印花厂 ----------------------- */
 	app.get('/bsPtFirms', bserIsLogin, PtFirm.bsPtFirms);
+	app.get('/bsPtFirmsAjax', bserIsLogin, PtFirm.bsPtFirmsAjax);
 	app.get('/bsPtFirmAdd', bserIsLogin, PtFirm.bsPtFirmAdd);
 	app.post('/bsPtFirmNew', bserIsLogin, postForm, PtFirm.bsPtFirmNew);
 	app.get('/bsPtFirmDel/:id', bserIsLogin, PtFirm.bsPtFirmDel);

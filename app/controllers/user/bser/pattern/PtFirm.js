@@ -1,5 +1,6 @@
 const Conf = require('../../../../config/conf.js');
 const _ = require('underscore');
+const MdFilter = require('../../../../middle/MdFilter');
 
 const PtFirmDB = require('../../../../models/pattern/PtFirm');
 const PternDB = require('../../../../models/pattern/Ptern');
@@ -15,6 +16,65 @@ exports.bsPtFirms = async(req, res) => {
 		return res.redirect("/error?info=bsPtFirms,Error&error="+error);
 	}
 }
+
+exports.bsPtFirmsAjax = async(req, res) => {
+	// console.log("/bsPtFirms");
+	try{
+		const crUser = req.session.crUser;
+
+		const {param, filter, sortBy, page, pagesize, skip} = PtFirmsParamFilter(req, crUser);
+		const count = await PtFirmDB.countDocuments(param);
+		const PtFirms = await PtFirmDB.find(param, filter)
+			.skip(skip).limit(pagesize)
+			.sort(sortBy);
+
+		let PtFirm = null;
+		if(PtFirms.length > 0) {
+			const code = req.query.code.replace(/^\s*/g,"").toUpperCase();
+			PtFirm = await PtFirmDB.findOne({code: code}, filter);
+		}
+
+		return res.status(200).json({
+			status: 200,
+			message: '成功获取',
+			data: {PtFirm, PtFirms, count, page, pagesize}
+		});
+	} catch(error) {
+		console.log(error)
+		return res.json({status: 500, message: "bsPtFirmsAjax Error!"});
+	}
+}
+const PtFirmsParamFilter = (req, crUser) => {
+	let param = {
+		"Firm": crUser.Firm,
+	};
+	const filter = {};
+	const sortBy = {};
+
+	if(req.query.code) {
+		let symbConb = String(req.query.code)
+		symbConb = symbConb.replace(/^\s*/g,"").toUpperCase();
+		symbConb = new RegExp(symbConb + '.*');
+		param["code"] = {'$in': symbConb};
+	}
+
+	if(req.query.sortKey && req.query.sortVal) {
+		let sortKey = req.query.sortKey;
+		let sortVal = parseInt(req.query.sortVal);
+		if(!isNaN(sortVal) && (sortVal == 1 || sortVal == -1)) {
+			sortBy[sortKey] = sortVal;
+		}
+	}
+
+	sortBy['weight'] = -1;
+	sortBy['updAt'] = -1;
+
+	const {page, pagesize, skip} = MdFilter.page_Filter(req);
+	return {param, filter, sortBy, page, pagesize, skip};
+}
+
+
+
 
 exports.bsPtFirmAdd = async(req, res) => {
 	// console.log("/bsPtFirmAdd");

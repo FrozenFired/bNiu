@@ -1,5 +1,6 @@
 const Conf = require('../../../../config/conf.js');
 const _ = require('underscore');
+const MdFilter = require('../../../../middle/MdFilter');
 
 const MtFirmDB = require('../../../../models/material/MtFirm');
 const MtrialDB = require('../../../../models/material/Mtrial');
@@ -15,6 +16,65 @@ exports.bsMtFirms = async(req, res) => {
 		return res.redirect("/error?info=bsMtFirms,Error&error="+error);
 	}
 }
+
+exports.bsMtFirmsAjax = async(req, res) => {
+	// console.log("/bsMtFirms");
+	try{
+		const crUser = req.session.crUser;
+
+		const {param, filter, sortBy, page, pagesize, skip} = MtFirmsParamFilter(req, crUser);
+		const count = await MtFirmDB.countDocuments(param);
+		const MtFirms = await MtFirmDB.find(param, filter)
+			.skip(skip).limit(pagesize)
+			.sort(sortBy);
+
+		let MtFirm = null;
+		if(MtFirms.length > 0) {
+			const code = req.query.code.replace(/^\s*/g,"").toUpperCase();
+			MtFirm = await MtFirmDB.findOne({code: code}, filter);
+		}
+
+		return res.status(200).json({
+			status: 200,
+			message: '成功获取',
+			data: {MtFirm, MtFirms, count, page, pagesize}
+		});
+	} catch(error) {
+		console.log(error)
+		return res.json({status: 500, message: "bsMtFirmsAjax Error!"});
+	}
+}
+const MtFirmsParamFilter = (req, crUser) => {
+	let param = {
+		"Firm": crUser.Firm,
+	};
+	const filter = {};
+	const sortBy = {};
+
+	if(req.query.code) {
+		let symbConb = String(req.query.code)
+		symbConb = symbConb.replace(/^\s*/g,"").toUpperCase();
+		symbConb = new RegExp(symbConb + '.*');
+		param["code"] = {'$in': symbConb};
+	}
+
+	if(req.query.sortKey && req.query.sortVal) {
+		let sortKey = req.query.sortKey;
+		let sortVal = parseInt(req.query.sortVal);
+		if(!isNaN(sortVal) && (sortVal == 1 || sortVal == -1)) {
+			sortBy[sortKey] = sortVal;
+		}
+	}
+
+	sortBy['weight'] = -1;
+	sortBy['updAt'] = -1;
+
+	const {page, pagesize, skip} = MdFilter.page_Filter(req);
+	return {param, filter, sortBy, page, pagesize, skip};
+}
+
+
+
 
 exports.bsMtFirmAdd = async(req, res) => {
 	// console.log("/bsMtFirmAdd");

@@ -3,8 +3,9 @@
 	因为如果有其他数据库占据了 此颜色的id后 删除此颜色 其他数据库会不方便
 */
 const Conf = require('../../../../config/conf.js');
-const MdFile = require('../../../../middle/MdFile');
 const _ = require('underscore');
+const MdFile = require('../../../../middle/MdFile');
+const MdFilter = require('../../../../middle/MdFilter');
 
 const PtFirmDB = require('../../../../models/pattern/PtFirm');
 const PtCategDB = require('../../../../models/pattern/PtCateg');
@@ -17,19 +18,83 @@ exports.bsPterns = async(req, res) => {
 	try{
 		const info = req.query.info;
 		const crUser = req.session.crUser;
-		const Pterns = await PternDB.find()
-			.populate("PtCateg")
-			.populate("PtFirm")
-			.sort({"weight": -1});
 		const PtCategs = await PtCategDB.find({isBottom: 1})
 			.populate({path: "PtCategFar", populate: {path: "PtCategFar"}})
 			.sort({"weight": -1});
 		const PtFirms = await PtFirmDB.find();
-		return res.render("./user/bser/pattern/Ptern/list", {title: "印花管理", info, PtCategs, PtFirms, Pterns, crUser});
+		return res.render("./user/bser/pattern/Ptern/list", {title: "印花管理", info, PtCategs, PtFirms, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPterns,Error&error="+error);
 	}
 }
+
+exports.bsPternsAjax = async(req, res) => {
+	// console.log("/bsPterns");
+	try{
+		const crUser = req.session.crUser;
+
+		const {param, filter, sortBy, page, pagesize, skip} = PternsParamFilter(req, crUser);
+		const count = await PternDB.countDocuments(param);
+		const objects = await PternDB.find(param, filter)
+			.populate("PtFirm")
+			.skip(skip).limit(pagesize)
+			.sort(sortBy);
+
+		// 如果是编号查询 首先要看是否有与编号一致的产品
+		let object = null;
+		if(objects.length > 0 && req.query.code) {
+			const code = req.query.code.replace(/^\s*/g,"").toUpperCase();
+			object = await PternDB.findOne({code: code}, filter);
+		}
+
+		return res.status(200).json({
+			status: 200,
+			message: '成功获取',
+			data: {object, objects, count, page, pagesize}
+		});
+	} catch(error) {
+		console.log(error)
+		return res.json({status: 500, message: "bsPternsAjax Error!"});
+	}
+}
+const PternsParamFilter = (req, crUser) => {
+	let param = {
+		"Firm": crUser.Firm,
+	};
+	const filter = {};
+	const sortBy = {};
+
+	if(req.query.code) {
+		let symbConb = String(req.query.code)
+		symbConb = symbConb.replace(/(\s*$)/g, "").replace( /^\s*/, '').toUpperCase();
+		symbConb = new RegExp(symbConb + '.*');
+		param["code"] = symbConb;
+	}
+
+	if(req.query.PtFirm) {
+		let symbConb = req.query.PtFirm
+		if(symbConb.length == 24) {
+			param["PtFirm"] = {'$eq': symbConb};
+		}
+	}
+
+	if(req.query.sortKey && req.query.sortVal) {
+		let sortKey = req.query.sortKey;
+		let sortVal = parseInt(req.query.sortVal);
+		if(!isNaN(sortVal) && (sortVal == 1 || sortVal == -1)) {
+			sortBy[sortKey] = sortVal;
+		}
+	}
+
+	sortBy['weight'] = -1;
+	sortBy['updAt'] = -1;
+
+	const {page, pagesize, skip} = MdFilter.page_Filter(req);
+	return {param, filter, sortBy, page, pagesize, skip};
+}
+
+
+
 
 exports.bsPternAdd = async(req, res) => {
 	// console.log("/bsPternAdd");
@@ -173,9 +238,9 @@ exports.bsPternPhotoUpd = async(req, res) => {
 		if(!Ptern) return res.redirect("/error?info=没有找到此印花信息");
 		const delPhoto = Ptern.photo;
 		Ptern.photo = photo;
-		const PternSave = Ptern.save();
+		const PternSave = await Ptern.save();
 		MdFile.delFile(delPhoto);
-		return res.redirect("/bsPterns");
+		return res.redirect("/bsPtern/"+PternSave._id);
 	} catch(error) {
 		return res.redirect("/error?info=bsPternPhotoUpd,Error&error="+error);
 	}
@@ -206,7 +271,11 @@ exports.bsPtern = async(req, res) => {
 			.populate("PtCateg")
 			.populate("PtFirm")
 		if(!Ptern) return res.redirect("/error?info=不存在此分类");
-		return res.render("./user/bser/pattern/Ptern/detail", {title: "材料详情", Ptern, crUser});
+		const PtCategs = await PtCategDB.find({isBottom: 1})
+			.populate({path: "PtCategFar", populate: {path: "PtCategFar"}})
+			.sort({"weight": -1});
+		const PtFirms = await PtFirmDB.find();
+		return res.render("./user/bser/pattern/Ptern/detail", {title: "材料详情", Ptern, PtCategs, PtFirms, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPtern,Error&error="+error);
 	}

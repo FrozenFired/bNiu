@@ -1,6 +1,5 @@
 const Conf = require('../../../../config/conf.js');
 const _ = require('underscore');
-
 const MdFilter = require('../../../../middle/MdFilter');
 
 const PdNomeDB = require('../../../../models/product/PdNome');
@@ -22,7 +21,6 @@ exports.bsPdNomesAjax = async(req, res) => {
 	// console.log("/bsPdNomes");
 	try{
 		const crUser = req.session.crUser;
-
 
 		const {param, filter, sortBy, page, pagesize, skip} = PdNomesParamFilter(req, crUser);
 		const count = await PdNomeDB.countDocuments(param);
@@ -48,7 +46,7 @@ exports.bsPdNomesAjax = async(req, res) => {
 }
 const PdNomesParamFilter = (req, crUser) => {
 	let param = {
-		"firm": crUser.firm,
+		"Firm": crUser.Firm,
 	};
 	const filter = {};
 	const sortBy = {};

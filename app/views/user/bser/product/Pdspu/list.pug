@@ -2,46 +2,54 @@ extends ../../../aalayout/layout
 
 block content
 	.container
+		if info
+			-a;
+			.border.p-2.my-3.rounded.text-center.text-warning
+				h3 #{info}
+				.text-right
+					a.btn.btn-default(href="/bsPdNomes") 确认
 		nav(aria-label="breadcrumb")
 			ol.breadcrumb
 				li.breadcrumb-item: a(href="/bser") Home
 				li.breadcrumb-item.active(aria-current="page") #{title}
 		.row.my-3
-			.col-12.text-right
+			.col-6
+				input#codeSearch.form-control(type="text")
+			.col-6.text-right
+				button.btn.btn-danger.jsDel-btnClick.mr-5(type="button") -
 				a.btn.btn-warning(href="/bsPdspuAdd") +
 
-		- getUrl = "/bsPdspuUpdAjax";
-		.row
-			each Pdspu in Pdspus
-				- object = Pdspu;
-				.col-6.col-lg-3.mt-4
-					.card.text-center(style="width: 100%;")
-						img.card-img-top.border-bottom.js-click-imgEnlarge(id="img-"+Pdspu._id+"-photo-sub", src=Pdspu.photo, alt="Pdspu Photo Lost", width="100%", height="150px", style="object-fit: scale-down;")
-						
-						.row(class="jsImg-clickBefore-"+Pdspu._id+"-photo-sub")
-							.col-6
-								.jsImg-clickUpd.text-info(id="clickUpd-"+Pdspu._id+"-photo-sub") [点击]
-							.col-6
-								- field="photo", value=Pdspu.photo, subid="photo", valueHide=1, toUp=-1, fieldDesp="[upd]";
-								include ../../../../aaPlugin/ajaxInputUpd
-								- fieldDesp = null, valueHide = null, toUp = null;
-						.row(class="jsImg-clickAfter-"+Pdspu._id+"-photo-sub", style="display:none")
-							.col-6
-								.jsImg-cancel.btn.btn-secondary(id="clickUpd-"+Pdspu._id+"-photo-sub") [取消]
-							.col-6
-								form(method="post", action="/bsPdspuPhotoUpd", enctype="multipart/form-data")
-									input(type="hidden", name="obj[_id]", value=Pdspu._id)
-									input(type="hidden", name="flDir", value=Conf.photo.Pdspu.dir)
-									input(type="hidden", name="flName", value=crUser.Firm+"-"+Pdspu.code+"-"+crUser._id)
-									input.jsImg-ipt(id="ipt-"+Pdspu._id+"-photo-sub", type="file", name="fls", style="display:none")
-									.form-group
-										input.btn.btn-success(type="submit" value="确认")
-						.card-body
-							.code
-								- field="code", value=Pdspu.code, subid="code", fieldDesp="编号:";
-								include ../../../../aaPlugin/ajaxInputUpd
-							.weight.mt-3
-								- field="weight", value=Pdspu.weight, subid="weight", fieldDesp="排序:";
-								include ../../../../aaPlugin/ajaxInputUpd
-							.text-right.mt-3
-								a(href="/bsPdspu/"+Pdspu._id) [查看]
+		.PdNomesList
+			button.PdNomeClick.btn.mt-3(type="button" data-pdnome="") 产品名称:
+			button.PdNomeClick#PdNomeAll.btn.btn-success.ml-5.mt-3(type="button" data-pdnome="") 全部
+			each PdNome in PdNomes
+				-a;
+				button.PdNomeClick.btn.btn-default.ml-4.mt-3(type="button" data-pdnome=PdNome._id) #{PdNome.code}
+		.objectsList
+			input#objectFilterAjax(type="hidden", value="/bsPdspusAjax?@#objectsElem@bs")
+			#objectsElem.mt-5
+	//- .container-fluid
+		.row.mt-5
+			.col-lg-3.px-5.mt-3
+				span.mr-2 类别:
+				span#PdCateg
+				select.mt-4.PdcategSel#FirCateg.form-control(data-style="btn-info", data-level=1)
+					option(value="All") 全部
+					option(value="Null") 未分类
+				select.mt-4.PdcategSel#SecCateg.form-control(data-style="btn-info", data-level=2, style="display:none")
+					option(value="All") 全部
+				select.mt-4.PdcategSel#ThdCateg.form-control(data-style="btn-info", data-level=3, style="display:none")
+					option(value="All") 全部
+			.col-lg-8
+				.PdNomesList
+					button.PdNomeClick.btn.mt-3(type="button" data-pdnome="") 产品名称:
+					button.PdNomeClick#PdNomeAll.btn.btn-success.ml-5.mt-3(type="button" data-pdnome="") 全部
+					each PdNome in PdNomes
+						-a;
+						button.PdNomeClick.btn.btn-default.ml-4.mt-3(type="button" data-pdnome=PdNome._id) #{PdNome.code}
+				.objectsList
+					input#objectFilterAjax(type="hidden", value="/bsPdspusAjax?@#objectsElem@bs")
+					#objectsElem.mt-5
+			.col-lg-1
+	script(src="/js/bser/product/Pdspu/list.js")
+	script(src="/js/dbs/product/Pdspu.js")

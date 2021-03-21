@@ -14,6 +14,22 @@ block content
 				.col-9.col-sm-6
 					input#codeIpt.form-control(type="text", name="obj[code]", autocomplete="off")
 				.offset-3.col-9.col-form-label#codeDanger.text-danger(style="display:none") 请输入正确的编号
+			//- .form-group.row
+				.col-12
+					input#PdCategIpt.form-control(type="text", name="obj[PdCateg]" autocomplete="off")
+				label.col-3.col-sm-2.col-form-label(for="PdCategIpt") 分类
+				.col-3.col-sm-2
+					input#FirCategIpt.form-control(type="text", name="FirCategId" autocomplete="off")
+					input#FirCategReq.form-control(type="text", list="FirCategDatalist", name="codeFirCateg" autocomplete="off")
+					datalist#FirCategDatalist
+				.col-3.col-sm-2
+					input#SecCategIpt.form-control(type="text", name="SecCategId" autocomplete="off")
+					input#SecCategReq.form-control(type="text", list="SecCategDatalist", name="codeSecCateg" autocomplete="off")
+					datalist#SecCategDatalist
+				.col-3.col-sm-2
+					input#ThdCategIpt.form-control(type="text", name="ThdCategId" autocomplete="off")
+					input#ThdCategReq.form-control(type="text", list="ThdCategDatalist", name="codeThdCateg" autocomplete="off")
+					datalist#ThdCategDatalist
 			.form-group.row
 				label.col-3.col-sm-2.col-form-label(for="PdCategIpt") 分类
 				.col-9.col-sm-6
@@ -34,13 +50,6 @@ block content
 					input#PdNomeReq.form-control(type="text", list="PdNomeDatalist", name="codePdNome" autocomplete="off")
 					datalist#PdNomeDatalist
 				.offset-3.col-9.col-form-label#PdNomeDanger.text-danger(style="display:none") 请输入产品名称
-			//- .form-group.row
-				//- label.col-3.col-sm-2.col-form-label(for="PdNomeIpt") 名称
-				//- .col-9.col-sm-6
-				//- 	select#PdNomeIpt.form-control(name="obj[PdNome]", data-style="btn-info")
-				//- 		each PdNome in PdNomes
-				//- 			- code = "["+PdNome.code+"]";
-				//- 			option(value=PdNome._id) #{code}
 			.form-group.row
 				label.col-3.col-sm-2.col-form-label(for="SizeSystIpt") 尺寸标准
 				.col-9.col-sm-6

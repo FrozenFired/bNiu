@@ -1,5 +1,6 @@
 const Conf = require('../../../../config/conf.js');
 const MdFile = require('../../../../middle/MdFile');
+const MdFilter = require('../../../../middle/MdFilter');
 const _ = require('underscore');
 
 const PdCategDB = require('../../../../models/product/PdCateg');
@@ -23,6 +24,69 @@ exports.bsPdCategs = async(req, res) => {
 	} catch(error) {
 		return res.redirect("/error?info=bsPdCategs,Error&error="+error);
 	}
+}
+exports.bsPdCategsAjax = async(req, res) => {
+	// console.log("/bsPdCategs");
+	try{
+		const crUser = req.session.crUser;
+
+		const {param, filter, sortBy, page, pagesize, skip} = PdCategsParamFilter(req, crUser);
+		const count = await PdCategDB.countDocuments(param);
+		const objects = await PdCategDB.find(param, filter)
+			.populate({path: "PdCategSons", populate: {path: "PdCategSons"}})
+			.skip(skip).limit(pagesize)
+			.sort(sortBy);
+		// 如果是编号查询 首先要看是否有与编号一致的产品
+		let object = null;
+		if(objects.length > 0 && req.query.code) {
+			const code = req.query.code.replace(/^\s*/g,"").toUpperCase();
+			object = await PdCategDB.findOne({code: code}, filter);
+		}
+
+		return res.status(200).json({
+			status: 200,
+			message: '成功获取',
+			data: {object, objects, count, page, pagesize}
+		});
+	} catch(error) {
+		console.log(error)
+		return res.json({status: 500, message: "bsPdCategsAjax Error!"});
+	}
+}
+const PdCategsParamFilter = (req, crUser) => {
+	let param = {
+		"Firm": crUser.Firm,
+	};
+	const filter = {};
+	const sortBy = {};
+
+	if(req.query.code) {
+		let symbConb = String(req.query.code)
+		symbConb = symbConb.replace(/(\s*$)/g, "").replace( /^\s*/, '').toUpperCase();
+		symbConb = new RegExp(symbConb + '.*');
+		param["code"] = symbConb;
+	}
+
+	if(req.query.level) {
+		let symbConb = parseInt(req.query.level);
+		if(symbConb >=1 && symbConb <=3) {
+			param["level"] = {'$eq': symbConb};
+		}
+	}
+
+	if(req.query.sortKey && req.query.sortVal) {
+		let sortKey = req.query.sortKey;
+		let sortVal = parseInt(req.query.sortVal);
+		if(!isNaN(sortVal) && (sortVal == 1 || sortVal == -1)) {
+			sortBy[sortKey] = sortVal;
+		}
+	}
+
+	sortBy['weight'] = -1;
+	sortBy['updAt'] = -1;
+
+	const {page, pagesize, skip} = MdFilter.page_Filter(req);
+	return {param, filter, sortBy, page, pagesize, skip};
 }
 
 exports.bsPdCategAdd = async(req, res) => {
