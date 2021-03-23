@@ -1,4 +1,6 @@
-0.0.97		Pdspu Detail 优化
+0.0.98		Categ 优化
+0.0.97	59a48a987072bb193bc37d9422d536ff557b7782
+			Pdspu Detail 优化
 0.0.96	6cf5e45b6eb2f23c9c24d3aec12d9eabeb3baa8f
 			Pdspu Mtrial Ptern 列表优化
 0.0.95	3bd78aabfaa765d05376e04483ead8a663c3a26f

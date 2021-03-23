@@ -104,6 +104,7 @@ module.exports = app => {
 
 	/* ------------------------ MtCateg 材质分类 ----------------------- */
 	app.get('/bsMtCategs', bserIsLogin, MtCateg.bsMtCategs);
+	app.get('/bsMtCategsAjax', bserIsLogin, MtCateg.bsMtCategsAjax);
 	app.get('/bsMtCategAdd', bserIsLogin, MtCateg.bsMtCategAdd);
 	app.post('/bsMtCategNew', bserIsLogin, postForm, MtCateg.bsMtCategNew);
 	app.get('/bsMtCategDel/:id', bserIsLogin, MtCateg.bsMtCategDel);
@@ -138,6 +139,7 @@ module.exports = app => {
 	app.post('/bsPtFirmUpdAjax', bserIsLogin, PtFirm.bsPtFirmUpdAjax);
 	/* ------------------------ PtCateg 印花分类 ----------------------- */
 	app.get('/bsPtCategs', bserIsLogin, PtCateg.bsPtCategs);
+	app.get('/bsPtCategsAjax', bserIsLogin, PtCateg.bsPtCategsAjax);
 	app.get('/bsPtCategAdd', bserIsLogin, PtCateg.bsPtCategAdd);
 	app.post('/bsPtCategNew', bserIsLogin, postForm, PtCateg.bsPtCategNew);
 	app.get('/bsPtCategDel/:id', bserIsLogin, PtCateg.bsPtCategDel);

@@ -31,21 +31,24 @@
 					- field="code", value=Pdspu.code, subid="code", fieldDesp="编号:";
 					include ../../../../../aaPlugin/ajaxInputUpd
 				.PdNome
-					- value = "未命名";
+					span 名称:
 					if Pdspu.PdNome
-						- value = Pdspu.PdNome.code;
-					- field="PdNome", subid="PdNome", fieldDesp="名称:";
-					include ../../../../../aaPlugin/ajaxInputUpd
-				.PdCateg
-					- fieldSels = fieldPdCateg, nullDesp = "不分类";
-					- field="PdCateg", subid="PdCateg";
-					if Pdspu.PdCateg
-						- selectedVal = Pdspu.PdCateg._id;
-						- value=object[field].code, fieldDesp="分类:";
+						- PdNome = Pdspu.PdNome;
+						span #{PdNome.code}
 					else
-						- selectedVal = "", value="", valueHide=1, fieldDesp="未分类";
-					include ../../../../../aaPlugin/ajaxSelectUpd
-					- fieldDesp = null, valueHide = null, nullDesp = null;
+						span 未命名
+				.PdCateg
+					if Pdspu.PdCategFir
+						- PdCategFir = Pdspu.PdCategFir;
+						.PdCategFir 分类: #{PdCategFir.code}
+						if Pdspu.PdCategSec
+							- PdCategSec = Pdspu.PdCategSec;
+							.PdCategSec 二级分类: #{PdCategSec.code}
+							if Pdspu.PdCategThd
+								- PdCategThd = Pdspu.PdCategThd;
+								.PdCategThd 三级分类: #{PdCategThd.code}
+					else
+						span 未分类
 				.SizeSyst
 					- fieldSels = fieldSizeSyst, fieldDesp="尺寸标准:";
 					- field="SizeSyst", subid="SizeSyst";

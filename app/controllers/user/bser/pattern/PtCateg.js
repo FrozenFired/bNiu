@@ -1,5 +1,6 @@
 const Conf = require('../../../../config/conf.js');
 const MdFile = require('../../../../middle/MdFile');
+const MdFilter = require('../../../../middle/MdFilter');
 const _ = require('underscore');
 
 const PtCategDB = require('../../../../models/pattern/PtCateg');
@@ -24,6 +25,79 @@ exports.bsPtCategs = async(req, res) => {
 		return res.redirect("/error?info=bsPtCategs,Error&error="+error);
 	}
 }
+exports.bsPtCategsAjax = async(req, res) => {
+	// console.log("/bsPtCategs");
+	try{
+		const crUser = req.session.crUser;
+
+		const {param, filter, sortBy, page, pagesize, skip} = PtCategsParamFilter(req, crUser);
+		const count = await PtCategDB.countDocuments(param);
+		const objects = await PtCategDB.find(param, filter)
+			.populate({path: "PtCategSons", populate: {path: "PtCategSons"}})
+			.skip(skip).limit(pagesize)
+			.sort(sortBy);
+		// 如果是编号查询 首先要看是否有与编号一致的产品
+		let object = null;
+		if(objects.length > 0 && req.query.code) {
+			const code = req.query.code.replace(/^\s*/g,"").toUpperCase();
+			object = await PtCategDB.findOne({code: code}, filter);
+		}
+
+		return res.status(200).json({
+			status: 200,
+			message: '成功获取',
+			data: {object, objects, count, page, pagesize}
+		});
+	} catch(error) {
+		console.log(error)
+		return res.json({status: 500, message: "bsPtCategsAjax Error!"});
+	}
+}
+const PtCategsParamFilter = (req, crUser) => {
+	let param = {
+		"Firm": crUser.Firm,
+	};
+	const filter = {};
+	const sortBy = {};
+
+	if(req.query.code) {
+		let symbConb = String(req.query.code)
+		symbConb = symbConb.replace(/(\s*$)/g, "").replace( /^\s*/, '').toUpperCase();
+		symbConb = new RegExp(symbConb + '.*');
+		param["code"] = symbConb;
+	}
+
+	if(req.query.level) {
+		let symbConb = parseInt(req.query.level);
+		if(symbConb >=1 && symbConb <=3) {
+			param["level"] = {'$eq': symbConb};
+		}
+	}
+
+	if(req.query.PtCategFar) {
+		let symbConb = req.query.PtCategFar;
+		if(symbConb.length == 24) {
+			param["PtCategFar"] = {'$eq': symbConb};
+		}
+	}
+
+	if(req.query.sortKey && req.query.sortVal) {
+		let sortKey = req.query.sortKey;
+		let sortVal = parseInt(req.query.sortVal);
+		if(!isNaN(sortVal) && (sortVal == 1 || sortVal == -1)) {
+			sortBy[sortKey] = sortVal;
+		}
+	}
+
+	sortBy['weight'] = -1;
+	sortBy['updAt'] = -1;
+
+	const {page, pagesize, skip} = MdFilter.page_Filter(req);
+	return {param, filter, sortBy, page, pagesize, skip};
+}
+
+
+
 
 exports.bsPtCategAdd = async(req, res) => {
 	// console.log("/bsPtCategAdd");
@@ -90,7 +164,6 @@ exports.bsPtCategUpdAjax = async(req, res) => {
 			val = parseInt(val);
 			if(isNaN(val)) return res.json({status: 500, message: "[bsPtCategUpdAjax weight] 排序为数字, 请传递正确的参数"});
 		} else if(field == "isBottom") {
-			console.log(val)
 			val = parseInt(val);
 			if(val == 1) {
 				if(PtCateg.PtCategSons.length > 0) return res.json({status: 500, message: "[bsPtCategUpdAjax weight] 请先删除子分类"});
@@ -136,12 +209,22 @@ exports.bsPtCategDel = async(req, res) => {
 			PtCategFar.save();
 		}
 
-		const PternUpdMany = await PternDB.updateMany({PtCateg: id }, {PtCateg: null});
+		// const PternUpdMany = await PternDB.updateMany({PtCateg: id }, {PtCateg: null});
+		if(PtCateg.level == 1) {
+			PternUpdMany = await PternDB.updateMany({PtCategFir: id }, {PtCategFir: null, PtCategSec: null, PtCategThd: null});
+		} else if(PtCateg.level == 2) {
+			PternUpdMany = await PternDB.updateMany({PtCategSec: id }, {PtCategSec: null, PtCategThd: null});
+		} else if(PtCateg.level == 3) {
+			PternUpdMany = await PternDB.updateMany({PtCategThd: id }, {PtCategThd: null});
+		} else {
+			return ("/bsPtCategs?info=删除错误");
+		}
 
 		const PtCategDel = await PtCategDB.deleteOne({_id: id});
 		return res.redirect("/bsPtCategs");
 	} catch(error) {
-		return res.redirect("/error?info=bsPtCategAdd,Error&error="+error);
+		// console.log(error)
+		return res.redirect("/error?info=bsPtCategDel,Error&error="+error);
 	}
 }
 
@@ -168,7 +251,7 @@ exports.bsPtCateg = async(req, res) => {
 		if(!PtCateg) return res.redirect("/error?info=不存在此分类");
 		return res.render("./user/bser/pattern/PtCateg/detail", {title: "印花分类详情", PtCateg, crUser});
 	} catch(error) {
-		return res.redirect("/error?info=bsPtCategAdd,Error&error="+error);
+		return res.redirect("/error?info=bsPtCateg,Error&error="+error);
 	}
 }
 exports.bsPtCategUp = async(req, res) => {
@@ -181,7 +264,7 @@ exports.bsPtCategUp = async(req, res) => {
 
 		return res.render("./user/bser/pattern/PtCateg/update", {title: "印花分类详情", PtCateg, crUser});
 	} catch(error) {
-		return res.redirect("/error?info=bsPtCategAdd,Error&error="+error);
+		return res.redirect("/error?info=bsPtCategUp,Error&error="+error);
 	}
 }
 /*

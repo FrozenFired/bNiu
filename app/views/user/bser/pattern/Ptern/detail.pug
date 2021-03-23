@@ -15,7 +15,6 @@ block content
 
 		- getUrl = "/bsPternUpdAjax";
 		- fieldPtFirm = PtFirms.map((item) => {return {val: item._id, text: item.code} });
-		- fieldPtCateg = PtCategs.map((item) => {return {val: item._id, text: item.code} });
 		- object = Ptern;
 		.row
 			.col-md-4
@@ -55,16 +54,18 @@ block content
 								- selectedVal = "", value="", valueHide=1, fieldDesp="未选择印花厂";
 							include ../../../../aaPlugin/ajaxSelectUpd
 							- fieldDesp = null, valueHide = null;
-						.PtCateg.mt-2
-							- fieldSels = fieldPtCateg, nullDesp = "不分类";
-							- field="PtCateg", subid="PtCateg";
-							if Ptern.PtCateg
-								- selectedVal = Ptern.PtCateg._id;
-								- value=object[field].code, fieldDesp="分类:";
+						.PtCateg
+							if Ptern.PtCategFir
+								- PtCategFir = Ptern.PtCategFir;
+								.PtCategFir 分类: #{PtCategFir.code}
+								if Ptern.PtCategSec
+									- PtCategSec = Ptern.PtCategSec;
+									.PtCategSec 二级分类: #{PtCategSec.code}
+									if Ptern.PtCategThd
+										- PtCategThd = Ptern.PtCategThd;
+										.PtCategThd 三级分类: #{PtCategThd.code}
 							else
-								- selectedVal = "", value="", valueHide=1, fieldDesp="未分类";
-							include ../../../../aaPlugin/ajaxSelectUpd
-							- fieldDesp = null, valueHide = null;
+								span 未分类
 						.weight.mt-3
 							- field="weight", value=Ptern.weight, subid="weight", fieldDesp="权重:";
 							include ../../../../aaPlugin/ajaxInputUpd

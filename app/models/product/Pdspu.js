@@ -8,7 +8,9 @@ const colection = 'Pdspu';
 const dbSchema = new Schema({
 	/* ------------------ Basic ------------------ */
 	code: String,	// 编号公司唯一
-	PdCateg: {type: ObjectId, ref: 'PdCateg'},	// 种类
+	PdCategFir: {type: ObjectId, ref: 'PdCateg'},	// 种类
+	PdCategSec: {type: ObjectId, ref: 'PdCateg'},	// 种类
+	PdCategThd: {type: ObjectId, ref: 'PdCateg'},	// 种类
 	PdNome: {type: ObjectId, ref: 'PdNome'},	// 名称
 	photo: String,
 	photos: [String],

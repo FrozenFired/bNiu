@@ -8,7 +8,10 @@ const colection = 'Ptern';
 const dbSchema = new Schema({
 	code: String,
 
-	PtCateg: {type: ObjectId, ref: 'PtCateg'},
+	PtCategFir: {type: ObjectId, ref: 'PtCateg'},
+	PtCategSec: {type: ObjectId, ref: 'PtCateg'},
+	PtCategThd: {type: ObjectId, ref: 'PtCateg'},
+
 	PtFirm: {type: ObjectId, ref: 'PtFirm'},
 
 	langs: [{

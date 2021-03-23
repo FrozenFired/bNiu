@@ -7,7 +7,7 @@ block content
 			.border.p-2.my-3.rounded.text-center.text-warning
 				h3 #{info}
 				.text-right
-					a.btn.btn-default(href="/bsPdNomes") 确认
+					a.btn.btn-default(href="/bsPdspus") 确认
 		nav(aria-label="breadcrumb")
 			ol.breadcrumb
 				li.breadcrumb-item: a(href="/bser") Home
@@ -19,27 +19,34 @@ block content
 				button.btn.btn-danger.jsDel-btnClick.mr-5(type="button") -
 				a.btn.btn-warning(href="/bsPdspuAdd") +
 
-		.PdNomesList
+		//- .PdNomesList
 			button.PdNomeClick.btn.mt-3(type="button" data-pdnome="") 产品名称:
 			button.PdNomeClick#PdNomeAll.btn.btn-success.ml-5.mt-3(type="button" data-pdnome="") 全部
 			each PdNome in PdNomes
 				-a;
 				button.PdNomeClick.btn.btn-default.ml-4.mt-3(type="button" data-pdnome=PdNome._id) #{PdNome.code}
-		.objectsList
+		//- .objectsList
 			input#objectFilterAjax(type="hidden", value="/bsPdspusAjax?@#objectsElem@bs")
 			#objectsElem.mt-5
-	//- .container-fluid
+	.container-fluid
 		.row.mt-5
-			.col-lg-3.px-5.mt-3
-				span.mr-2 类别:
-				span#PdCateg
-				select.mt-4.PdcategSel#FirCateg.form-control(data-style="btn-info", data-level=1)
-					option(value="All") 全部
-					option(value="Null") 未分类
-				select.mt-4.PdcategSel#SecCateg.form-control(data-style="btn-info", data-level=2, style="display:none")
-					option(value="All") 全部
-				select.mt-4.PdcategSel#ThdCateg.form-control(data-style="btn-info", data-level=3, style="display:none")
-					option(value="All") 全部
+			.col-lg-3.px-5
+				.all
+					button.PdCategClick.btn.mt-3(type="button" data-pdcateg="") 产品类型:
+					button.PdCategClick#PdCategAll.btn.btn-success.ml-5.mt-3(type="button" data-pdcateg="") 全部
+				each PdCategFir in PdCategs
+					-a;
+					.mb-2
+						button.PdCategClick.btn.btn-default.mt-3(type="button" data-pdcateg=PdCategFir._id data-level=1) #{PdCategFir.code}
+					each PdCategSec in PdCategFir.PdCategSons
+						-a;
+						div.ml-4
+							button.PdCategClick.btn.btn-default(type="button" data-pdcateg=PdCategSec._id data-level=2) #{PdCategSec.code}
+						each PdCategThd in PdCategSec.PdCategSons
+							-a;
+							div.ml-4
+								button.ml-4.PdCategClick.btn.btn-default(type="button" data-pdcateg=PdCategThd._id data-level=3) #{PdCategThd.code}
+
 			.col-lg-8
 				.PdNomesList
 					button.PdNomeClick.btn.mt-3(type="button" data-pdnome="") 产品名称:

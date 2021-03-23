@@ -5,7 +5,6 @@ $(function() {
 	let elemId = '';
 	let role = '';
 
-	let categUrl = "/bsPdCategsAjax";
 	objectsInit = () => {
 		const objectFilter = $("#objectFilterAjax").val();
 		if(objectFilter) {
@@ -15,66 +14,62 @@ $(function() {
 		}
 		urlQuery = objectParam;
 		getObjects(urlQuery, elemId, 1, role);
-
-		getFirCateg(categUrl);
 	}
 	objectsInit();
 
-	/* ====== 选择分类 显示系列 ====== */
-	$(".PdcategSel").change(function(e) {
+	/* ====== 点击产品分类 显示系列 ====== */
+	$(".PdCategClick").click(function(e) {
+		$("#codeSearch").val('');
+
 		$(".PdNomeClick").removeClass("btn-success");
 		$(".PdNomeClick").addClass("btn-default");
 		$("#PdNomeAll").removeClass("btn-default");
 		$("#PdNomeAll").addClass("btn-success");
-		$("#codeSearch").val('');
+
+		$(".PdCategClick").removeClass("btn-success");
+		$(".PdCategClick").addClass("btn-default");
 
 		const target = $(e.target);
-		let level = target.data("level");;
+		let PdCateg = target.data("pdcateg");
+		const level = target.data("level");
 
-		const val = $(this).val();
-		let PdCateg = new Array();
-		if(val == "All") {
-			if(level == 1) {
-				$("#SecCateg").hide()
-				$("#ThdCateg").hide()
-				FirCategs.forEach((Fir) => {
-					const sons = Fir.PdCategSons;
-					sons.forEach((Sec) => {
-						SecCategs.push(Sec)
-					})
-				});
-			} else if(level == 2) {
-				$("#ThdCateg").hide()
-			}
-			urlQuery = objectParam;
-			getObjects(urlQuery, elemId, 1, role);
-		} else if(val == "Null") {
-			// PdCategId = Null
-			$("#SecCateg").hide()
-			$("#ThdCateg").hide()
-			PdCateg = "?PdCateg=Null";
-			urlQuery = objectParam + PdCateg;
-			getObjects(urlQuery, elemId, 1, role);
+		let PdCategParam = "";
+
+		if(!PdCateg || PdCateg.length != 24) {
+			PdCategParam = "";
+			$("#PdCategAll").removeClass("btn-default");
+			$("#PdCategAll").addClass("btn-success");
 		} else {
-			if(!val || val.length != 24) {
-				alert("操作错误")
-			} else {
-				if(level == 1) {
-					$("#SecCateg").show();
-					PdCategsRender(getSecCategs(val), "#SecCateg", ".optionSecCateg")
-				} else if(level == 2) {
-					$("#ThdCateg").show();
-					PdCategsRender(getThdCategs(val), "#ThdCateg", ".optionThdCateg")
-				}
-
+			if(level == 1) {
+				PdCategParam = "&PdCategFir="+PdCateg;
+			} else if(level == 2) {
+				PdCategParam = "&PdCategSec="+PdCateg;
+			} else if(level == 3) {
+				PdCategParam = "&PdCategThd="+PdCateg;
 			}
+			$(this).removeClass("btn-default");
+			$(this).addClass("btn-success");
 		}
+
+		page = 0;
+		urlQuery = objectParam + PdCategParam;
+		getObjects(urlQuery, elemId, 1, role);
+
+		$("#codeSearch").val('');
 	})
 
 	/* ====== 点击品类名 显示系列 ====== */
 	$(".PdNomeClick").click(function(e) {
+		$("#codeSearch").val('');
+
+		$(".PdCategClick").removeClass("btn-success");
+		$(".PdCategClick").addClass("btn-default");
+		$("#PdCategAll").removeClass("btn-default");
+		$("#PdCategAll").addClass("btn-success");
+
 		$(".PdNomeClick").removeClass("btn-success");
 		$(".PdNomeClick").addClass("btn-default");
+
 
 		const target = $(e.target);
 		let PdNome = target.data("pdnome");
@@ -91,8 +86,6 @@ $(function() {
 		page = 0;
 		urlQuery = objectParam + PdNome;
 		getObjects(urlQuery, elemId, 1, role);
-
-		$("#codeSearch").val('');
 	})
 
 	/* ====== 根据搜索关键词 显示系列 ====== */
@@ -101,6 +94,11 @@ $(function() {
 		$(".PdNomeClick").addClass("btn-default");
 		$("#PdNomeAll").removeClass("btn-default");
 		$("#PdNomeAll").addClass("btn-success");
+
+		$(".PdCategClick").removeClass("btn-success");
+		$(".PdCategClick").addClass("btn-default");
+		$("#PdCategAll").removeClass("btn-default");
+		$("#PdCategAll").addClass("btn-success");
 
 		let code = $("#codeSearch").val().replace(/(\s*$)/g, "").replace( /^\s*/, '').toUpperCase();
 
@@ -126,45 +124,3 @@ $(function() {
 		}
 	});
 })
-let FirCategs;
-let SecCategs = new Array();
-var getFirCateg = (categUrl, farId, level) => {
-	$.ajax({
-		type: "GET",
-		url: categUrl+"?level="+1,
-		success: function(results) {
-			if(results.status === 200) {
-				FirCategs = results.data.objects;
-				if(FirCategs.length > 0) {
-					FirCategs.forEach((Fir) => {
-						const sons = Fir.PdCategSons;
-						sons.forEach((Sec) => {
-							SecCategs.push(Sec)
-						})
-					});
-				}
-				PdCategsRender(FirCategs, "#FirCateg", ".optionFirCateg");
-			} else {
-				alert(results.message);
-			}
-		}
-	});
-}
-var getSecCategs = (FirCategId) => {
-	const FirCateg = FirCategs.find((item) => {return String(item._id) == String(FirCategId);});
-	return(FirCateg.PdCategSons)
-}
-var getThdCategs = (SecCategId) => {
-	const SecCateg = SecCategs.find((item) => {return String(item._id) == String(SecCategId);});
-	return(SecCateg.PdCategSons)
-}
-
-var PdCategsRender = (PdCategs, categSelectId, categSelOptionClass) => {
-	let elem = "";
-	for(let i=0; i<PdCategs.length; i++) {
-		let PdCateg = PdCategs[i];
-		elem += '<option class='+categSelOptionClass+' value='+PdCateg._id+'>'+PdCateg.code+'</option>';
-	}
-	$(categSelOptionClass).remove();
-	$(categSelectId).append(elem);
-}

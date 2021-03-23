@@ -8,7 +8,10 @@ const colection = 'Mtrial';
 const dbSchema = new Schema({
 	code: String,
 
-	MtCateg: {type: ObjectId, ref: 'MtCateg'},
+	MtCategFir: {type: ObjectId, ref: 'MtCateg'},
+	MtCategSec: {type: ObjectId, ref: 'MtCateg'},
+	MtCategThd: {type: ObjectId, ref: 'MtCateg'},
+
 	MtFirm: {type: ObjectId, ref: 'MtFirm'},
 
 	langs: [{

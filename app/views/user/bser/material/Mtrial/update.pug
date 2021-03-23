@@ -22,22 +22,26 @@ block content
 							else
 								option(value=MtFirm._id) #{MtFirm.code}
 			.form-group.row
-				label.col-3.col-sm-2.col-form-label(for="isBottomIpt") 分类
-				.col-9.col-sm-6
-					select#isBottomIpt.form-control(name="obj[MtCateg]", data-style="btn-info")
-						option(value="") 不分类
-						each MtCateg in MtCategs
-							- code = "["+MtCateg.code+"]";
-							if MtCateg.MtCategFar
-								- let Far = MtCateg.MtCategFar
-								- code = Far.code+" -> "+code;
-								if Far.MtCategFar
-									- code = Far.MtCategFar.code+" -> "+code;
-							if String(Mtrial.MtCateg) == String(MtCateg._id)
-								-a;
-								option(value=MtCateg._id, selected="selected") #{code}
-							else
-								option(value=MtCateg._id) #{code}
+				label.col-3.col-sm-2.col-form-label 分类
+				- let MtCategFir = new Object();
+				if Mtrial.MtCategFir
+					- MtCategFir = Mtrial.MtCategFir;
+				.col-3.col-sm-2
+					input#ipt-MtCateg-1.iptMtCateg.form-control(type="text", name="obj[MtCategFir]", value=MtCategFir._id, autocomplete="off")
+					input#req-MtCateg-1.reqMtCateg.form-control(type="text", value=MtCategFir.code, autocomplete="off")
+				- let MtCategSec = new Object();
+				if Mtrial.MtCategSec
+					- MtCategSec = Mtrial.MtCategSec;
+				.col-3.col-sm-2
+					input#ipt-MtCateg-2.iptMtCateg.form-control(type="text", name="obj[MtCategSec]", value=MtCategSec._id, autocomplete="off")
+					input#req-MtCateg-2.reqMtCateg.form-control(type="text", value=MtCategSec.code, autocomplete="off")
+				- let MtCategThd = new Object();
+				if Mtrial.MtCategThd
+					- MtCategThd = Mtrial.MtCategThd;
+				.col-3.col-sm-2
+					input#ipt-MtCateg-3.iptMtCateg.form-control(type="text", name="obj[MtCategThd]", value=MtCategThd._id, autocomplete="off")
+					input#req-MtCateg-3.reqMtCateg.form-control(type="text", value=MtCategThd.code, autocomplete="off")
+				.offset-3.offset-sm-2.col-9.col-sm-6.col-form-label#MtCateg-box
 			.form-group.row
 				label.col-3.col-sm-2.col-form-label(for="codeIpt") code
 				.col-9.col-sm-6
@@ -51,3 +55,4 @@ block content
 			.form-group.row
 				.offset-sm-6.col-sm-2
 					input.btn.btn-success.btn-block(type="submit" value="确认")
+	script(src="/js/bser/material/Mtrial/edit.js")

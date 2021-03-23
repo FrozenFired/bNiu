@@ -17,18 +17,17 @@ block content
 							- a;
 							option(value=MtFirm._id) #{MtFirm.code}
 			.form-group.row
-				label.col-3.col-sm-2.col-form-label(for="MtCategIpt") MtCateg
-				.col-9.col-sm-6
-					select#MtCategIpt.form-control(name="obj[MtCateg]", data-style="btn-info")
-						option(value="") 不分类
-						each MtCateg in MtCategs
-							- code = "["+MtCateg.code+"]";
-							if MtCateg.MtCategFar
-								- let Far = MtCateg.MtCategFar
-								- code = Far.code+" -> "+code;
-								if Far.MtCategFar
-									- code = Far.MtCategFar.code+" -> "+code;
-							option(value=MtCateg._id) #{code}
+				label.col-3.col-sm-2.col-form-label 分类
+				.col-3.col-sm-2
+					input#ipt-MtCateg-1.iptMtCateg.form-control(type="hidden", name="obj[MtCategFir]" autocomplete="off")
+					input#req-MtCateg-1.reqMtCateg.form-control(type="text", autocomplete="off")
+				.col-3.col-sm-2
+					input#ipt-MtCateg-2.iptMtCateg.form-control(type="hidden", name="obj[MtCategSec]" autocomplete="off")
+					input#req-MtCateg-2.reqMtCateg.form-control(type="text", autocomplete="off")
+				.col-3.col-sm-2
+					input#ipt-MtCateg-3.iptMtCateg.form-control(type="hidden", name="obj[MtCategThd]" autocomplete="off")
+					input#req-MtCateg-3.reqMtCateg.form-control(type="text", autocomplete="off")
+				.offset-3.offset-sm-2.col-9.col-sm-6.col-form-label#MtCateg-box
 			.form-group.row
 				label.col-3.col-sm-2.col-form-label(for="codeIpt") code
 				.col-9.col-sm-6
@@ -47,3 +46,4 @@ block content
 			.form-group.row
 				.offset-sm-6.col-sm-2
 					input.btn.btn-success.btn-block(type="submit" value="添加")
+	script(src="/js/bser/material/Mtrial/edit.js")

@@ -28,7 +28,7 @@ exports.bsPdspus = async(req, res) => {
 		const PdCategs = await PdCategDB.find({level: 1})
 			.populate({path: "PdCategSons", populate: {path: "PdCategSons"}})
 			.sort({"weight": -1})
-		return res.render("./user/bser/product/Pdspu/list", {title: "产品管理", info, PdNomes, PdCategs, crUser});
+		return res.render("./user/bser/product/Pdspu/list", {title: "产品列表", info, PdNomes, PdCategs, crUser});
 	} catch(error) {
 		console.log(error)
 		return res.redirect("/error?info=bsPdspus,Error&error="+error);
@@ -42,6 +42,9 @@ exports.bsPdspusAjax = async(req, res) => {
 		const {param, filter, sortBy, page, pagesize, skip} = PdspusParamFilter(req, crUser);
 		const count = await PdspuDB.countDocuments(param);
 		const objects = await PdspuDB.find(param, filter)
+			.populate("PdCategFir")
+			.populate("PdCategSec")
+			.populate("PdCategThd")
 			.populate("PdNome")
 			.skip(skip).limit(pagesize)
 			.sort(sortBy);
@@ -84,6 +87,27 @@ const PdspusParamFilter = (req, crUser) => {
 		}
 	}
 
+	if(req.query.PdCategFir) {
+		let symbConb = req.query.PdCategFir
+		if(symbConb.length == 24) {
+			param["PdCategFir"] = {'$eq': symbConb};
+		}
+	}
+
+	if(req.query.PdCategSec) {
+		let symbConb = req.query.PdCategSec
+		if(symbConb.length == 24) {
+			param["PdCategSec"] = {'$eq': symbConb};
+		}
+	}
+
+	if(req.query.PdCategThd) {
+		let symbConb = req.query.PdCategThd
+		if(symbConb.length == 24) {
+			param["PdCategThd"] = {'$eq': symbConb};
+		}
+	}
+
 	if(req.query.sortKey && req.query.sortVal) {
 		let sortKey = req.query.sortKey;
 		let sortVal = parseInt(req.query.sortVal);
@@ -106,41 +130,57 @@ exports.bsPdspuAdd = async(req, res) => {
 	// console.log("/bsPdspuAdd");
 	try{
 		const crUser = req.session.crUser;
-		const PdCategs = await PdCategDB.find({isBottom: 1})
-			.populate({path: "PdCategFar", populate: {path: "PdCategFar"}})
-			.sort({"weight": -1})
 		const SizeSysts = await SizeSystDB.find().sort({"weight": -1});
-		return res.render("./user/bser/product/Pdspu/add", {title: "添加新产品", PdCategs, SizeSysts, crUser});
+		return res.render("./user/bser/product/Pdspu/add", {title: "添加新产品", SizeSysts, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPdspuAdd,Error&error="+error);
 	}
 }
 
 
-const PdspuFilter_Func = async(req, res) => {
+const PdspuFilter_Func = async(req) => {
 	try{
+		const crUser = req.session.crUser;
 		const obj = req.body.obj;
 		// Pdspu值的判断
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
-		if(obj.code.length < 3) return res.redirect("/error?info=PdspuFilter_Func,编号长度最小为3");
+		if(obj.code.length < 3) return {obj: null, info: "PdspuFilter_Func,编号长度最小为3"};
 		obj.price = parseFloat(obj.price);
-		if(isNaN(obj.price)) return res.redirect("/error?info=PdspuFilter_Func,请输入正确售价");
+		if(isNaN(obj.price)) return {obj: null, info: "PdspuFilter_Func,请输入正确售价"};
 		if(obj.cost) {
 			obj.cost = parseFloat(obj.cost);
-			if(isNaN(obj.cost)) return res.redirect("/error?info=PdspuFilter_Func,请输入正确采购价, 可以不输入");
+			if(isNaN(obj.cost)) return {obj: null, info: "PdspuFilter_Func,请输入正确采购价, 可以不输入"};
 		}
-		if(obj.PdCateg) {
-			const PdCateg = await PdCategDB.findOne({_id: obj.PdCateg});
-			if(!PdCateg) return res.redirect("/error?info=PdspuFilter_Func,没有此分类");
+
+		if(obj.PdCategFir) {
+			const PdCategFir = await PdCategDB.findOne({_id: obj.PdCategFir})
+				.populate({path: "PdCategSons", populate: {path: "PdCategSons"}});
+			if(!PdCategFir) return {obj: null, info: "/error?info=PdspuFilter_Func,没有此分类(Fir)"};
+			if(obj.PdCategSec) {
+				const PdCategSec = PdCategFir.PdCategSons.find((item) => {return item._id == String(obj.PdCategSec);});
+				if(!PdCategSec) return {obj: null, info: "/error?info=PdspuFilter_Func,没有此分类(Sec)"}
+				if(obj.PdCategThd) {
+					const PdCategThd = PdCategSec.PdCategSons.find((item) => {return item._id == String(obj.PdCategThd);});
+					if(!PdCategThd) return {obj: null, info: "/error?info=PdspuFilter_Func,没有此分类(Thd)"};
+				} else {
+					obj.PdCategThd = null;
+				}
+			} else {
+				obj.PdCategSec = null;
+				obj.PdCategThd = null;
+			}
 		} else {
-			obj.PdCateg = null;
+			obj.PdCategFir = null;
+			obj.PdCategSec = null;
+			obj.PdCategThd = null;
 		}
+
 		if(obj.PdNome) {
 			const PdNome = await PdNomeDB.findOne({_id: obj.PdNome});
-			if(!PdNome) return res.redirect("/error?info=PdspuFilter_Func,没有此名称");
+			if(!PdNome) return {obj: null, info: "/error?info=PdspuFilter_Func,没有此名称"};
 		} else {	// 如果没有此名称 则自动添加
 			const codePdNome = req.body.codePdNome.replace(/^\s*/g,"").toUpperCase();
-			if(codePdNome.length < 1) return res.redirect("/error?info=bsPdNomeNew,codePdNome");
+			if(codePdNome.length < 1) return {obj: null, info: "/error?info=bsPdNomeNew,codePdNome"};
 			const PdNomeSame = await PdNomeDB.findOne({code: codePdNome});
 			if(PdNomeSame) {
 				obj.PdNome = PdNomeSame._id;
@@ -155,21 +195,24 @@ const PdspuFilter_Func = async(req, res) => {
 		}
 		if(obj.SizeSyst) {
 			const SizeSyst = await SizeSystDB.findOne({_id: obj.SizeSyst});
-			if(!SizeSyst) return res.redirect("/error?info=PdspuFilter_Func,没有此尺寸标准");
+			if(!SizeSyst) return {obj: null, info: "/error?info=PdspuFilter_Func,没有此尺寸标准"};
 		} else {
 			obj.PdNome = null;
 		}
 
-		return obj;
+
+		return {obj, info: null};
 	} catch(error) {
-		return res.redirect("/error?info=PdspuFilter_Func,Error&error="+error);
+		console.log(error);
+		return {obj: null, info: "/error?info=PdspuFilter_Func,Error&error="+error};
 	}
 }
 exports.bsPdspuNew = async(req, res) => {
 	// console.log("/bsPdspuNew");
 	try{
 		const crUser = req.session.crUser;
-		const obj = await PdspuFilter_Func(req, res);
+		const {obj, info} = await PdspuFilter_Func(req);
+		if(!obj) return res.redirect("/bsPdspus?info="+info);
 		// Pdspu值的初始化
 		obj.Firm = crUser.Firm;
 		obj.photo = Conf.photo.Pdspu.def;
@@ -198,6 +241,7 @@ exports.bsPdspuNew = async(req, res) => {
 
 		return res.redirect("/bsPdspus");
 	} catch(error) {
+		console.log(error)
 		return res.redirect("/error?info=bsPdspuNew,Error&error="+error);
 	}
 }
@@ -209,7 +253,8 @@ exports.bsPdspuUpd = async(req, res) => {
 		const Pdspu = await PdspuDB.findOne({_id: req.body.obj._id});
 		if(!Pdspu) return res.redirect("/error?info=bsPdspuUpd,没有找到此材料信息");
 
-		const obj = await PdspuFilter_Func(req, res);
+		const {obj, info} = await PdspuFilter_Func(req);
+		if(!obj) return res.redirect("/bsPdspus?info="+info);
 
 		const PdspuSame = await PdspuDB.findOne({_id: {"$ne": obj._id}, code: obj.code});
 		if(PdspuSame) return res.redirect("/error?info=bsPdspuUpd,有相同的编号");
@@ -218,6 +263,7 @@ exports.bsPdspuUpd = async(req, res) => {
 		const PdspuSave = await _object.save();
 		return res.redirect("/bsPdspu/"+PdspuSave._id);
 	} catch(error) {
+		console.log(error)
 		return res.redirect("/error?info=bsPdspuUpd,Error&error="+error);
 	}
 }
@@ -262,7 +308,21 @@ exports.bsPdspuUpdAjax = async(req, res) => {
 
 		} else if(field == "SizeSyst") {
 			if(val.length != 24) return res.json({status: 500, message: "尺寸标准操作错误"});
-		}else if(field == "weight") {
+			const SizeSyst = await SizeSystDB.findOne({_id: val});
+			if(!SizeSyst) return res.json({status: 500, message: "尺寸标准没有找到"})
+		} else if(field == "PdCategFir") {
+			if(val.length != 24) return res.json({status: 500, message: "分类修改 参数错误(Fir)"});
+			const PdCategFir = await PdCategDB.findOne({_id: val});
+			if(!PdCategFir) return res.json({status: 500, message: "没有找到分类(Fir)"})
+		} else if(field == "PdCategSec") {
+			if(val.length != 24) return res.json({status: 500, message: "分类修改 参数错误(Sec)"});
+			const PdCategSec = await PdCategDB.findOne({_id: val});
+			if(!PdCategSec) return res.json({status: 500, message: "没有找到分类(Sec)"})
+		} else if(field == "PdCategThd") {
+			if(val.length != 24) return res.json({status: 500, message: "分类修改 参数错误(Thd)"});
+			const PdCategThd = await PdCategDB.findOne({_id: val});
+			if(!PdCategThd) return res.json({status: 500, message: "没有找到分类(Thd)"})
+		} else if(field == "weight") {
 			val = parseInt(val);
 			if(isNaN(val)) return res.json({status: 500, message: "[bsPdspuUpdAjax weight] 排序为数字, 请传递正确的参数"});
 		} else {
@@ -303,7 +363,9 @@ exports.bsPdspu = async(req, res) => {
 		const crUser = req.session.crUser;
 		const id = req.params.id;
 		const Pdspu = await PdspuDB.findOne({_id: id})
-			.populate("PdCateg")
+			.populate("PdCategFir")
+			.populate("PdCategSec")
+			.populate("PdCategThd")
 			.populate("PdNome")
 			.populate("Mtrials")
 			.populate("SizeSyst")
@@ -312,7 +374,6 @@ exports.bsPdspu = async(req, res) => {
 			.populate("PdCostMts")
 			.populate("Pdskus")
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
-
 		let SizeSystId = null;
 		if(Pdspu.SizeSyst) SizeSystId = Pdspu.SizeSyst._id;
 		const Sizes = await SizeDB.find({SizeSyst: SizeSystId});
@@ -336,14 +397,14 @@ exports.bsPdspuUp = async(req, res) => {
 		const crUser = req.session.crUser;
 		const id = req.params.id;
 		const Pdspu = await PdspuDB.findOne({_id: id})
+			.populate("PdCategFir")
+			.populate("PdCategSec")
+			.populate("PdCategThd")
 			.populate("PdNome");
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
 
-		const PdCategs = await PdCategDB.find({isBottom: 1})
-			.populate({path: "PdCategFar", populate: {path: "PdCategFar"}})
-			.sort({"weight": -1})
 		const SizeSysts = await SizeSystDB.find().sort({"weight": -1});
-		return res.render("./user/bser/product/Pdspu/update/basicUp", {title: "产品更新", Pdspu, PdCategs, SizeSysts, crUser});
+		return res.render("./user/bser/product/Pdspu/update/basicUp", {title: "产品更新", Pdspu, SizeSysts, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPdspuUp,Error&error="+error);
 	}

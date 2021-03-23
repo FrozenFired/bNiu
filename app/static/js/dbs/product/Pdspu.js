@@ -50,7 +50,27 @@ const objectRender = (object, role) => {
 			elem += 'style="object-fit: scale-down;"'
 		elem += '/>'
 		elem += '<h5>编号: '+object.code+'</h5>'
-		elem += '<h5>名称: '+object.PdNome.code+'</h5>'
+		elem += '<h5>名称: ';
+			if(object.PdNome) {
+				elem += object.PdNome.code;
+			} else {
+				elem += "名称错误"
+			}
+		elem += '</h5>'
+		elem += '<div class="PdCateg">';
+			elem += '<span> 分类: '
+			if(object.PdCategFir) {
+				elem += object.PdCategFir.code;
+				if(object.PdCategSec) {
+					elem += '<div class="PdCategSec"> 二级分类: '+object.PdCategSec.code+'</div>'
+					if(object.PdCategThd) {
+						elem += '<div class="PdCategThd"> 三级分类: '+object.PdCategThd.code+'</div>'
+					}
+				}
+			} else {
+				elem += "未分类"
+			}
+		elem += '</h5>'
 		elem += '<div class="row">'
 			elem += '<div class="col-sm-6 text-left">'
 				elem += '<span class="bg-white text-info jsUpd-span jsUpd-span-weight-weight-'+object._id;

@@ -49,7 +49,7 @@ exports.bsPdCategsAjax = async(req, res) => {
 			data: {object, objects, count, page, pagesize}
 		});
 	} catch(error) {
-		console.log(error)
+		// console.log(error)
 		return res.json({status: 500, message: "bsPdCategsAjax Error!"});
 	}
 }
@@ -71,6 +71,13 @@ const PdCategsParamFilter = (req, crUser) => {
 		let symbConb = parseInt(req.query.level);
 		if(symbConb >=1 && symbConb <=3) {
 			param["level"] = {'$eq': symbConb};
+		}
+	}
+
+	if(req.query.PdCategFar) {
+		let symbConb = req.query.PdCategFar;
+		if(symbConb.length == 24) {
+			param["PdCategFar"] = {'$eq': symbConb};
 		}
 	}
 
@@ -200,7 +207,16 @@ exports.bsPdCategDel = async(req, res) => {
 			PdCategFar.save();
 		}
 
-		const PdspuUpdMany = await PdspuDB.updateMany({PdCateg: id }, {PdCateg: null});
+		// const PdspuUpdMany = await PdspuDB.updateMany({PdCateg: id }, {PdCateg: null});
+		if(PdCateg.level == 1) {
+			PdspuUpdMany = await PdspuDB.updateMany({PdCategFir: id }, {PdCategFir: null, PdCategSec: null, PdCategThd: null});
+		} else if(PdCateg.level == 2) {
+			PdspuUpdMany = await PdspuDB.updateMany({PdCategSec: id }, {PdCategSec: null, PdCategThd: null});
+		} else if(PdCateg.level == 3) {
+			PdspuUpdMany = await PdspuDB.updateMany({PdCategThd: id }, {PdCategThd: null});
+		} else {
+			return ("/bsPdCategs?info=删除错误");
+		}
 
 		const PdCategDel = await PdCategDB.deleteOne({_id: id});
 		return res.redirect("/bsPdCategs");

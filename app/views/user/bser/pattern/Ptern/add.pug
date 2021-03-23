@@ -17,18 +17,17 @@ block content
 							- a;
 							option(value=PtFirm._id) #{PtFirm.code}
 			.form-group.row
-				label.col-3.col-sm-2.col-form-label(for="PtCategIpt") PtCateg
-				.col-9.col-sm-6
-					select#PtCategIpt.form-control(name="obj[PtCateg]", data-style="btn-info")
-						option(value="") 不分类
-						each PtCateg in PtCategs
-							- code = "["+PtCateg.code+"]";
-							if PtCateg.PtCategFar
-								- let Far = PtCateg.PtCategFar
-								- code = Far.code+" -> "+code;
-								if Far.PtCategFar
-									- code = Far.PtCategFar.code+" -> "+code;
-							option(value=PtCateg._id) #{code}
+				label.col-3.col-sm-2.col-form-label 分类
+				.col-3.col-sm-2
+					input#ipt-PtCateg-1.iptPtCateg.form-control(type="hidden", name="obj[PtCategFir]" autocomplete="off")
+					input#req-PtCateg-1.reqPtCateg.form-control(type="text", autocomplete="off")
+				.col-3.col-sm-2
+					input#ipt-PtCateg-2.iptPtCateg.form-control(type="hidden", name="obj[PtCategSec]" autocomplete="off")
+					input#req-PtCateg-2.reqPtCateg.form-control(type="text", autocomplete="off")
+				.col-3.col-sm-2
+					input#ipt-PtCateg-3.iptPtCateg.form-control(type="hidden", name="obj[PtCategThd]" autocomplete="off")
+					input#req-PtCateg-3.reqPtCateg.form-control(type="text", autocomplete="off")
+				.offset-3.offset-sm-2.col-9.col-sm-6.col-form-label#PtCateg-box
 			.form-group.row
 				label.col-3.col-sm-2.col-form-label(for="codeIpt") code
 				.col-9.col-sm-6
@@ -42,3 +41,4 @@ block content
 			.form-group.row
 				.offset-sm-6.col-sm-2
 					input.btn.btn-success.btn-block(type="submit" value="添加")
+	script(src="/js/bser/pattern/Ptern/edit.js")
