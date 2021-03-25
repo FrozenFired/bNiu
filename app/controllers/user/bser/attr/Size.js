@@ -18,8 +18,8 @@ exports.bsSizes = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const SizeNums = Conf.SizeNums;
-		const SizeSysts = await SizeSystDB.find();
-		const Sizes = await SizeDB.find();
+		const SizeSysts = await SizeSystDB.find({Firm: crUser.Firm}).sort({"weight": -1, "updAt": -1});
+		const Sizes = await SizeDB.find({Firm: crUser.Firm});
 		return res.render("./user/bser/attr/Size/list", {title: "尺寸管理", SizeNums, SizeSysts, Sizes, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsSizes,Error&error="+error);
@@ -42,9 +42,10 @@ exports.bsSizeSystNew = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const obj = req.body.obj;
+		obj.Firm = crUser.Firm;
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 		if(obj.code.length < 2) return res.redirect("/error?info=bsSizeSystNew,objCode");
-		const SizeSystSame = await SizeSystDB.findOne({code: obj.code});
+		const SizeSystSame = await SizeSystDB.findOne({code: obj.code, Firm: crUser.Firm});
 		if(SizeSystSame) return res.redirect("/error?info=bsSizeSystNew,SizeSystSame");
 		const _object = new SizeSystDB(obj);
 		const SizeSave = await	_object.save();
@@ -57,8 +58,9 @@ exports.bsSizeSystNew = async(req, res) => {
 exports.bsSizeSystUpdAjax = async(req, res) => {
 	// console.log("/bsSizeSystUpdAjax");
 	try{
+		const crUser = req.session.crUser;
 		const id = req.body.id;		// 所要更改的Size的id
-		const SizeSyst = await SizeSystDB.findOne({'_id': id})
+		const SizeSyst = await SizeSystDB.findOne({'_id': id, Firm: crUser.Firm})
 		if(!SizeSyst) return res.json({status: 500, message: "没有找到此尺寸信息, 请刷新重试"});
 
 		const field = req.body.field;	// 传输数据的类型
@@ -66,7 +68,7 @@ exports.bsSizeSystUpdAjax = async(req, res) => {
 		if(field == "code") {
 			val = String(val).replace(/^\s*/g,"").toUpperCase();
 			if(val.length < 1) return res.json({status: 500, message: "[bsSizeSystUpdAjax code] 尺寸标准名称不正确"});
-			const SizeSystSame = await SizeSystDB.findOne({code: val});
+			const SizeSystSame = await SizeSystDB.findOne({code: val, Firm: crUser.Firm});
 			if(SizeSystSame) return res.json({status: 500, message: "有相同的编号"});			
 		} else if(field == "weight"){
 			val = parseInt(val);
@@ -84,18 +86,20 @@ exports.bsSizeSystUpdAjax = async(req, res) => {
 exports.bsSizeNewAjax = async(req, res) => {
 	// console.log("/bsSizeNewAjax");
 	try{
+		const crUser = req.session.crUser;
 		const size = req.body.size;
 		const standardId = req.body.standard;
 		const symbol = req.body.symbol.replace(/^\s*/g,"").toUpperCase();
 		if(!symbol) return res.json({status: 500, message: "请输入尺寸标识, 请刷新重试"});
 
-		const SizeSyst = await SizeSystDB.findOne({'_id': standardId})
+		const SizeSyst = await SizeSystDB.findOne({'_id': standardId, Firm: crUser.Firm})
 		if(!SizeSyst) return res.json({status: 500, message: "没有找到此尺寸信息, 请刷新重试"});
 
-		const SizeSame = await SizeDB.findOne({SizeSyst: standardId, size: size});
+		const SizeSame = await SizeDB.findOne({SizeSyst: standardId, size: size, Firm: crUser.Firm});
 		if(SizeSame) return res.json({status: 500, message: "已经存在, 请刷新重试"});
 
 		const obj = new Object();
+		obj.Firm = crUser.Firm;
 		obj.SizeSyst = standardId;
 		obj.size = size;
 		obj.symbol = symbol;
@@ -111,14 +115,15 @@ exports.bsSizeNewAjax = async(req, res) => {
 exports.bsSizeUpdAjax = async(req, res) => {
 	// console.log("/bsSizeUpdAjax");
 	try{
+		const crUser = req.session.crUser;
 		const id = req.body.id;		// 所要更改的Size的id
-		const Size = await SizeDB.findOne({'_id': id})
+		const Size = await SizeDB.findOne({'_id': id, Firm: crUser.Firm});
 		if(!Size) return res.json({status: 500, message: "没有找到此尺寸信息, 请刷新重试"});
 
 		const field = req.body.field;	// 传输数据的类型
 		const val = String(req.body.val).replace(/^\s*/g,"").toUpperCase();		// 数据的值
 		if(!val) {
-			const SizeDel = await SizeDB.deleteOne({_id: id});
+			const SizeDel = await SizeDB.deleteOne({_id: id, Firm: crUser.Firm});
 		} else {
 			Size[field] = val;
 			const SizeSave = Size.save();
@@ -136,13 +141,13 @@ exports.bsSizeSystDel = async(req, res) => {
 		const crUser = req.session.crUser;
 
 		const id = req.params.id;
-		const SizeSystExist = await SizeSystDB.findOne({_id: id});
+		const SizeSystExist = await SizeSystDB.findOne({_id: id, Firm: crUser.Firm});
 		if(!SizeSystExist) return res.json({status: 500, message: "此尺寸标准已经不存在, 请刷新重试"});
 
 
-		const SizesDelMany = await SizeDB.deleteMany({SizeSyst: id});
-		const SizeSystDel = await SizeSystDB.deleteOne({_id: id});
-		const PdspuUpdMany = await PdspuDB.updateMany({SizeSyst: id }, {SizeSyst: null});
+		const SizesDelMany = await SizeDB.deleteMany({SizeSyst: id, Firm: crUser.Firm});
+		const SizeSystDel = await SizeSystDB.deleteOne({_id: id, Firm: crUser.Firm});
+		const PdspuUpdMany = await PdspuDB.updateMany({SizeSyst: id, Firm: crUser.Firm}, {SizeSyst: null});
 
 		return res.redirect("/bsSizes");
 	} catch(error) {

@@ -18,11 +18,12 @@ exports.bsPterns = async(req, res) => {
 	try{
 		const info = req.query.info;
 		const crUser = req.session.crUser;
-		const PtCategs = await PtCategDB.find({level: 1})
+		const PtCategs = await PtCategDB.find({level: 1, Firm: crUser.Firm})
 			.populate({path: "PtCategSons", populate: {path: "PtCategSons"}})
-			.sort({"weight": -1});
-		const PtFirms = await PtFirmDB.find();
-		return res.render("./user/bser/pattern/Ptern/list", {title: "印花管理", info, PtCategs, PtFirms, crUser});
+			.sort({"weight": -1, "updAt": -1});
+		const PtFirms = await PtFirmDB.find({Firm: crUser.Firm})
+			.sort({"weight": -1, "updAt": -1});
+		return res.render("./user/bser/pattern/Ptern/list", {title: "印花列表", info, PtCategs, PtFirms, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPterns,Error&error="+error);
 	}
@@ -44,7 +45,7 @@ exports.bsPternsAjax = async(req, res) => {
 		let object = null;
 		if(objects.length > 0 && req.query.code) {
 			const code = req.query.code.replace(/^\s*/g,"").toUpperCase();
-			object = await PternDB.findOne({code: code}, filter);
+			object = await PternDB.findOne({code: code, Firm: crUser.Firm}, filter);
 		}
 
 		return res.status(200).json({
@@ -121,12 +122,10 @@ exports.bsPternAdd = async(req, res) => {
 	// console.log("/bsPternAdd");
 	try{
 		const crUser = req.session.crUser;
-		const PtCategs = await PtCategDB.find({isBottom: 1})
-			.populate({path: "PtCategFar", populate: {path: "PtCategFar"}})
-			.sort({"weight": -1});
-		const PtFirms = await PtFirmDB.find();
+		const PtFirms = await PtFirmDB.find({Firm: crUser.Firm})
+			.sort({"weight": -1, "updAt": -1});
 		if(!PtFirms || PtFirms.length < 1) return res.redirect("./error?info=请先添加印花厂");
-		return res.render("./user/bser/pattern/Ptern/add", {title: "添加新印花", crUser, PtCategs, PtFirms});
+		return res.render("./user/bser/pattern/Ptern/add", {title: "添加新印花", crUser, PtFirms});
 	} catch(error) {
 		return res.redirect("/error?info=bsPternAdd,Error&error="+error);
 	}
@@ -145,11 +144,11 @@ const PterFilter_Func = async(req) => {
 		}
 
 		if(!obj.PtFirm) return {obj: null, info: "/error?info=PterFilter_Func, 请选择印花厂"};
-		const PtFirm = await PtFirmDB.findOne({_id: obj.PtFirm});
+		const PtFirm = await PtFirmDB.findOne({_id: obj.PtFirm, Firm: crUser.Firm});
 		if(!PtFirm) return {obj: null, info: "/error?info=PterFilter_Func, 没有此印花厂"};
 
 		if(obj.PtCategFir) {
-			const PtCategFir = await PtCategDB.findOne({_id: obj.PtCategFir})
+			const PtCategFir = await PtCategDB.findOne({_id: obj.PtCategFir, Firm: crUser.Firm})
 				.populate({path: "PtCategSons", populate: {path: "PtCategSons"}});
 			if(!PtCategFir) return {obj: null, info: "/error?info=PterFilter_Func,没有此分类(Fir)"};
 			if(obj.PtCategSec) {
@@ -188,7 +187,7 @@ exports.bsPternNew = async(req, res) => {
 		obj.Firm = crUser.Firm;
 		obj.photo = Conf.photo.Ptern.def;
 
-		const PternSame = await PternDB.findOne({code: obj.code});
+		const PternSame = await PternDB.findOne({code: obj.code, Firm: crUser.Firm});
 		if(PternSame) return res.redirect("/error?info=bsPternNew,PternSame");
 
 		const _object = new PternDB(obj);
@@ -203,12 +202,12 @@ exports.bsPternUpd = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 
-		const Ptern = await PternDB.findOne({_id: req.body.obj._id});
-		if(!Ptern) return res.redirect("/error?info=bsPternUpd,没有找到此材料信息");
+		const Ptern = await PternDB.findOne({_id: req.body.obj._id, Firm: crUser.Firm});
+		if(!Ptern) return res.redirect("/error?info=bsPternUpd,没有找到此印花信息");
 
 		const {obj, info} = await PterFilter_Func(req);
 
-		const PternSame = await PternDB.findOne({_id: {"$ne": obj._id}, code: obj.code});
+		const PternSame = await PternDB.findOne({_id: {"$ne": obj._id}, code: obj.code, Firm: crUser.Firm});
 		if(PternSame) return res.redirect("/error?info=bsPternUpd,有相同的编号");
 
 		const _object = _.extend(Ptern, obj);
@@ -223,8 +222,9 @@ exports.bsPternUpd = async(req, res) => {
 exports.bsPternUpdAjax = async(req, res) => {
 	// console.log("/bsPternUpdAjax");
 	try{
+		const crUser = req.session.crUser;
 		const id = req.body.id;		// 所要更改的Ptern的id
-		const Ptern = await PternDB.findOne({_id: id})
+		const Ptern = await PternDB.findOne({_id: id, Firm: crUser.Firm})
 		if(!Ptern) return res.json({status: 500, message: "没有找到此印花信息, 请刷新重试"});
 
 		let val = req.body.val;		// 数据的值
@@ -233,7 +233,7 @@ exports.bsPternUpdAjax = async(req, res) => {
 		if(field == "code") {
 			val = String(val).replace(/^\s*/g,"").toUpperCase();
 			if(val.length < 1) return res.json({status: 500, message: "编号填写错误"});
-			const PternSame = await PternDB.findOne({code: val});
+			const PternSame = await PternDB.findOne({code: val, Firm: crUser.Firm});
 			if(PternSame) return res.json({status: 500, message: "有相同的编号"});
 		} else if(field == "photo") {
 			val = String(val).replace(/^\s*/g,"");
@@ -246,13 +246,13 @@ exports.bsPternUpdAjax = async(req, res) => {
 			if(isNaN(val)) return res.json({status: 500, message: "[bsPternUpdAjax weight] 排序为数字, 请传递正确的参数"});
 		} else if(field == "PtFirm") {
 			if(val.length != 24) return res.json({status: 500, message: "[bsPternUpdAjax weight] 没有找到您选择的印花厂"});
-			const PtFirm = await PtFirmDB.findOne({_id: val});
+			const PtFirm = await PtFirmDB.findOne({_id: val, Firm: crUser.Firm});
 			if(!PtFirm) return res.json({status: 500, message: "[bsPternUpdAjax weight] 没有找到您选择的印花厂"});
 		} else if(field == "PtCateg") {
 			if(val.length != 24) {
 				val=null;
 			} else {
-				const PtCateg = await PtCategDB.findOne({_id: val});
+				const PtCateg = await PtCategDB.findOne({_id: val, Firm: crUser.Firm});
 				if(!PtCateg) val=null;
 			}
 		} else {
@@ -276,13 +276,13 @@ exports.bsPternDel = async(req, res) => {
 		const crUser = req.session.crUser;
 
 		const id = req.params.id;
-		const PternExist = await PternDB.findOne({_id: id});
+		const PternExist = await PternDB.findOne({_id: id, Firm: crUser.Firm});
 		if(!PternExist) return res.json({status: 500, message: "此印花已经不存在, 请刷新重试"});
 
-		const Pdspu = await PdspuDB.findOne({Pterns: id});
+		const Pdspu = await PdspuDB.findOne({Pterns: id, Firm: crUser.Firm});
 		if(Pdspu) return res.redirect("/bsPterns?info=在 ["+Pdspu.code+"] 等产品已经使用此印花, 不可删除。 除非把相应产品删除");
 
-		const PternDel = await PternDB.deleteOne({_id: id});
+		const PternDel = await PternDB.deleteOne({_id: id, Firm: crUser.Firm});
 		return res.redirect("/bsPterns");
 	} catch(error) {
 		console.log(error);
@@ -306,7 +306,7 @@ exports.bsPternPhotoUpd = async(req, res) => {
 		const crUser = req.session.crUser;
 		const obj = req.body.obj;
 		const photo = req.body.files[0];
-		const Ptern = await PternDB.findOne({_id: obj._id});
+		const Ptern = await PternDB.findOne({_id: obj._id, Firm: crUser.Firm});
 		if(!Ptern) return res.redirect("/error?info=没有找到此印花信息");
 		const delPhoto = Ptern.photo;
 		Ptern.photo = photo;
@@ -339,14 +339,15 @@ exports.bsPtern = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const id = req.params.id;
-		const Ptern = await PternDB.findOne({_id: id})
+		const Ptern = await PternDB.findOne({_id: id, Firm: crUser.Firm})
 			.populate("PtCategFir")
 			.populate("PtCategSec")
 			.populate("PtCategThd")
 			.populate("PtFirm")
 		if(!Ptern) return res.redirect("/error?info=不存在此分类");
-		const PtFirms = await PtFirmDB.find();
-		return res.render("./user/bser/pattern/Ptern/detail", {title: "材料详情", Ptern, PtFirms, crUser});
+		const PtFirms = await PtFirmDB.find({Firm: crUser.Firm})
+			.sort({"weight": -1, "updAt": -1});
+		return res.render("./user/bser/pattern/Ptern/detail", {title: "印花详情", Ptern, PtFirms, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPtern,Error&error="+error);
 	}
@@ -356,15 +357,16 @@ exports.bsPternUp = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const id = req.params.id;
-		const Ptern = await PternDB.findOne({_id: id})
+		const Ptern = await PternDB.findOne({_id: id, Firm: crUser.Firm})
 			.populate("PtCategFir")
 			.populate("PtCategSec")
 			.populate("PtCategThd");
 		if(!Ptern) return res.redirect("/error?info=不存在此分类");
 
-		const PtFirms = await PtFirmDB.find();
+		const PtFirms = await PtFirmDB.find({Firm: crUser.Firm})
+			.sort({"weight": -1, "updAt": -1});
 		if(!PtFirms || PtFirms.length < 1) return res.redirect("./error?info=请先添加印花厂");
-		return res.render("./user/bser/pattern/Ptern/update", {title: "材料更新", Ptern, PtFirms, crUser});
+		return res.render("./user/bser/pattern/Ptern/update", {title: "印花更新", Ptern, PtFirms, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPternUp,Error&error="+error);
 	}

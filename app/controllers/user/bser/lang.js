@@ -13,7 +13,8 @@ exports.bsLangs = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const Langs = await LangDB.find()
-			.populate("langs.Lang");
+			.populate("langs.Lang")
+			.sort({"weight": -1, "updAt": -1});
 		// Langs.forEach((item) => {console.log(item); });
 		return res.render("./user/bser/lang/list", {title: "语言管理", Langs, crUser});
 	} catch(error) {
@@ -25,7 +26,8 @@ exports.bsLangAdd = async(req, res) => {
 	// console.log("/bsLangAdd");
 	try{
 		const crUser = req.session.crUser;
-		const Langs = await LangDB.find();
+		const Langs = await LangDB.find()
+			.sort({"weight": -1, "updAt": -1});
 		return res.render("./user/bser/lang/add", {title: "添加语言", Langs, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsLangAdd,Error&error="+error);
@@ -47,7 +49,8 @@ exports.bsLangNew = async(req, res) => {
 		if(LangSame) return res.redirect("/error?info=bsLangNew,LangSame");
 		const _object = new LangDB(obj);
 		const LangSave = await	_object.save();
-		const Langs = await LangDB.find({_id: {"$ne": LangSave._id}});
+		const Langs = await LangDB.find({_id: {"$ne": LangSave._id}})
+			.sort({"weight": -1, "updAt": -1});
 		for(let i=0; i<Langs.length; i++) {
 			const Lang = Langs[i];
 			Lang.langs.push({Lang: LangSave._id, nome: '*'});

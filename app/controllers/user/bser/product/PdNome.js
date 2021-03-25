@@ -10,7 +10,8 @@ exports.bsPdNomes = async(req, res) => {
 	try{
 		const info = req.query.info;
 		const crUser = req.session.crUser;
-		const PdNomes = await PdNomeDB.find().sort({"weight": -1});
+		const PdNomes = await PdNomeDB.find({Firm: crUser.Firm})
+			.sort({"weight": -1, "updAt": -1});
 		return res.render("./user/bser/product/PdNome/list", {title: "名称列表", info, PdNomes, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPdNomes,Error&error="+error);
@@ -31,7 +32,7 @@ exports.bsPdNomesAjax = async(req, res) => {
 		let PdNome = null;
 		if(PdNomes.length > 0) {
 			const code = req.query.code.replace(/^\s*/g,"").toUpperCase();
-			PdNome = await PdNomeDB.findOne({code: code}, filter);
+			PdNome = await PdNomeDB.findOne({code: code, Firm: crUser.Firm}, filter);
 		}
 
 		return res.status(200).json({
@@ -96,7 +97,7 @@ exports.bsPdNomeNew = async(req, res) => {
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 		if(obj.code.length < 1) return res.redirect("/error?info=bsPdNomeNew,objCode");
 
-		const PdNomeSame = await PdNomeDB.findOne({code: obj.code});
+		const PdNomeSame = await PdNomeDB.findOne({code: obj.code, Firm: crUser.Firm});
 		if(PdNomeSame) return res.redirect("/error?info=bsPdNomeNew,PdNomeSame");
 
 		const _object = new PdNomeDB(obj);
@@ -109,8 +110,9 @@ exports.bsPdNomeNew = async(req, res) => {
 exports.bsPdNomeUpdAjax = async(req, res) => {
 	// console.log("/bsPdNomeUpdAjax");
 	try{
+		const crUser = req.session.crUser;
 		const id = req.body.id;		// 所要更改的PdNome的id
-		const PdNome = await PdNomeDB.findOne({_id: id})
+		const PdNome = await PdNomeDB.findOne({_id: id, Firm: crUser.Firm})
 		if(!PdNome) return res.json({status: 500, message: "没有找到此名称信息, 请刷新重试"});
 
 		let val = req.body.val;		// 数据的值
@@ -119,7 +121,7 @@ exports.bsPdNomeUpdAjax = async(req, res) => {
 		if(field == "code") {
 			val = String(val).replace(/^\s*/g,"").toUpperCase();
 			if(val.length < 1) return res.json({status: 500, message: "[bsPdNomeUpdAjax code] 名称不正确"});
-			const PdNomeSame = await PdNomeDB.findOne({code: val});
+			const PdNomeSame = await PdNomeDB.findOne({code: val, Firm: crUser.Firm});
 			if(PdNomeSame) return res.json({status: 500, message: "有相同的编号"});
 		} else if(field == "weight") {
 			val = parseInt(val);
@@ -142,13 +144,13 @@ exports.bsPdNomeDel = async(req, res) => {
 		const crUser = req.session.crUser;
 
 		const id = req.params.id;
-		const PdNomeExist = await PdNomeDB.findOne({_id: id});
+		const PdNomeExist = await PdNomeDB.findOne({_id: id, Firm: crUser.Firm});
 		if(!PdNomeExist) return res.json({status: 500, message: "此名称已经不存在, 请刷新重试"});
 
-		const Pdspu = await PdspuDB.findOne({PdNome: id});
+		const Pdspu = await PdspuDB.findOne({PdNome: id, Firm: crUser.Firm});
 		if(Pdspu) return res.redirect("/bsPdNomes?info=["+Pdspu.code+"] 等产品正在使用此名称, 不可删除。 除非把相应产品删除");
 
-		const PdNomeDel = await PdNomeDB.deleteOne({_id: id});
+		const PdNomeDel = await PdNomeDB.deleteOne({_id: id, Firm: crUser.Firm});
 		return res.redirect("/bsPdNomes");
 	} catch(error) {
 		console.log(error);
@@ -165,7 +167,7 @@ exports.bsPdNomeNewAjax = async(req, res) => {
 		const code = req.body.code.replace(/^\s*/g,"").toUpperCase();
 		if(!code) return res.json({status: 500, message: "请输入名称标识, 请刷新重试"});
 
-		const PdNomeSame = await PdNomeDB.findOne({code: code});
+		const PdNomeSame = await PdNomeDB.findOne({code: code, Firm: crUser.Firm});
 		if(PdNomeSame) return res.json({status: 500, message: "已经存在, 请刷新重试"});
 
 		const obj = new Object();

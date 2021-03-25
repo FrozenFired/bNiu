@@ -18,10 +18,11 @@ exports.bsMtrials = async(req, res) => {
 	try{
 		const info = req.query.info;
 		const crUser = req.session.crUser;
-		const MtCategs = await MtCategDB.find({level: 1})
+		const MtCategs = await MtCategDB.find({level: 1, Firm: crUser.Firm})
 			.populate({path: "MtCategSons", populate: {path: "MtCategSons"}})
-			.sort({"weight": -1});
-		const MtFirms = await MtFirmDB.find();
+			.sort({"weight": -1, "updAt": -1});
+		const MtFirms = await MtFirmDB.find({Firm: crUser.Firm})
+			.sort({"weight": -1, "updAt": -1});
 		return res.render("./user/bser/material/Mtrial/list", {title: "材料列表", info, MtCategs, MtFirms, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsMtrials,Error&error="+error);
@@ -44,7 +45,7 @@ exports.bsMtrialsAjax = async(req, res) => {
 		let object = null;
 		if(objects.length > 0 && req.query.code) {
 			const code = req.query.code.replace(/^\s*/g,"").toUpperCase();
-			object = await MtrialDB.findOne({code: code}, filter);
+			object = await MtrialDB.findOne({code: code, Firm: crUser.Firm}, filter);
 		}
 
 		return res.status(200).json({
@@ -121,12 +122,10 @@ exports.bsMtrialAdd = async(req, res) => {
 	// console.log("/bsMtrialAdd");
 	try{
 		const crUser = req.session.crUser;
-		const MtCategs = await MtCategDB.find({isBottom: 1})
-			.populate({path: "MtCategFar", populate: {path: "MtCategFar"}})
-			.sort({"weight": -1});
-		const MtFirms = await MtFirmDB.find();
+		const MtFirms = await MtFirmDB.find({Firm: crUser.Firm})
+			.sort({"weight": -1, "updAt": -1});
 		if(!MtFirms || MtFirms.length < 1) return res.redirect("./error?info=请先添加材料供应商");
-		return res.render("./user/bser/material/Mtrial/add", {title: "添加新材料", crUser, MtCategs, MtFirms});
+		return res.render("./user/bser/material/Mtrial/add", {title: "添加新材料", crUser, MtFirms});
 	} catch(error) {
 		return res.redirect("/error?info=bsMtrialAdd,Error&error="+error);
 	}
@@ -145,11 +144,11 @@ const MtrialFilter_Func = async(req) => {
 		}
 
 		if(!obj.MtFirm) return {obj: null, info: "/error?info=MtrialFilter_Func, 请选择印花厂"};
-		const MtFirm = await MtFirmDB.findOne({_id: obj.MtFirm});
+		const MtFirm = await MtFirmDB.findOne({_id: obj.MtFirm, Firm: crUser.Firm});
 		if(!MtFirm) return {obj: null, info: "/error?info=MtrialFilter_Func, 没有此印花厂"};
 
 		if(obj.MtCategFir) {
-			const MtCategFir = await MtCategDB.findOne({_id: obj.MtCategFir})
+			const MtCategFir = await MtCategDB.findOne({_id: obj.MtCategFir, Firm: crUser.Firm})
 				.populate({path: "MtCategSons", populate: {path: "MtCategSons"}});
 			if(!MtCategFir) return {obj: null, info: "/error?info=MtrialFilter_Func,没有此分类(Fir)"};
 			if(obj.MtCategSec) {
@@ -188,7 +187,7 @@ exports.bsMtrialNew = async(req, res) => {
 		obj.Firm = crUser.Firm;
 		obj.photo = Conf.photo.Mtrial.def;
 
-		const MtrialSame = await MtrialDB.findOne({code: obj.code});
+		const MtrialSame = await MtrialDB.findOne({code: obj.code, Firm: crUser.Firm});
 		if(MtrialSame) return res.redirect("/error?info=bsMtrialNew,编号相同");
 
 		const _object = new MtrialDB(obj);
@@ -203,12 +202,12 @@ exports.bsMtrialUpd = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 
-		const Mtrial = await MtrialDB.findOne({_id: req.body.obj._id});
+		const Mtrial = await MtrialDB.findOne({_id: req.body.obj._id, Firm: crUser.Firm});
 		if(!Mtrial) return res.redirect("/error?info=bsMtrialUpd,没有找到此材料信息");
 
 		const {obj, info} = await MtrialFilter_Func(req);
 
-		const MtrialSame = await MtrialDB.findOne({_id: {"$ne": obj._id}, code: obj.code});
+		const MtrialSame = await MtrialDB.findOne({_id: {"$ne": obj._id}, code: obj.code, Firm: crUser.Firm});
 		if(MtrialSame) return res.redirect("/error?info=bsMtrialUpd,有相同的编号");
 
 		const _object = _.extend(Mtrial, obj);
@@ -223,8 +222,9 @@ exports.bsMtrialUpd = async(req, res) => {
 exports.bsMtrialUpdAjax = async(req, res) => {
 	// console.log("/bsMtrialUpdAjax");
 	try{
+		const crUser = req.session.crUser;
 		const id = req.body.id;		// 所要更改的Mtrial的id
-		const Mtrial = await MtrialDB.findOne({_id: id})
+		const Mtrial = await MtrialDB.findOne({_id: id, Firm: crUser.Firm})
 		if(!Mtrial) return res.json({status: 500, message: "没有找到此材料信息, 请刷新重试"});
 
 		let val = req.body.val;		// 数据的值
@@ -233,7 +233,7 @@ exports.bsMtrialUpdAjax = async(req, res) => {
 		if(field == "code") {
 			val = String(val).replace(/^\s*/g,"").toUpperCase();
 			if(val.length < 1) return res.json({status: 500, message: "编号填写错误"});
-			const MtrialSame = await MtrialDB.findOne({code: val});
+			const MtrialSame = await MtrialDB.findOne({code: val, Firm: crUser.Firm});
 			if(MtrialSame) return res.json({status: 500, message: "有相同的编号"});
 		} else if(field == "photo") {
 			val = String(val).replace(/^\s*/g,"");
@@ -246,13 +246,13 @@ exports.bsMtrialUpdAjax = async(req, res) => {
 			if(isNaN(val)) return res.json({status: 500, message: "[bsMtrialUpdAjax weight] 排序为数字, 请传递正确的参数"});
 		} else if(field == "MtFirm") {
 			if(val.length != 24) return res.json({status: 500, message: "[bsMtrialUpdAjax weight] 没有找到您选择的供应商"});
-			const MtFirm = await MtFirmDB.findOne({_id: val});
+			const MtFirm = await MtFirmDB.findOne({_id: val, Firm: crUser.Firm});
 			if(!MtFirm) return res.json({status: 500, message: "[bsMtrialUpdAjax weight] 没有找到您选择的供应商"});
 		} else if(field == "MtCateg") {
 			if(val.length != 24) {
 				val=null;
 			} else {
-				const MtCateg = await MtCategDB.findOne({_id: val});
+				const MtCateg = await MtCategDB.findOne({_id: val, Firm: crUser.Firm});
 				if(!MtCateg) val=null;
 			}
 		} else {
@@ -276,13 +276,13 @@ exports.bsMtrialDel = async(req, res) => {
 		const crUser = req.session.crUser;
 
 		const id = req.params.id;
-		const MtrialExist = await MtrialDB.findOne({_id: id});
+		const MtrialExist = await MtrialDB.findOne({_id: id, Firm: crUser.Firm});
 		if(!MtrialExist) return res.json({status: 500, message: "此材料已经不存在, 请刷新重试"});
 
-		const Pdspu = await PdspuDB.findOne({Mtrials: id});
+		const Pdspu = await PdspuDB.findOne({Mtrials: id, Firm: crUser.Firm});
 		if(Pdspu) return res.redirect("/bsMtrials?info=在 ["+Pdspu.code+"] 等产品已经使用此材料, 不可删除。 除非把相应产品删除");
 
-		const MtrialDel = await MtrialDB.deleteOne({_id: id});
+		const MtrialDel = await MtrialDB.deleteOne({_id: id, Firm: crUser.Firm});
 		return res.redirect("/bsMtrials");
 	} catch(error) {
 		console.log(error);
@@ -306,7 +306,7 @@ exports.bsMtrialPhotoUpd = async(req, res) => {
 		const crUser = req.session.crUser;
 		const obj = req.body.obj;
 		const photo = req.body.files[0];
-		const Mtrial = await MtrialDB.findOne({_id: obj._id});
+		const Mtrial = await MtrialDB.findOne({_id: obj._id, Firm: crUser.Firm});
 		if(!Mtrial) return res.redirect("/error?info=没有找到此材料信息");
 		const delPhoto = Mtrial.photo;
 		Mtrial.photo = photo;
@@ -339,13 +339,14 @@ exports.bsMtrial = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const id = req.params.id;
-		const Mtrial = await MtrialDB.findOne({_id: id})
+		const Mtrial = await MtrialDB.findOne({_id: id, Firm: crUser.Firm})
 			.populate("MtCategFir")
 			.populate("MtCategSec")
 			.populate("MtCategThd")
 			.populate("MtFirm")
 		if(!Mtrial) return res.redirect("/error?info=不存在此分类");
-		const MtFirms = await MtFirmDB.find();
+		const MtFirms = await MtFirmDB.find({Firm: crUser.Firm})
+			.sort({"weight": -1, "updAt": -1});
 		return res.render("./user/bser/material/Mtrial/detail", {title: "材料详情", Mtrial, MtFirms, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsMtrial,Error&error="+error);
@@ -356,13 +357,14 @@ exports.bsMtrialUp = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const id = req.params.id;
-		const Mtrial = await MtrialDB.findOne({_id: id})
+		const Mtrial = await MtrialDB.findOne({_id: id, Firm: crUser.Firm})
 			.populate("MtCategFir")
 			.populate("MtCategSec")
 			.populate("MtCategThd");
 		if(!Mtrial) return res.redirect("/error?info=不存在此分类");
 
-		const MtFirms = await MtFirmDB.find();
+		const MtFirms = await MtFirmDB.find({Firm: crUser.Firm})
+			.sort({"weight": -1, "updAt": -1});
 		if(!MtFirms || MtFirms.length < 1) return res.redirect("./error?info=请先添加材料供应商");
 		return res.render("./user/bser/material/Mtrial/update", {title: "材料更新", Mtrial, MtFirms, crUser});
 	} catch(error) {

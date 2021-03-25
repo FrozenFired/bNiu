@@ -1,4 +1,6 @@
-0.0.98		Categ 优化
+0.1.0		每个数据库后加上了Firm 排序默认 weight updAt 
+0.0.98	55146df635a18efaecdc518a6b2406f2dd2032c7
+			Categ 优化
 0.0.97	59a48a987072bb193bc37d9422d536ff557b7782
 			Pdspu Detail 优化
 0.0.96	6cf5e45b6eb2f23c9c24d3aec12d9eabeb3baa8f

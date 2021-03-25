@@ -70,7 +70,7 @@ const objectRender = (object, role) => {
 			} else {
 				elem += "未分类"
 			}
-		elem += '</h5>'
+		elem += '</div>'
 		elem += '<div class="row">'
 			elem += '<div class="col-sm-6 text-left">'
 				elem += '<span class="bg-white text-info jsUpd-span jsUpd-span-weight-weight-'+object._id;

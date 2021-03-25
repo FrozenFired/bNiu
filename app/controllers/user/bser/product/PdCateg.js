@@ -10,16 +10,16 @@ exports.bsPdCategs = async(req, res) => {
 	// console.log("/bsPdCategs");
 	try{
 		const crUser = req.session.crUser;
-		const PdCategFirs = await PdCategDB.find({level: 1})
+		const PdCategFirs = await PdCategDB.find({level: 1, Firm: crUser.Firm})
 			.populate({
 				path: "PdCategSons",
-				options: { sort: { weight: -1 }},
+				options: { sort: { "weight": -1, "updAt": -1}},
 				populate: {
 					path: "PdCategSons",
-					options: { sort: { weight: -1 }}
+					options: { sort: { "weight": -1, "updAt": -1}}
 				}
 			})
-			.sort({"weight": -1})
+			.sort({"weight": -1, "updAt": -1});
 		return res.render("./user/bser/product/PdCateg/list", {title: "产品分类管理", PdCategFirs, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPdCategs,Error&error="+error);
@@ -40,7 +40,7 @@ exports.bsPdCategsAjax = async(req, res) => {
 		let object = null;
 		if(objects.length > 0 && req.query.code) {
 			const code = req.query.code.replace(/^\s*/g,"").toUpperCase();
-			object = await PdCategDB.findOne({code: code}, filter);
+			object = await PdCategDB.findOne({code: code, Firm: crUser.Firm}, filter);
 		}
 
 		return res.status(200).json({
@@ -102,7 +102,7 @@ exports.bsPdCategAdd = async(req, res) => {
 		const crUser = req.session.crUser;
 		let PdCategFar = null;
 		if(req.query.PdCategFar) {
-			PdCategFar = await PdCategDB.findOne({_id: req.query.PdCategFar});
+			PdCategFar = await PdCategDB.findOne({_id: req.query.PdCategFar, Firm: crUser.Firm});
 			if(PdCategFar.level == 3 || PdCategFar.isBottom == 1) res.redirect("/error?info=bsPdCategAdd, 已经是底层, 不可再划分分类");
 		}
 		return res.render("./user/bser/product/PdCateg/add", {title: "添加新产品分类", PdCategFar, crUser});
@@ -120,13 +120,13 @@ exports.bsPdCategNew = async(req, res) => {
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 		if(obj.code.length < 1) return res.redirect("/error?info=bsPdCategNew,objCode");
 
-		const PdCategSame = await PdCategDB.findOne({code: obj.code, PdCategFar: obj.PdCategFar});
+		const PdCategSame = await PdCategDB.findOne({code: obj.code, PdCategFar: obj.PdCategFar, Firm: crUser.Firm});
 		if(PdCategSame) return res.redirect("/error?info=bsPdCategNew,有相同的编号");
 
 		const _object = new PdCategDB(obj);
 		let level = 1;
 		if(obj.PdCategFar) {
-			const PdCategFar = await PdCategDB.findOne({_id: obj.PdCategFar});
+			const PdCategFar = await PdCategDB.findOne({_id: obj.PdCategFar, Firm: crUser.Firm});
 			if(!PdCategFar) return res.redirect("/error?info=没有找到父分类");
 			if(PdCategFar.level == 3) return res.redirect("/error?info=不可再划分分类");
 			level = PdCategFar.level+1;
@@ -145,8 +145,9 @@ exports.bsPdCategNew = async(req, res) => {
 exports.bsPdCategUpdAjax = async(req, res) => {
 	// console.log("/bsPdCategUpdAjax");
 	try{
+		const crUser = req.session.crUser;
 		const id = req.body.id;		// 所要更改的PdCateg的id
-		const PdCateg = await PdCategDB.findOne({_id: id})
+		const PdCateg = await PdCategDB.findOne({_id: id, Firm: crUser.Firm})
 		if(!PdCateg) return res.json({status: 500, message: "没有找到此产品分类信息, 请刷新重试"});
 
 		let val = req.body.val;		// 数据的值
@@ -155,7 +156,7 @@ exports.bsPdCategUpdAjax = async(req, res) => {
 		if(field == "code") {
 			val = String(val).replace(/^\s*/g,"").toUpperCase();
 			if(val.length < 1) return res.json({status: 500, message: "编号填写错误"});
-			const PdCategSame = await PdCategDB.findOne({code: val});
+			const PdCategSame = await PdCategDB.findOne({code: val, PdCategFar: PdCateg.PdCategFar, Firm: crUser.Firm});
 			if(PdCategSame) return res.json({status: 500, message: "有相同的编号"});
 		} else if(field == "weight") {
 			val = parseInt(val);
@@ -194,7 +195,7 @@ exports.bsPdCategDel = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const id = req.params.id;
-		const PdCateg = await PdCategDB.findOne({_id: id})
+		const PdCateg = await PdCategDB.findOne({_id: id, Firm: crUser.Firm})
 			.populate("PdCategFar")
 			.populate("PdCategSons")
 		if(!PdCateg) return res.redirect("/error?info=不存在此分类");
@@ -207,18 +208,17 @@ exports.bsPdCategDel = async(req, res) => {
 			PdCategFar.save();
 		}
 
-		// const PdspuUpdMany = await PdspuDB.updateMany({PdCateg: id }, {PdCateg: null});
 		if(PdCateg.level == 1) {
-			PdspuUpdMany = await PdspuDB.updateMany({PdCategFir: id }, {PdCategFir: null, PdCategSec: null, PdCategThd: null});
+			PdspuUpdMany = await PdspuDB.updateMany({PdCategFir: id, Firm: crUser.Firm}, {PdCategFir: null, PdCategSec: null, PdCategThd: null});
 		} else if(PdCateg.level == 2) {
-			PdspuUpdMany = await PdspuDB.updateMany({PdCategSec: id }, {PdCategSec: null, PdCategThd: null});
+			PdspuUpdMany = await PdspuDB.updateMany({PdCategSec: id, Firm: crUser.Firm}, {PdCategSec: null, PdCategThd: null});
 		} else if(PdCateg.level == 3) {
-			PdspuUpdMany = await PdspuDB.updateMany({PdCategThd: id }, {PdCategThd: null});
+			PdspuUpdMany = await PdspuDB.updateMany({PdCategThd: id, Firm: crUser.Firm}, {PdCategThd: null});
 		} else {
 			return ("/bsPdCategs?info=删除错误");
 		}
 
-		const PdCategDel = await PdCategDB.deleteOne({_id: id});
+		const PdCategDel = await PdCategDB.deleteOne({_id: id, Firm: crUser.Firm});
 		return res.redirect("/bsPdCategs");
 	} catch(error) {
 		return res.redirect("/error?info=bsPdCategAdd,Error&error="+error);
@@ -242,7 +242,7 @@ exports.bsPdCateg = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const id = req.params.id;
-		const PdCateg = await PdCategDB.findOne({_id: id})
+		const PdCateg = await PdCategDB.findOne({_id: id, Firm: crUser.Firm})
 			.populate("PdCategFar")
 			.populate("PdCategSons")
 		if(!PdCateg) return res.redirect("/error?info=不存在此分类");
@@ -256,7 +256,7 @@ exports.bsPdCategUp = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const id = req.params.id;
-		const PdCateg = await PdCategDB.findOne({_id: id})
+		const PdCateg = await PdCategDB.findOne({_id: id, Firm: crUser.Firm})
 		if(!PdCateg) return res.redirect("/error?info=不存在此分类");
 
 		return res.render("./user/bser/product/PdCateg/update", {title: "产品分类详情", PdCateg, crUser});
@@ -278,10 +278,10 @@ exports.bsPdCategUpd = async(req, res) => {
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 		if(obj.code.length < 1) return res.redirect("/error?info=bsPdCategNew,objCode");
 
-		const PdCateg = await PdCategDB.findOne({_id: obj._id});
+		const PdCateg = await PdCategDB.findOne({_id: obj._id, Firm: crUser.Firm});
 		if(!PdCateg) return res.redirect("/error?info=bsPdCategNew,不存在此分类");
 
-		const PdCategSame = await PdCategDB.findOne({_id: {"$ne": obj._id}, code: obj.code, PdCategFar: obj.PdCategFar});
+		const PdCategSame = await PdCategDB.findOne({_id: {"$ne": obj._id}, code: obj.code, PdCategFar: obj.PdCategFar, Firm: crUser.Firm});
 		if(PdCategSame) return res.redirect("/error?info=bsPdCategNew,有相同的编号");
 
 		if(obj.isBottom == Conf.isBottom.y.num) {

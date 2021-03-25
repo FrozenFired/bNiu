@@ -10,7 +10,7 @@ exports.bsMtFirms = async(req, res) => {
 	try{
 		const info = req.query.info;
 		const crUser = req.session.crUser;
-		const MtFirms = await MtFirmDB.find().sort({"weight": -1});
+		const MtFirms = await MtFirmDB.find({Firm: crUser.Firm}).sort({"weight": -1, "updAt": -1});
 		return res.render("./user/bser/material/MtFirm/list", {title: "供货商列表", info, MtFirms, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsMtFirms,Error&error="+error);
@@ -31,7 +31,7 @@ exports.bsMtFirmsAjax = async(req, res) => {
 		let MtFirm = null;
 		if(MtFirms.length > 0) {
 			const code = req.query.code.replace(/^\s*/g,"").toUpperCase();
-			MtFirm = await MtFirmDB.findOne({code: code}, filter);
+			MtFirm = await MtFirmDB.findOne({code: code, Firm: crUser.Firm}, filter);
 		}
 
 		return res.status(200).json({
@@ -94,7 +94,7 @@ exports.bsMtFirmNew = async(req, res) => {
 		obj.Firm = crUser.Firm;
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 		if(obj.code.length < 1) return res.redirect("/error?info=bsMtFirmNew,objCode");
-		const MtFirmSame = await MtFirmDB.findOne({code: obj.code});
+		const MtFirmSame = await MtFirmDB.findOne({code: obj.code, Firm: crUser.Firm});
 		if(MtFirmSame) return res.redirect("/error?info=bsMtFirmNew,MtFirmSame");
 
 		const _object = new MtFirmDB(obj);
@@ -108,8 +108,9 @@ exports.bsMtFirmNew = async(req, res) => {
 exports.bsMtFirmUpdAjax = async(req, res) => {
 	// console.log("/bsMtFirmUpdAjax");
 	try{
+		const crUser = req.session.crUser;
 		const id = req.body.id;		// 所要更改的MtFirm的id
-		const MtFirm = await MtFirmDB.findOne({_id: id})
+		const MtFirm = await MtFirmDB.findOne({_id: id, Firm: crUser.Firm})
 		if(!MtFirm) return res.json({status: 500, message: "没有找到此供货商信息, 请刷新重试"});
 
 		let val = req.body.val;		// 数据的值
@@ -118,7 +119,7 @@ exports.bsMtFirmUpdAjax = async(req, res) => {
 		if(field == "code") {
 			val = String(val).replace(/^\s*/g,"").toUpperCase();
 			if(val.length < 1) return res.json({status: 500, message: "[bsMtFirmUpdAjax code] 供应商名称不正确"});
-			const MtFirmSame = await MtFirmDB.findOne({code: val});
+			const MtFirmSame = await MtFirmDB.findOne({code: val, Firm: crUser.Firm});
 			if(MtFirmSame) return res.json({status: 500, message: "有相同的编号"});
 		} else if(field == "weight") {
 			val = parseInt(val);
@@ -141,13 +142,13 @@ exports.bsMtFirmDel = async(req, res) => {
 		const crUser = req.session.crUser;
 
 		const id = req.params.id;
-		const MtFirmExist = await MtFirmDB.findOne({_id: id});
+		const MtFirmExist = await MtFirmDB.findOne({_id: id, Firm: crUser.Firm});
 		if(!MtFirmExist) return res.json({status: 500, message: "此供应商已经不存在, 请刷新重试"});
 
-		const Mtrial = await MtrialDB.findOne({MtFirm: id});
+		const Mtrial = await MtrialDB.findOne({MtFirm: id, Firm: crUser.Firm});
 		if(Mtrial) return res.redirect("/bsMtFirms?info=在 ["+Mtrial.code+"] 等材料已经使用此供应商, 不可删除。 除非把相应材料删除");
 
-		const MtFirmDel = await MtFirmDB.deleteOne({_id: id});
+		const MtFirmDel = await MtFirmDB.deleteOne({_id: id, Firm: crUser.Firm});
 		return res.redirect("/bsMtFirms");
 	} catch(error) {
 		console.log(error);

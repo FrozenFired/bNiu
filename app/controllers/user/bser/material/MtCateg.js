@@ -10,16 +10,16 @@ exports.bsMtCategs = async(req, res) => {
 	// console.log("/bsMtCategs");
 	try{
 		const crUser = req.session.crUser;
-		const MtCategFirs = await MtCategDB.find({level: 1})
+		const MtCategFirs = await MtCategDB.find({level: 1, Firm: crUser.Firm})
 			.populate({
 				path: "MtCategSons",
-				options: { sort: { weight: -1 }},
+				options: { sort: { "weight": -1, "updAt": -1}},
 				populate: {
 					path: "MtCategSons",
-					options: { sort: { weight: -1 }}
+					options: { sort: { "weight": -1, "updAt": -1}}
 				}
 			})
-			.sort({"weight": -1})
+			.sort({"weight": -1, "updAt": -1})
 		return res.render("./user/bser/material/MtCateg/list", {title: "材料分类管理", MtCategFirs, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsMtCategs,Error&error="+error);
@@ -40,7 +40,7 @@ exports.bsMtCategsAjax = async(req, res) => {
 		let object = null;
 		if(objects.length > 0 && req.query.code) {
 			const code = req.query.code.replace(/^\s*/g,"").toUpperCase();
-			object = await MtCategDB.findOne({code: code}, filter);
+			object = await MtCategDB.findOne({code: code, Firm: crUser.Firm}, filter);
 		}
 
 		return res.status(200).json({
@@ -105,7 +105,7 @@ exports.bsMtCategAdd = async(req, res) => {
 		const crUser = req.session.crUser;
 		let MtCategFar = null;
 		if(req.query.MtCategFar) {
-			MtCategFar = await MtCategDB.findOne({_id: req.query.MtCategFar});
+			MtCategFar = await MtCategDB.findOne({_id: req.query.MtCategFar, Firm: crUser.Firm});
 			if(MtCategFar.level == 3 || MtCategFar.isBottom == 1) res.redirect("/error?info=bsMtCategAdd, 已经是底层, 不可再划分分类");
 		}
 		return res.render("./user/bser/material/MtCateg/add", {title: "添加新材料分类", MtCategFar, crUser});
@@ -123,13 +123,13 @@ exports.bsMtCategNew = async(req, res) => {
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 		if(obj.code.length < 1) return res.redirect("/error?info=bsMtCategNew,objCode");
 
-		const MtCategSame = await MtCategDB.findOne({code: obj.code, MtCategFar: obj.MtCategFar});
+		const MtCategSame = await MtCategDB.findOne({code: obj.code, MtCategFar: obj.MtCategFar, Firm: crUser.Firm});
 		if(MtCategSame) return res.redirect("/error?info=bsMtCategNew,有相同的编号");
 
 		const _object = new MtCategDB(obj);
 		let level = 1;
 		if(obj.MtCategFar) {
-			const MtCategFar = await MtCategDB.findOne({_id: obj.MtCategFar});
+			const MtCategFar = await MtCategDB.findOne({_id: obj.MtCategFar, Firm: crUser.Firm});
 			if(!MtCategFar) return res.redirect("/error?info=没有找到父分类");
 			if(MtCategFar.level == 3) return res.redirect("/error?info=不可再划分分类");
 			level = MtCategFar.level+1;
@@ -148,8 +148,9 @@ exports.bsMtCategNew = async(req, res) => {
 exports.bsMtCategUpdAjax = async(req, res) => {
 	// console.log("/bsMtCategUpdAjax");
 	try{
+		const crUser = req.session.crUser;
 		const id = req.body.id;		// 所要更改的MtCateg的id
-		const MtCateg = await MtCategDB.findOne({_id: id})
+		const MtCateg = await MtCategDB.findOne({_id: id, Firm: crUser.Firm})
 		if(!MtCateg) return res.json({status: 500, message: "没有找到此材料分类信息, 请刷新重试"});
 
 		let val = req.body.val;		// 数据的值
@@ -158,13 +159,12 @@ exports.bsMtCategUpdAjax = async(req, res) => {
 		if(field == "code") {
 			val = String(val).replace(/^\s*/g,"").toUpperCase();
 			if(val.length < 1) return res.json({status: 500, message: "编号填写错误"});
-			const MtCategSame = await MtCategDB.findOne({code: val});
+			const MtCategSame = await MtCategDB.findOne({code: val, MtCategFar: MtCateg.MtCategFar, Firm: crUser.Firm});
 			if(MtCategSame) return res.json({status: 500, message: "有相同的编号"});
 		} else if(field == "weight") {
 			val = parseInt(val);
 			if(isNaN(val)) return res.json({status: 500, message: "[bsMtCategUpdAjax weight] 排序为数字, 请传递正确的参数"});
 		} else if(field == "isBottom") {
-			console.log(val)
 			val = parseInt(val);
 			if(val == 1) {
 				if(MtCateg.MtCategSons.length > 0) return res.json({status: 500, message: "[bsMtCategUpdAjax weight] 请先删除子分类"});
@@ -198,7 +198,7 @@ exports.bsMtCategDel = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const id = req.params.id;
-		const MtCateg = await MtCategDB.findOne({_id: id})
+		const MtCateg = await MtCategDB.findOne({_id: id, Firm: crUser.Firm})
 			.populate("MtCategFar")
 			.populate("MtCategSons")
 		if(!MtCateg) return res.redirect("/error?info=不存在此分类");
@@ -211,9 +211,9 @@ exports.bsMtCategDel = async(req, res) => {
 			const MtCategFarSave = await MtCategFar.save();
 		}
 
-		const MtrialUpdMany = await MtrialDB.updateMany({MtCateg: id }, {MtCateg: null});
+		const MtrialUpdMany = await MtrialDB.updateMany({MtCateg: id, Firm: crUser.Firm}, {MtCateg: null});
 
-		const MtCategDel = await MtCategDB.deleteOne({_id: id});
+		const MtCategDel = await MtCategDB.deleteOne({_id: id, Firm: crUser.Firm});
 		return res.redirect("/bsMtCategs");
 	} catch(error) {
 		return res.redirect("/error?info=bsMtCategAdd,Error&error="+error);

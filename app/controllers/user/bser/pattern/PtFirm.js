@@ -10,7 +10,8 @@ exports.bsPtFirms = async(req, res) => {
 	try{
 		const info = req.query.info;
 		const crUser = req.session.crUser;
-		const PtFirms = await PtFirmDB.find().sort({"weight": -1});
+		const PtFirms = await PtFirmDB.find({Firm: crUser.Firm})
+			.sort({"weight": -1, "updAt": -1});
 		return res.render("./user/bser/pattern/PtFirm/list", {title: "印花厂列表", info, PtFirms, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPtFirms,Error&error="+error);
@@ -31,7 +32,7 @@ exports.bsPtFirmsAjax = async(req, res) => {
 		let PtFirm = null;
 		if(PtFirms.length > 0) {
 			const code = req.query.code.replace(/^\s*/g,"").toUpperCase();
-			PtFirm = await PtFirmDB.findOne({code: code}, filter);
+			PtFirm = await PtFirmDB.findOne({code: code, Firm: crUser.Firm}, filter);
 		}
 
 		return res.status(200).json({
@@ -94,7 +95,7 @@ exports.bsPtFirmNew = async(req, res) => {
 		obj.Firm = crUser.Firm;
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 		if(obj.code.length < 1) return res.redirect("/error?info=bsPtFirmNew,objCode");
-		const PtFirmSame = await PtFirmDB.findOne({code: obj.code});
+		const PtFirmSame = await PtFirmDB.findOne({code: obj.code, Firm: crUser.Firm});
 		if(PtFirmSame) return res.redirect("/error?info=bsPtFirmNew,PtFirmSame");
 
 		const _object = new PtFirmDB(obj);
@@ -107,8 +108,9 @@ exports.bsPtFirmNew = async(req, res) => {
 exports.bsPtFirmUpdAjax = async(req, res) => {
 	// console.log("/bsPtFirmUpdAjax");
 	try{
+		const crUser = req.session.crUser;
 		const id = req.body.id;		// 所要更改的PtFirm的id
-		const PtFirm = await PtFirmDB.findOne({_id: id})
+		const PtFirm = await PtFirmDB.findOne({_id: id, Firm: crUser.Firm})
 		if(!PtFirm) return res.json({status: 500, message: "没有找到此印花厂信息, 请刷新重试"});
 
 		let val = req.body.val;		// 数据的值
@@ -117,7 +119,7 @@ exports.bsPtFirmUpdAjax = async(req, res) => {
 		if(field == "code") {
 			val = String(val).replace(/^\s*/g,"").toUpperCase();
 			if(val.length < 1) return res.json({status: 500, message: "[bsPtFirmUpdAjax code] 印花厂名称不正确"});
-			const PtFirmSame = await PtFirmDB.findOne({code: val});
+			const PtFirmSame = await PtFirmDB.findOne({code: val, Firm: crUser.Firm});
 			if(PtFirmSame) return res.json({status: 500, message: "有相同的编号"});
 		} else if(field == "weight") {
 			val = parseInt(val);
@@ -140,7 +142,7 @@ exports.bsPtFirmDel = async(req, res) => {
 		const crUser = req.session.crUser;
 
 		const id = req.params.id;
-		const PtFirmExist = await PtFirmDB.findOne({_id: id});
+		const PtFirmExist = await PtFirmDB.findOne({_id: id, Firm: crUser.Firm});
 		if(!PtFirmExist) return res.json({status: 500, message: "此印花厂已经不存在, 请刷新重试"});
 
 		const Ptern = await PternDB.findOne({PtFirm: id});
