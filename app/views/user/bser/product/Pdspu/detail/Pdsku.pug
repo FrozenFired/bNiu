@@ -18,8 +18,38 @@ h3.mt-3 库存
 - getUrl = "/bsPdspuPdskuUpdAjax"
 - field="stock", subid='stock', fieldDesp=null;
 
+
+
+- let Ptern_Pdskus = Pdspu.Pdskus.filter((Pdsku) => {return Pdsku.Ptern == null});
+.isPttern
+	table.table.table-hover.table-bordered.text-center
+		thead
+			tr
+				th(width=widthTr+"%")
+				each size in Pdspu.sizes
+					- let val = size;
+					each Size in Sizes
+						if Size.size == size
+							- val = Size.symbol;
+							- break;
+					th(width=widthTr+"%") #{val}
+		tbody
+			each Color in Pdspu.Colors
+				- let Color_Pdskus = Ptern_Pdskus.filter((Pdsku) => {return String(Pdsku.Color) == String(Color._id)});
+				tr
+					td #{Color.code}
+					each size in Pdspu.sizes
+						- a;
+						td
+							- let Pdsku = {};
+							each Color_Pdsku in Color_Pdskus
+								if Color_Pdsku.size == size && String(Color_Pdsku.Color) == String(Color._id) && Color_Pdsku.Ptern == null
+									- Pdsku = Color_Pdsku;
+									- break;
+							- object=Pdsku, value=Pdsku.stock;
+							include ../../../../../aaPlugin/ajaxInputUpd
 each Ptern in Pdspu.Pterns
-	-a;
+	- let Ptern_Pdskus = Pdspu.Pdskus.filter((Pdsku) => {return String(Pdsku.Ptern) == String(Ptern._id)});
 	.PternTable(id="PternTable-"+Ptern._id)
 		.row
 			.col-6
@@ -38,17 +68,17 @@ each Ptern in Pdspu.Pterns
 						th(width=widthTr+"%") #{val}
 			tbody
 				each Color in Pdspu.Colors
-					- a;
+					- let Color_Pdskus = Ptern_Pdskus.filter((Pdsku) => {return String(Pdsku.Color) == String(Color._id)});
 					tr
 						td #{Color.code}
 
 						each size in Pdspu.sizes
 							- a;
 							td
-								- let PdStock = {};
-								each Pdsku in Pdspu.Pdskus
-									if Pdsku.size == size && String(Pdsku.Color) == String(Color._id)
-										- PdStock = Pdsku;
+								- let Pdsku = {};
+								each Color_Pdsku in Color_Pdskus
+									if Color_Pdsku.size == size && String(Color_Pdsku.Color) == String(Color._id) && String(Color_Pdsku.Ptern) == String(Ptern._id)
+										- Pdsku = Color_Pdsku;
 										- break;
-								- object=PdStock, value=PdStock.stock;
+								- object=Pdsku, value=Pdsku.stock;
 								include ../../../../../aaPlugin/ajaxInputUpd

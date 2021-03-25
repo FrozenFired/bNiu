@@ -20,9 +20,9 @@ exports.bsMtrials = async(req, res) => {
 		const crUser = req.session.crUser;
 		const MtCategs = await MtCategDB.find({level: 1, Firm: crUser.Firm})
 			.populate({path: "MtCategSons", populate: {path: "MtCategSons"}})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 		const MtFirms = await MtFirmDB.find({Firm: crUser.Firm})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 		return res.render("./user/bser/material/Mtrial/list", {title: "材料列表", info, MtCategs, MtFirms, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsMtrials,Error&error="+error);
@@ -108,7 +108,7 @@ const MtrialsParamFilter = (req, crUser) => {
 		}
 	}
 
-	sortBy['weight'] = -1;
+	sortBy['sort'] = -1;
 	sortBy['updAt'] = -1;
 
 	const {page, pagesize, skip} = MdFilter.page_Filter(req);
@@ -123,7 +123,7 @@ exports.bsMtrialAdd = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const MtFirms = await MtFirmDB.find({Firm: crUser.Firm})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 		if(!MtFirms || MtFirms.length < 1) return res.redirect("./error?info=请先添加材料供应商");
 		return res.render("./user/bser/material/Mtrial/add", {title: "添加新材料", crUser, MtFirms});
 	} catch(error) {
@@ -241,13 +241,13 @@ exports.bsMtrialUpdAjax = async(req, res) => {
 				MdFile.delFile(Mtrial[field]);
 				if(!val) val = Conf.photo.Mtrial.def;
 			}
-		} else if(field == "weight") {
+		} else if(field == "sort") {
 			val = parseInt(val);
-			if(isNaN(val)) return res.json({status: 500, message: "[bsMtrialUpdAjax weight] 排序为数字, 请传递正确的参数"});
+			if(isNaN(val)) return res.json({status: 500, message: "[bsMtrialUpdAjax sort] 排序为数字, 请传递正确的参数"});
 		} else if(field == "MtFirm") {
-			if(val.length != 24) return res.json({status: 500, message: "[bsMtrialUpdAjax weight] 没有找到您选择的供应商"});
+			if(val.length != 24) return res.json({status: 500, message: "[bsMtrialUpdAjax sort] 没有找到您选择的供应商"});
 			const MtFirm = await MtFirmDB.findOne({_id: val, Firm: crUser.Firm});
-			if(!MtFirm) return res.json({status: 500, message: "[bsMtrialUpdAjax weight] 没有找到您选择的供应商"});
+			if(!MtFirm) return res.json({status: 500, message: "[bsMtrialUpdAjax sort] 没有找到您选择的供应商"});
 		} else if(field == "MtCateg") {
 			if(val.length != 24) {
 				val=null;
@@ -256,7 +256,7 @@ exports.bsMtrialUpdAjax = async(req, res) => {
 				if(!MtCateg) val=null;
 			}
 		} else {
-			return res.json({status: 500, message: "[bsMtrialUpdAjax weight] 您操作错误, 如果坚持操作, 请联系管理员"});
+			return res.json({status: 500, message: "[bsMtrialUpdAjax sort] 您操作错误, 如果坚持操作, 请联系管理员"});
 		}
 
 		Mtrial[field] = val;
@@ -346,7 +346,7 @@ exports.bsMtrial = async(req, res) => {
 			.populate("MtFirm")
 		if(!Mtrial) return res.redirect("/error?info=不存在此分类");
 		const MtFirms = await MtFirmDB.find({Firm: crUser.Firm})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 		return res.render("./user/bser/material/Mtrial/detail", {title: "材料详情", Mtrial, MtFirms, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsMtrial,Error&error="+error);
@@ -364,7 +364,7 @@ exports.bsMtrialUp = async(req, res) => {
 		if(!Mtrial) return res.redirect("/error?info=不存在此分类");
 
 		const MtFirms = await MtFirmDB.find({Firm: crUser.Firm})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 		if(!MtFirms || MtFirms.length < 1) return res.redirect("./error?info=请先添加材料供应商");
 		return res.render("./user/bser/material/Mtrial/update", {title: "材料更新", Mtrial, MtFirms, crUser});
 	} catch(error) {

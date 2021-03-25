@@ -12,6 +12,7 @@ const dbSchema = new Schema({
 	PdCategSec: {type: ObjectId, ref: 'PdCateg'},	// 种类
 	PdCategThd: {type: ObjectId, ref: 'PdCateg'},	// 种类
 	PdNome: {type: ObjectId, ref: 'PdNome'},	// 名称
+	desp: String,		// 描述
 	photo: String,
 	photos: [String],
 	langs: [{
@@ -20,15 +21,21 @@ const dbSchema = new Schema({
 		desp: String
 	}],
 
+	weight: Number, // 重量
+
+	isMtrial: Number,
 	Mtrials: [{type: ObjectId, ref: 'Mtrial'}],
 	/* 用料: 根据尺寸 确定所有用料 比如 布料1 不料2 扣子1 腰带 要显示在商品详情页下*/
 	PdCostMts: [{type: ObjectId, ref: 'PdCostMt'}],
 
 	/* ------------------ Attr sku ------------------ */
+	isPtern: Number,
 	Pterns: [{type: ObjectId, ref: 'Ptern'}],
 
+	isColor: Number,
 	Colors: [{type: ObjectId, ref: 'Color'}],
 
+	isSize: Number,
 	SizeSyst: {type: ObjectId, ref: 'SizeSyst'},
 	sizes: [Number],
 
@@ -43,7 +50,7 @@ const dbSchema = new Schema({
 
 	// status: Number,		// 其他标识
 	shelf: Number,		// 上下架
-	weight: Number,		// 权重
+	sort: Number,		// 权重
 	/* ------------------ 自动生成 ------------------ */
 	Firm: {type: ObjectId, ref: 'Firm'},
 	crtAt: Date,
@@ -52,8 +59,12 @@ const dbSchema = new Schema({
 
 dbSchema.pre('save', function(next) {	
 	if(this.isNew) {
-		if(!this.weight) this.weight = 1;
+		if(!this.sort) this.sort = 1;
 		if(!this.shelf) this.shelf = 1;
+		if(!this.isMtrial) this.isMtrial = 0;
+		if(!this.isSize) this.isSize = 0;
+		if(!this.ifColor) this.ifColor = 0;
+		if(!this.isPtern) this.isPtern = 0;
 		this.crtAt = Date.now();
 	}
 	this.updAt = Date.now();

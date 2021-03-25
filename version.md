@@ -1,4 +1,6 @@
-0.1.0		每个数据库后加上了Firm 排序默认 weight updAt 
+0.1.1		产品 增加重量 is规格 把原来的weight权重变为sort排序
+0.1.0	68ce92dca2818aba40f5e31f426071908205ec3a
+			每个数据库后加上了Firm 排序默认 weight updAt 
 0.0.98	55146df635a18efaecdc518a6b2406f2dd2032c7
 			Categ 优化
 0.0.97	59a48a987072bb193bc37d9422d536ff557b7782

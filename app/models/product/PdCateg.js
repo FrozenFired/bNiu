@@ -18,7 +18,7 @@ const dbSchema = new Schema({
 	isBottom: Number,	// 是否是最底层分类
 
 	shelf: Number,
-	weight: Number,
+	sort: Number,
 	/* ------------------ 自动生成 ------------------ */
 	Firm: {type: ObjectId, ref: 'Firm'},
 	updAt: Date,
@@ -28,7 +28,7 @@ dbSchema.pre('save', function(next) {
 	if(this.isNew) {
 		if(!this.level) this.level = 1;
 		if(!this.shelf) this.shelf = 1;
-		if(!this.weight) this.weight = 1;
+		if(!this.sort) this.sort = 1;
 		if(!this.isBottom) this.isBottom = -1;
 		if(this.level == 3) this.isBottom = 1;
 	}

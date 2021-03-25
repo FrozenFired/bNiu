@@ -23,7 +23,7 @@ block content
 							if MtCateg.MtCategFar
 								- MtCategFar = MtCateg.MtCategFar;
 								a(href="/bsMtCateg/"+MtCategFar._id) #{MtCategFar.code}
-						.weight 排序: #{MtCateg.weight}
+						.sort 排序: #{MtCateg.sort}
 						.isBottom
 							if MtCateg.isBottom == 1
 								-a;

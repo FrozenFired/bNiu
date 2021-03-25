@@ -13,13 +13,13 @@ exports.bsPdCategs = async(req, res) => {
 		const PdCategFirs = await PdCategDB.find({level: 1, Firm: crUser.Firm})
 			.populate({
 				path: "PdCategSons",
-				options: { sort: { "weight": -1, "updAt": -1}},
+				options: { sort: { "sort": -1, "updAt": -1}},
 				populate: {
 					path: "PdCategSons",
-					options: { sort: { "weight": -1, "updAt": -1}}
+					options: { sort: { "sort": -1, "updAt": -1}}
 				}
 			})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 		return res.render("./user/bser/product/PdCateg/list", {title: "产品分类管理", PdCategFirs, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPdCategs,Error&error="+error);
@@ -89,7 +89,7 @@ const PdCategsParamFilter = (req, crUser) => {
 		}
 	}
 
-	sortBy['weight'] = -1;
+	sortBy['sort'] = -1;
 	sortBy['updAt'] = -1;
 
 	const {page, pagesize, skip} = MdFilter.page_Filter(req);
@@ -158,21 +158,21 @@ exports.bsPdCategUpdAjax = async(req, res) => {
 			if(val.length < 1) return res.json({status: 500, message: "编号填写错误"});
 			const PdCategSame = await PdCategDB.findOne({code: val, PdCategFar: PdCateg.PdCategFar, Firm: crUser.Firm});
 			if(PdCategSame) return res.json({status: 500, message: "有相同的编号"});
-		} else if(field == "weight") {
+		} else if(field == "sort") {
 			val = parseInt(val);
-			if(isNaN(val)) return res.json({status: 500, message: "[bsPdCategUpdAjax weight] 排序为数字, 请传递正确的参数"});
+			if(isNaN(val)) return res.json({status: 500, message: "[bsPdCategUpdAjax sort] 排序为数字, 请传递正确的参数"});
 		} else if(field == "isBottom") {
 			console.log(val)
 			val = parseInt(val);
 			if(val == 1) {
-				if(PdCateg.PdCategSons.length > 0) return res.json({status: 500, message: "[bsPdCategUpdAjax weight] 请先删除子分类"});
+				if(PdCateg.PdCategSons.length > 0) return res.json({status: 500, message: "[bsPdCategUpdAjax sort] 请先删除子分类"});
 			} else if(val == -1){
-				if(PdCateg.level == 3) return res.json({status: 500, message: "[bsPdCategUpdAjax weight] 只能是最底层"});
+				if(PdCateg.level == 3) return res.json({status: 500, message: "[bsPdCategUpdAjax sort] 只能是最底层"});
 			} else {
-				return res.json({status: 500, message: "[bsPdCategUpdAjax weight] 底层参数错误"});
+				return res.json({status: 500, message: "[bsPdCategUpdAjax sort] 底层参数错误"});
 			}
 		} else {
-			return res.json({status: 500, message: "[bsPdCategUpdAjax weight] 您操作错误, 如果坚持操作, 请联系管理员"});
+			return res.json({status: 500, message: "[bsPdCategUpdAjax sort] 您操作错误, 如果坚持操作, 请联系管理员"});
 		}
 
 		PdCateg[field] = val;

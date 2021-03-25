@@ -25,10 +25,10 @@ exports.bsPdspus = async(req, res) => {
 		const info = req.query.info;
 		const crUser = req.session.crUser;
 		const PdNomes = await PdNomeDB.find({Firm: crUser.Firm})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 		const PdCategs = await PdCategDB.find({level: 1, Firm: crUser.Firm})
 			.populate({path: "PdCategSons", populate: {path: "PdCategSons"}})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 		return res.render("./user/bser/product/Pdspu/list", {title: "产品列表", info, PdNomes, PdCategs, crUser});
 	} catch(error) {
 		console.log(error)
@@ -117,7 +117,7 @@ const PdspusParamFilter = (req, crUser) => {
 		}
 	}
 
-	sortBy['weight'] = -1;
+	sortBy['sort'] = -1;
 	sortBy['updAt'] = -1;
 
 	const {page, pagesize, skip} = MdFilter.page_Filter(req);
@@ -132,7 +132,7 @@ exports.bsPdspuAdd = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const SizeSysts = await SizeSystDB.find({Firm: crUser.Firm})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 		return res.render("./user/bser/product/Pdspu/add", {title: "添加新产品", SizeSysts, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPdspuAdd,Error&error="+error);
@@ -152,6 +152,26 @@ const PdspuFilter_Func = async(req) => {
 		if(obj.cost) {
 			obj.cost = parseFloat(obj.cost);
 			if(isNaN(obj.cost)) return {obj: null, info: "PdspuFilter_Func,请输入正确采购价, 可以不输入"};
+		}
+		if(obj.weight) {
+			obj.weight = parseFloat(obj.weight);
+			if(isNaN(obj.weight)) return {obj: null, info: "PdspuFilter_Func,请输入正确的重量值, 可以不输入"};
+		}
+		if(obj.isMtrial) {
+			obj.isMtrial = parseInt(obj.isMtrial);
+			if(obj.isMtrial != 1) obj.isMtrial = 0;
+		}
+		if(obj.isSize) {
+			obj.isSize = parseInt(obj.isSize);
+			if(obj.isSize != 1) obj.isSize = 0;
+		}
+		if(obj.isColor) {
+			obj.isColor = parseInt(obj.isColor);
+			if(obj.isColor != 1) obj.isColor = 0;
+		}
+		if(obj.isPtern) {
+			obj.isPtern = parseInt(obj.isPtern);
+			if(obj.isPtern != 1) obj.isPtern = 0;
 		}
 
 		if(obj.PdCategFir) {
@@ -324,9 +344,9 @@ exports.bsPdspuUpdAjax = async(req, res) => {
 			if(val.length != 24) return res.json({status: 500, message: "分类修改 参数错误(Thd)"});
 			const PdCategThd = await PdCategDB.findOne({_id: val, Firm: crUser.Firm});
 			if(!PdCategThd) return res.json({status: 500, message: "没有找到分类(Thd)"})
-		} else if(field == "weight") {
+		} else if(field == "sort") {
 			val = parseInt(val);
-			if(isNaN(val)) return res.json({status: 500, message: "[bsPdspuUpdAjax weight] 排序为数字, 请传递正确的参数"});
+			if(isNaN(val)) return res.json({status: 500, message: "[bsPdspuUpdAjax sort] 排序为数字, 请传递正确的参数"});
 		} else {
 			return res.json({status: 500, message: "参数错误"});
 		}
@@ -381,7 +401,7 @@ exports.bsPdspu = async(req, res) => {
 
 		const Sizes = await SizeDB.find({SizeSyst: SizeSystId, Firm: crUser.Firm});
 		const SizeSysts = await SizeSystDB.find({Firm: crUser.Firm})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 
 		return res.render("./user/bser/product/Pdspu/detail", {title: "产品详情", Pdspu, Sizes, SizeSysts, crUser});
 	} catch(error) {
@@ -402,7 +422,7 @@ exports.bsPdspuUp = async(req, res) => {
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
 
 		const SizeSysts = await SizeSystDB.find({Firm: crUser.Firm})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 		return res.render("./user/bser/product/Pdspu/update/basicUp", {title: "产品更新", Pdspu, SizeSysts, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPdspuUp,Error&error="+error);

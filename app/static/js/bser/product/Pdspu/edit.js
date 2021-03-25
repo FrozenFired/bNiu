@@ -2,6 +2,8 @@ $(() => {
 	$("#objForm").submit(function(e) {
 		const code = $("#codeIpt").val().replace(/^\s*/g,"").toUpperCase();
 		const price = $("#priceIpt").val();
+		const weight = $("#weightIpt").val();
+		const cost = $("#costIpt").val();
 		const PdNome = $("#PdNomeReq").val().replace(/^\s*/g,"").toUpperCase();
 
 		if(code.length < 3) {
@@ -12,6 +14,12 @@ $(() => {
 			e.preventDefault();
 		} else if(!jsFunc_isFloat(price)) {
 			$("#priceDanger").show();
+			e.preventDefault();
+		} else if(weight && weight.length>0 && !jsFunc_isFloat(weight)) {
+			$("#weightDanger").show();
+			e.preventDefault();
+		} else if(cost && cost.length>0 && !jsFunc_isFloat(cost)) {
+			$("#costDanger").show();
 			e.preventDefault();
 		}
 	})
@@ -31,6 +39,28 @@ $(() => {
 			$("#priceDanger").show();
 		} else {
 			$("#priceDanger").hide();
+		}
+	})
+
+	$("#weightIpt").blur(function(e) {
+		const weight = $(this).val();
+		if(weight && weight.length > 0) {
+			if(!jsFunc_isFloat(weight)) {
+				$("#weightDanger").show();
+			} else {
+				$("#weightDanger").hide();
+			}
+		}
+	})
+
+	$("#costIpt").blur(function(e) {
+		const cost = $(this).val();
+		if(cost && cost.length > 0) {
+			if(!jsFunc_isFloat(cost)) {
+				$("#costDanger").show();
+			} else {
+				$("#costDanger").hide();
+			}
 		}
 	})
 

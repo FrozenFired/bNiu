@@ -53,14 +53,14 @@ const objectRender = (object, role) => {
 		elem += '<h5>供货商: '+object.MtFirm.code+'</h5>'
 		elem += '<div class="row">'
 			elem += '<div class="col-sm-6 text-left">'
-				elem += '<span class="bg-white text-info jsUpd-span jsUpd-span-weight-weight-'+object._id;
-				elem += '" data-field="weight" data-subid="weight" data-id='+object._id+'>[ '+object.weight+' ]';
+				elem += '<span class="bg-white text-info jsUpd-span jsUpd-span-sort-sort-'+object._id;
+				elem += '" data-field="sort" data-subid="sort" data-id='+object._id+'>[ '+object.sort+' ]';
 
-				elem += '<input class="jsUpd-org-weight-weight-'+object._id+'" type="hidden" value='+object.weight+'>';
+				elem += '<input class="jsUpd-org-sort-sort-'+object._id+'" type="hidden" value='+object.sort+'>';
 
-				elem += '<input class="jsUpd-ipt form-control jsUpd-ipt-weight-weight-'+object._id;
-				elem += '" type="text" data-field="weight" data-subid="weight" data-id='+object._id;
-				elem += ' data-url="/bsMtrialUpdAjax" data-toup=1 value='+object.weight+' style="display:none">'
+				elem += '<input class="jsUpd-ipt form-control jsUpd-ipt-sort-sort-'+object._id;
+				elem += '" type="text" data-field="sort" data-subid="sort" data-id='+object._id;
+				elem += ' data-url="/bsMtrialUpdAjax" data-toup=1 value='+object.sort+' style="display:none">'
 			elem += '</div>'
 			elem += '<div class="col-sm-6 text-right">'
 				elem += '<a href="/bsMtrial/'+object._id+'">[查看]</a>'

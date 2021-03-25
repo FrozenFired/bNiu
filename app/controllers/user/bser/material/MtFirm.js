@@ -10,7 +10,7 @@ exports.bsMtFirms = async(req, res) => {
 	try{
 		const info = req.query.info;
 		const crUser = req.session.crUser;
-		const MtFirms = await MtFirmDB.find({Firm: crUser.Firm}).sort({"weight": -1, "updAt": -1});
+		const MtFirms = await MtFirmDB.find({Firm: crUser.Firm}).sort({"sort": -1, "updAt": -1});
 		return res.render("./user/bser/material/MtFirm/list", {title: "供货商列表", info, MtFirms, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsMtFirms,Error&error="+error);
@@ -66,7 +66,7 @@ const MtFirmsParamFilter = (req, crUser) => {
 		}
 	}
 
-	sortBy['weight'] = -1;
+	sortBy['sort'] = -1;
 	sortBy['updAt'] = -1;
 
 	const {page, pagesize, skip} = MdFilter.page_Filter(req);
@@ -121,9 +121,9 @@ exports.bsMtFirmUpdAjax = async(req, res) => {
 			if(val.length < 1) return res.json({status: 500, message: "[bsMtFirmUpdAjax code] 供应商名称不正确"});
 			const MtFirmSame = await MtFirmDB.findOne({code: val, Firm: crUser.Firm});
 			if(MtFirmSame) return res.json({status: 500, message: "有相同的编号"});
-		} else if(field == "weight") {
+		} else if(field == "sort") {
 			val = parseInt(val);
-			if(isNaN(val)) return res.json({status: 500, message: "[bsMtFirmUpdAjax weight] 排序为数字, 请传递正确的参数"});
+			if(isNaN(val)) return res.json({status: 500, message: "[bsMtFirmUpdAjax sort] 排序为数字, 请传递正确的参数"});
 		}
 
 		MtFirm[field] = val;

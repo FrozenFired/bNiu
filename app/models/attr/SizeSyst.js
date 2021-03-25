@@ -12,7 +12,7 @@ const dbSchema = new Schema({
 		nome: String
 	}],
 
-	weight: Number,
+	sort: Number,
 	/* ------------------ 自动生成 ------------------ */
 	Firm: {type: ObjectId, ref: 'Firm'},
 	updAt: Date,
@@ -20,7 +20,7 @@ const dbSchema = new Schema({
 
 dbSchema.pre('save', function(next) {
 	if(this.isNew) {
-		if(!this.weight) this.weight = 1;
+		if(!this.sort) this.sort = 1;
 	}
 	this.updAt = Date.now();
 	next();

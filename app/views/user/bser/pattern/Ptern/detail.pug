@@ -66,8 +66,8 @@ block content
 										.PtCategThd 三级分类: #{PtCategThd.code}
 							else
 								span 未分类
-						.weight.mt-3
-							- field="weight", value=Ptern.weight, subid="weight", fieldDesp="权重:";
+						.sort.mt-3
+							- field="sort", value=Ptern.sort, subid="sort", fieldDesp="权重:";
 							include ../../../../aaPlugin/ajaxInputUpd
 						.text-right.mt-3.jsDel-objElem(style="display:none")
 							a.text-danger(href="/bsPternDel/"+Ptern._id) [删除]

@@ -20,9 +20,9 @@ exports.bsPterns = async(req, res) => {
 		const crUser = req.session.crUser;
 		const PtCategs = await PtCategDB.find({level: 1, Firm: crUser.Firm})
 			.populate({path: "PtCategSons", populate: {path: "PtCategSons"}})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 		const PtFirms = await PtFirmDB.find({Firm: crUser.Firm})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 		return res.render("./user/bser/pattern/Ptern/list", {title: "印花列表", info, PtCategs, PtFirms, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPterns,Error&error="+error);
@@ -108,7 +108,7 @@ const PternsParamFilter = (req, crUser) => {
 		}
 	}
 
-	sortBy['weight'] = -1;
+	sortBy['sort'] = -1;
 	sortBy['updAt'] = -1;
 
 	const {page, pagesize, skip} = MdFilter.page_Filter(req);
@@ -123,7 +123,7 @@ exports.bsPternAdd = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const PtFirms = await PtFirmDB.find({Firm: crUser.Firm})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 		if(!PtFirms || PtFirms.length < 1) return res.redirect("./error?info=请先添加印花厂");
 		return res.render("./user/bser/pattern/Ptern/add", {title: "添加新印花", crUser, PtFirms});
 	} catch(error) {
@@ -241,13 +241,13 @@ exports.bsPternUpdAjax = async(req, res) => {
 				MdFile.delFile(Ptern[field]);
 				if(!val) val = Conf.photo.Ptern.def;
 			}
-		} else if(field == "weight") {
+		} else if(field == "sort") {
 			val = parseInt(val);
-			if(isNaN(val)) return res.json({status: 500, message: "[bsPternUpdAjax weight] 排序为数字, 请传递正确的参数"});
+			if(isNaN(val)) return res.json({status: 500, message: "[bsPternUpdAjax sort] 排序为数字, 请传递正确的参数"});
 		} else if(field == "PtFirm") {
-			if(val.length != 24) return res.json({status: 500, message: "[bsPternUpdAjax weight] 没有找到您选择的印花厂"});
+			if(val.length != 24) return res.json({status: 500, message: "[bsPternUpdAjax sort] 没有找到您选择的印花厂"});
 			const PtFirm = await PtFirmDB.findOne({_id: val, Firm: crUser.Firm});
-			if(!PtFirm) return res.json({status: 500, message: "[bsPternUpdAjax weight] 没有找到您选择的印花厂"});
+			if(!PtFirm) return res.json({status: 500, message: "[bsPternUpdAjax sort] 没有找到您选择的印花厂"});
 		} else if(field == "PtCateg") {
 			if(val.length != 24) {
 				val=null;
@@ -256,7 +256,7 @@ exports.bsPternUpdAjax = async(req, res) => {
 				if(!PtCateg) val=null;
 			}
 		} else {
-			return res.json({status: 500, message: "[bsPternUpdAjax weight] 您操作错误, 如果坚持操作, 请联系管理员"});
+			return res.json({status: 500, message: "[bsPternUpdAjax sort] 您操作错误, 如果坚持操作, 请联系管理员"});
 		}
 
 		Ptern[field] = val;
@@ -346,7 +346,7 @@ exports.bsPtern = async(req, res) => {
 			.populate("PtFirm")
 		if(!Ptern) return res.redirect("/error?info=不存在此分类");
 		const PtFirms = await PtFirmDB.find({Firm: crUser.Firm})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 		return res.render("./user/bser/pattern/Ptern/detail", {title: "印花详情", Ptern, PtFirms, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPtern,Error&error="+error);
@@ -364,7 +364,7 @@ exports.bsPternUp = async(req, res) => {
 		if(!Ptern) return res.redirect("/error?info=不存在此分类");
 
 		const PtFirms = await PtFirmDB.find({Firm: crUser.Firm})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 		if(!PtFirms || PtFirms.length < 1) return res.redirect("./error?info=请先添加印花厂");
 		return res.render("./user/bser/pattern/Ptern/update", {title: "印花更新", Ptern, PtFirms, crUser});
 	} catch(error) {

@@ -11,7 +11,7 @@ exports.bsPdNomes = async(req, res) => {
 		const info = req.query.info;
 		const crUser = req.session.crUser;
 		const PdNomes = await PdNomeDB.find({Firm: crUser.Firm})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 		return res.render("./user/bser/product/PdNome/list", {title: "名称列表", info, PdNomes, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPdNomes,Error&error="+error);
@@ -67,7 +67,7 @@ const PdNomesParamFilter = (req, crUser) => {
 		}
 	}
 
-	sortBy['weight'] = -1;
+	sortBy['sort'] = -1;
 	sortBy['updAt'] = -1;
 
 	const {page, pagesize, skip} = MdFilter.page_Filter(req);
@@ -123,9 +123,9 @@ exports.bsPdNomeUpdAjax = async(req, res) => {
 			if(val.length < 1) return res.json({status: 500, message: "[bsPdNomeUpdAjax code] 名称不正确"});
 			const PdNomeSame = await PdNomeDB.findOne({code: val, Firm: crUser.Firm});
 			if(PdNomeSame) return res.json({status: 500, message: "有相同的编号"});
-		} else if(field == "weight") {
+		} else if(field == "sort") {
 			val = parseInt(val);
-			if(isNaN(val)) return res.json({status: 500, message: "[bsPdNomeUpdAjax weight] 排序为数字, 请传递正确的参数"});
+			if(isNaN(val)) return res.json({status: 500, message: "[bsPdNomeUpdAjax sort] 排序为数字, 请传递正确的参数"});
 		}
 
 		PdNome[field] = val;

@@ -13,13 +13,13 @@ exports.bsMtCategs = async(req, res) => {
 		const MtCategFirs = await MtCategDB.find({level: 1, Firm: crUser.Firm})
 			.populate({
 				path: "MtCategSons",
-				options: { sort: { "weight": -1, "updAt": -1}},
+				options: { sort: { "sort": -1, "updAt": -1}},
 				populate: {
 					path: "MtCategSons",
-					options: { sort: { "weight": -1, "updAt": -1}}
+					options: { sort: { "sort": -1, "updAt": -1}}
 				}
 			})
-			.sort({"weight": -1, "updAt": -1})
+			.sort({"sort": -1, "updAt": -1})
 		return res.render("./user/bser/material/MtCateg/list", {title: "材料分类管理", MtCategFirs, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsMtCategs,Error&error="+error);
@@ -89,7 +89,7 @@ const MtCategsParamFilter = (req, crUser) => {
 		}
 	}
 
-	sortBy['weight'] = -1;
+	sortBy['sort'] = -1;
 	sortBy['updAt'] = -1;
 
 	const {page, pagesize, skip} = MdFilter.page_Filter(req);
@@ -161,20 +161,20 @@ exports.bsMtCategUpdAjax = async(req, res) => {
 			if(val.length < 1) return res.json({status: 500, message: "编号填写错误"});
 			const MtCategSame = await MtCategDB.findOne({code: val, MtCategFar: MtCateg.MtCategFar, Firm: crUser.Firm});
 			if(MtCategSame) return res.json({status: 500, message: "有相同的编号"});
-		} else if(field == "weight") {
+		} else if(field == "sort") {
 			val = parseInt(val);
-			if(isNaN(val)) return res.json({status: 500, message: "[bsMtCategUpdAjax weight] 排序为数字, 请传递正确的参数"});
+			if(isNaN(val)) return res.json({status: 500, message: "[bsMtCategUpdAjax sort] 排序为数字, 请传递正确的参数"});
 		} else if(field == "isBottom") {
 			val = parseInt(val);
 			if(val == 1) {
-				if(MtCateg.MtCategSons.length > 0) return res.json({status: 500, message: "[bsMtCategUpdAjax weight] 请先删除子分类"});
+				if(MtCateg.MtCategSons.length > 0) return res.json({status: 500, message: "[bsMtCategUpdAjax sort] 请先删除子分类"});
 			} else if(val == -1){
-				if(MtCateg.level == 3) return res.json({status: 500, message: "[bsMtCategUpdAjax weight] 只能是最底层"});
+				if(MtCateg.level == 3) return res.json({status: 500, message: "[bsMtCategUpdAjax sort] 只能是最底层"});
 			} else {
-				return res.json({status: 500, message: "[bsMtCategUpdAjax weight] 底层参数错误"});
+				return res.json({status: 500, message: "[bsMtCategUpdAjax sort] 底层参数错误"});
 			}
 		} else {
-			return res.json({status: 500, message: "[bsMtCategUpdAjax weight] 您操作错误, 如果坚持操作, 请联系管理员"});
+			return res.json({status: 500, message: "[bsMtCategUpdAjax sort] 您操作错误, 如果坚持操作, 请联系管理员"});
 		}
 
 		MtCateg[field] = val;

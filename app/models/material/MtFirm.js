@@ -23,7 +23,7 @@ const dbSchema = new Schema({
 	resp: String,// 负责人
 
 	shelf: Number,										// req
-	weight: Number,										// req
+	sort: Number,										// req
 	/* ------------------ 自动生成 ------------------ */
 	Firm: {type: ObjectId, ref: 'Firm'},
 	crtAt: Date,
@@ -32,7 +32,7 @@ const dbSchema = new Schema({
 dbSchema.pre('save', function(next) {	
 	if(this.isNew) {
 		if(!this.shelf) this.shelf = 1;
-		if(!this.weight) this.weight = 1;
+		if(!this.sort) this.sort = 1;
 		this.crtAt = Date.now();
 	}
 	this.updAt = Date.now();

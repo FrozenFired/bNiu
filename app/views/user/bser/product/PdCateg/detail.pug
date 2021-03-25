@@ -23,7 +23,7 @@ block content
 							if PdCateg.PdCategFar
 								- PdCategFar = PdCateg.PdCategFar;
 								a(href="/bsPdCateg/"+PdCategFar._id) #{PdCategFar.code}
-						.weight 排序: #{PdCateg.weight}
+						.sort 排序: #{PdCateg.sort}
 						.isBottom
 							if PdCateg.isBottom == 1
 								-a;

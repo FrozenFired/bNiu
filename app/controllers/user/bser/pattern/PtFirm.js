@@ -11,7 +11,7 @@ exports.bsPtFirms = async(req, res) => {
 		const info = req.query.info;
 		const crUser = req.session.crUser;
 		const PtFirms = await PtFirmDB.find({Firm: crUser.Firm})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 		return res.render("./user/bser/pattern/PtFirm/list", {title: "印花厂列表", info, PtFirms, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPtFirms,Error&error="+error);
@@ -67,7 +67,7 @@ const PtFirmsParamFilter = (req, crUser) => {
 		}
 	}
 
-	sortBy['weight'] = -1;
+	sortBy['sort'] = -1;
 	sortBy['updAt'] = -1;
 
 	const {page, pagesize, skip} = MdFilter.page_Filter(req);
@@ -121,9 +121,9 @@ exports.bsPtFirmUpdAjax = async(req, res) => {
 			if(val.length < 1) return res.json({status: 500, message: "[bsPtFirmUpdAjax code] 印花厂名称不正确"});
 			const PtFirmSame = await PtFirmDB.findOne({code: val, Firm: crUser.Firm});
 			if(PtFirmSame) return res.json({status: 500, message: "有相同的编号"});
-		} else if(field == "weight") {
+		} else if(field == "sort") {
 			val = parseInt(val);
-			if(isNaN(val)) return res.json({status: 500, message: "[bsPtFirmUpdAjax weight] 排序为数字, 请传递正确的参数"});
+			if(isNaN(val)) return res.json({status: 500, message: "[bsPtFirmUpdAjax sort] 排序为数字, 请传递正确的参数"});
 		}
 
 		PtFirm[field] = val;

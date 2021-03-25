@@ -18,7 +18,7 @@ exports.bsSizes = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const SizeNums = Conf.SizeNums;
-		const SizeSysts = await SizeSystDB.find({Firm: crUser.Firm}).sort({"weight": -1, "updAt": -1});
+		const SizeSysts = await SizeSystDB.find({Firm: crUser.Firm}).sort({"sort": -1, "updAt": -1});
 		const Sizes = await SizeDB.find({Firm: crUser.Firm});
 		return res.render("./user/bser/attr/Size/list", {title: "尺寸管理", SizeNums, SizeSysts, Sizes, crUser});
 	} catch(error) {
@@ -70,7 +70,7 @@ exports.bsSizeSystUpdAjax = async(req, res) => {
 			if(val.length < 1) return res.json({status: 500, message: "[bsSizeSystUpdAjax code] 尺寸标准名称不正确"});
 			const SizeSystSame = await SizeSystDB.findOne({code: val, Firm: crUser.Firm});
 			if(SizeSystSame) return res.json({status: 500, message: "有相同的编号"});			
-		} else if(field == "weight"){
+		} else if(field == "sort"){
 			val = parseInt(val);
 			if(isNaN(val)) val = 1;
 		}

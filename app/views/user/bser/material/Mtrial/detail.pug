@@ -66,8 +66,8 @@ block content
 										.MtCategThd 三级分类: #{MtCategThd.code}
 							else
 								span 未分类
-						.weight.mt-2
-							- field="weight", value=Mtrial.weight, subid="weight", fieldDesp="权重:";
+						.sort.mt-2
+							- field="sort", value=Mtrial.sort, subid="sort", fieldDesp="权重:";
 							include ../../../../aaPlugin/ajaxInputUpd
 						.text-right.mt-3.jsDel-objElem(style="display:none")
 							a.text-danger(href="/bsMtrialDel/"+Mtrial._id) [删除]

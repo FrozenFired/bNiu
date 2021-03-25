@@ -29,7 +29,7 @@ exports.bsPdspuMtrialUp = async(req, res) => {
 			.populate("Mtrials");
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
 		const Mtrials = await MtrialDB.find({Firm: crUser.Firm})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 		return res.render("./user/bser/product/Pdspu/update/pdMtrialsUp", {title: "产品印花更新", Pdspu, Mtrials, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPdspuUp,Error&error="+error);
@@ -262,7 +262,7 @@ exports.bsPdspuColorUp = async(req, res) => {
 			.populate("Colors");
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
 		const Colors = await ColorDB.find({Firm: crUser.Firm})
-			.sort({"weight": -1, "updAt": -1});
+			.sort({"sort": -1, "updAt": -1});
 
 		return res.render("./user/bser/product/Pdspu/update/pdColorsUp", {title: "产品颜色更新", Pdspu, Colors, crUser});
 	} catch(error) {
@@ -344,7 +344,7 @@ exports.bsPdspuPternUp = async(req, res) => {
 			.populate("Pterns");
 		if(!Pdspu) return res.redirect("/error?info=不存在此产品");
 		const Pterns = await PternDB.find({Firm: crUser.Firm})
-			.sort({"weight": -1, "updAt": -1})
+			.sort({"sort": -1, "updAt": -1})
 		return res.render("./user/bser/product/Pdspu/update/pdPternsUp", {title: "产品印花更新", Pdspu, Pterns, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsPdspuUp,Error&error="+error);
@@ -498,6 +498,7 @@ exports.bsPdSpusPhotosDel = async(req, res) => {
 exports.bsPdspuPdCostMtUpdAjax = async(req, res) => {
 		// console.log("/bsPdspuPdCostMtUpdAjax");
 	try{
+		const crUser = req.session.crUser;
 		const id = req.body.id;		// 所要更改的Color的id
 		const PdCostMt = await PdCostMtDB.findOne({'_id': id, Firm: crUser.Firm})
 		if(!PdCostMt) return res.json({status: 500, message: "没有找到此颜色信息, 请刷新重试"});
@@ -525,6 +526,7 @@ exports.bsPdspuPdCostMtUpdAjax = async(req, res) => {
 exports.bsPdspuPdskuUpdAjax = async(req, res) => {
 		// console.log("/bsPdspuPdskuUpdAjax");
 	try{
+		const crUser = req.session.crUser;
 		const id = req.body.id;		// 所要更改的Color的id
 		const Pdsku = await PdskuDB.findOne({'_id': id, Firm: crUser.Firm})
 		if(!Pdsku) return res.json({status: 500, message: "没有找到此颜色信息, 请刷新重试"});

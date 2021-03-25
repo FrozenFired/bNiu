@@ -18,7 +18,7 @@ exports.bsColors = async(req, res) => {
 	try{
 		const info = req.query.info;
 		const crUser = req.session.crUser;
-		const Colors = await ColorDB.find({Firm: crUser.Firm}).sort({"weight": -1, 'updAt': -1});
+		const Colors = await ColorDB.find({Firm: crUser.Firm}).sort({"sort": -1, 'updAt': -1});
 		return res.render("./user/bser/attr/Color/list", {title: "颜色列表", info, Colors, crUser});
 	} catch(error) {
 		return res.redirect("/error?info=bsColors,Error&error="+error);
@@ -80,9 +80,9 @@ exports.bsColorUpdAjax = async(req, res) => {
 			if(!regexp.test(val) || (val.length != Stint.extent.Color.rgb.len)) {
 				return res.json({status: 500, message: "[bsColorUpdAjax rgb] 颜色名称不正确 必须是6位RGB字符"});
 			}
-		} else if(field == "weight") {
+		} else if(field == "sort") {
 			val = parseInt(val);
-			if(isNaN(val)) return res.json({status: 500, message: "[bsColorUpdAjax weight] 排序为数字, 请传递正确的参数"});
+			if(isNaN(val)) return res.json({status: 500, message: "[bsColorUpdAjax sort] 排序为数字, 请传递正确的参数"});
 		}
 		Color[field] = val;
 
