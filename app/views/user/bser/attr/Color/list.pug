@@ -13,29 +13,15 @@ block content
 				li.breadcrumb-item: a(href="/bser") Home
 				li.breadcrumb-item.active(aria-current="page") #{title}
 		.row.my-3
-			.col-12.text-right
+			.col-6
+				input#codeSearch.form-control(type="text")
+			.col-6.text-right
 				button.btn.btn-danger.jsDel-btnClick.mr-5(type="button") -
-				a.btn.btn-info(href="/bsColorAdd") +
+				a.btn.btn-warning(href="/bsColorAdd") +
 
-		- getUrl = "/bsColorUpdAjax";
-		.text-warning.text-center.border.rounded.messageAjax(style="display:none")
-			h3#messageAjax
-		.row
-			each Color in Colors
-				- object = Color;
-				.col-4.col-md-3.col-lg-2.mt-4
-					.card.text-center(style="width: 100%;")
-						.border-bottom(class="jsColor-rgb-rgb-"+Color._id, style="width: 100%; background-color: #"+Color.rgb)
-							- field="rgb", value=Color.rgb, subid="rgb";
-							include ../../../../aaPlugin/ajaxInputUpd
-						.card-body
-							.code
-								- field="code", value=Color.code, subid="code";
-								include ../../../../aaPlugin/ajaxInputUpd
-							.sort.mt-3
-								- field="sort", value=Color.sort, subid="sort";
-								include ../../../../aaPlugin/ajaxInputUpd
-							.text-right.mt-3.jsDel-objElem(style="display:none")
-								a.text-danger(href="/bsColorDel/"+Color._id) [删除]
-
-		div(style="height: 200px")
+		.objectsList
+			input#objectFilterAjax(type="hidden", value="/bsColorsAjax?@#objectsElem@bs")
+			#objectsElem.mt-5
+	script(src="/js/bser/attr/Color/list.js")
+	script(src="/js/dbs/attr/Color.js")
+		

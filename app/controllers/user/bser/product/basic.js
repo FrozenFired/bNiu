@@ -157,22 +157,6 @@ const PdspuFilter_Func = async(req) => {
 			obj.weight = parseFloat(obj.weight);
 			if(isNaN(obj.weight)) return {obj: null, info: "PdspuFilter_Func,请输入正确的重量值, 可以不输入"};
 		}
-		if(obj.isMtrial) {
-			obj.isMtrial = parseInt(obj.isMtrial);
-			if(obj.isMtrial != 1) obj.isMtrial = 0;
-		}
-		if(obj.isSize) {
-			obj.isSize = parseInt(obj.isSize);
-			if(obj.isSize != 1) obj.isSize = 0;
-		}
-		if(obj.isColor) {
-			obj.isColor = parseInt(obj.isColor);
-			if(obj.isColor != 1) obj.isColor = 0;
-		}
-		if(obj.isPtern) {
-			obj.isPtern = parseInt(obj.isPtern);
-			if(obj.isPtern != 1) obj.isPtern = 0;
-		}
 
 		if(obj.PdCategFir) {
 			const PdCategFir = await PdCategDB.findOne({_id: obj.PdCategFir, Firm: crUser.Firm})
@@ -253,6 +237,8 @@ exports.bsPdspuNew = async(req, res) => {
 		const objPdsku = new Object();
 		objPdsku.Firm = crUser.Firm;
 		objPdsku.Pdspu = _object._id;
+		objPdsku.stock = 0;
+		objPdsku.sale = 0;
 		objPdsku.PdCostMts = [_objPdCostMt._id];
 		const _objPdsku = new PdskuDB(objPdsku);
 		_object.Pdskus.push(_objPdsku._id);

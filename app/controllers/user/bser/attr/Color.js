@@ -4,6 +4,7 @@
 */
 const Conf = require('../../../../config/conf.js');
 const Stint = require('../../../../config/stint.js');
+const MdFile = require('../../../../middle/MdFile');
 const MdFilter = require('../../../../middle/MdFilter');
 const _ = require('underscore');
 
@@ -24,6 +25,62 @@ exports.bsColors = async(req, res) => {
 		return res.redirect("/error?info=bsColors,Error&error="+error);
 	}
 }
+exports.bsColorsAjax = async(req, res) => {
+	// console.log("/bsColors");
+	try{
+		const crUser = req.session.crUser;
+
+		const {param, filter, sortBy, page, pagesize, skip} = ColorsParamFilter(req, crUser);
+		const count = await ColorDB.countDocuments(param);
+		const objects = await ColorDB.find(param, filter)
+			.skip(skip).limit(pagesize)
+			.sort(sortBy);
+
+		// 如果是编号查询 首先要看是否有与编号一致的产品
+		let object = null;
+		if(objects.length > 0 && req.query.code) {
+			const code = req.query.code.replace(/^\s*/g,"").toUpperCase();
+			object = await ColorDB.findOne({code: code, Firm: crUser.Firm}, filter);
+		}
+
+		return res.status(200).json({
+			status: 200,
+			message: '成功获取',
+			data: {object, objects, count, page, pagesize}
+		});
+	} catch(error) {
+		console.log(error)
+		return res.json({status: 500, message: "bsColorsAjax Error!"});
+	}
+}
+const ColorsParamFilter = (req, crUser) => {
+	let param = {
+		"Firm": crUser.Firm,
+	};
+	const filter = {};
+	const sortBy = {};
+
+	if(req.query.code) {
+		let symbConb = String(req.query.code)
+		symbConb = symbConb.replace(/(\s*$)/g, "").replace( /^\s*/, '').toUpperCase();
+		symbConb = new RegExp(symbConb + '.*');
+		param["code"] = symbConb;
+	}
+
+	if(req.query.sortKey && req.query.sortVal) {
+		let sortKey = req.query.sortKey;
+		let sortVal = parseInt(req.query.sortVal);
+		if(!isNaN(sortVal) && (sortVal == 1 || sortVal == -1)) {
+			sortBy[sortKey] = sortVal;
+		}
+	}
+
+	sortBy['sort'] = -1;
+	sortBy['updAt'] = -1;
+
+	const {page, pagesize, skip} = MdFilter.page_Filter(req);
+	return {param, filter, sortBy, page, pagesize, skip};
+}
 
 exports.bsColorAdd = async(req, res) => {
 	// console.log("/bsColorAdd");
@@ -42,6 +99,7 @@ exports.bsColorNew = async(req, res) => {
 		const crUser = req.session.crUser;
 		const obj = req.body.obj;
 		obj.Firm = crUser.Firm;
+		obj.photo = Conf.photo.Color.def;
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 		if(obj.code.length < 1) return res.redirect("/error?info=bsColorNew,objCode");
 		const ColorSame = await ColorDB.findOne({code: obj.code, Firm: crUser.Firm});
@@ -112,5 +170,38 @@ exports.bsColorDel = async(req, res) => {
 	} catch(error) {
 		console.log(error);
 		return res.redirect("/error?info=bsColorDel,Error&error="+error);
+	}
+}
+
+exports.bsColor = async(req, res) => {
+	// console.log("/bsColor");
+	try{
+		const crUser = req.session.crUser;
+		const id = req.params.id;
+		const Color = await ColorDB.findOne({_id: id, Firm: crUser.Firm})
+		if(!Color) return res.redirect("/error?info=不存在此颜色");
+		return res.render("./user/bser/attr/Color/detail", {title: "颜色详情", Color, crUser});
+	} catch(error) {
+		return res.redirect("/error?info=bsColor,Error&error="+error);
+	}
+}
+
+
+
+exports.bsColorPhotoUpd = async(req, res) => {
+	// console.log("/bsColorPhotoUpd");
+	try{
+		const crUser = req.session.crUser;
+		const obj = req.body.obj;
+		const photo = req.body.files[0];
+		const Color = await ColorDB.findOne({_id: obj._id, Firm: crUser.Firm});
+		if(!Color) return res.redirect("/error?info=没有找到此印花信息");
+		const delPhoto = Color.photo;
+		Color.photo = photo;
+		const ColorSave = await Color.save();
+		MdFile.delFile(delPhoto);
+		return res.redirect("/bsColor/"+ColorSave._id);
+	} catch(error) {
+		return res.redirect("/error?info=bsColorPhotoUpd,Error&error="+error);
 	}
 }

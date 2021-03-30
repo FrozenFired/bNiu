@@ -1,4 +1,6 @@
-0.1.1		产品 增加重量 is规格 把原来的weight权重变为sort排序
+0.1.2		颜色图片 以及如果其中没有其中一个属性的设置
+0.1.1	f81aa8e61a7b8df23642e12090f9b4c0c24ddb0c
+			产品 增加重量 is规格 把原来的weight权重变为sort排序
 0.1.0	68ce92dca2818aba40f5e31f426071908205ec3a
 			每个数据库后加上了Firm 排序默认 weight updAt 
 0.0.98	55146df635a18efaecdc518a6b2406f2dd2032c7

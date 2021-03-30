@@ -12,6 +12,7 @@ const dbSchema = new Schema({
 		nome: String
 	}],
 
+	photo: String,
 	rgb: String,
 
 	sort: Number,

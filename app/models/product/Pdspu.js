@@ -23,19 +23,15 @@ const dbSchema = new Schema({
 
 	weight: Number, // 重量
 
-	isMtrial: Number,
 	Mtrials: [{type: ObjectId, ref: 'Mtrial'}],
 	/* 用料: 根据尺寸 确定所有用料 比如 布料1 不料2 扣子1 腰带 要显示在商品详情页下*/
 	PdCostMts: [{type: ObjectId, ref: 'PdCostMt'}],
 
 	/* ------------------ Attr sku ------------------ */
-	isPtern: Number,
 	Pterns: [{type: ObjectId, ref: 'Ptern'}],
 
-	isColor: Number,
 	Colors: [{type: ObjectId, ref: 'Color'}],
 
-	isSize: Number,
 	SizeSyst: {type: ObjectId, ref: 'SizeSyst'},
 	sizes: [Number],
 
@@ -61,10 +57,6 @@ dbSchema.pre('save', function(next) {
 	if(this.isNew) {
 		if(!this.sort) this.sort = 1;
 		if(!this.shelf) this.shelf = 1;
-		if(!this.isMtrial) this.isMtrial = 0;
-		if(!this.isSize) this.isSize = 0;
-		if(!this.ifColor) this.ifColor = 0;
-		if(!this.isPtern) this.isPtern = 0;
 		this.crtAt = Date.now();
 	}
 	this.updAt = Date.now();

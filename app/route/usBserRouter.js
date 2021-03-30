@@ -163,10 +163,14 @@ module.exports = app => {
 
 	/* ------------------------ Color ------------------------ */
 	app.get('/bsColors', bserIsLogin, Color.bsColors);
+	app.get('/bsColorsAjax', bserIsLogin, Color.bsColorsAjax);
 	app.get('/bsColorAdd', bserIsLogin, Color.bsColorAdd);
 	app.get('/bsColorDel/:id', bserIsLogin, Color.bsColorDel);
 	app.post('/bsColorNew', bserIsLogin, postForm, Color.bsColorNew);
 	app.post('/bsColorUpdAjax', bserIsLogin, Color.bsColorUpdAjax);
+	app.post('/bsColorPhotoUpd', bserIsLogin, postForm, MdFile.newFiles, Color.bsColorPhotoUpd);
+
+	app.get('/bsColor/:id', bserIsLogin, Color.bsColor);
 	/* ============================================= attr ============================================= */
 
 	/* ------------------------ Lang ------------------------ */

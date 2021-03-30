@@ -67,26 +67,6 @@ block content
 					input#weightIpt.form-control(type="text", name="obj[weight]", value=Pdspu.weight)
 				.offset-3.col-9.col-form-label#priceDanger.text-danger(style="display:none") 重量是数字
 			.form-group.row
-				label.col-3.col-sm-2.col-form-label(for="isMtrialIpt") 是否耗材
-				.col-9.col-sm-6
-					select#isMtrialIpt.form-control(name="obj[isMtrial]", data-style="btn-info")
-						option(value=1) 耗材
-						if Pdspu.isMtrial == 0
-							-a;
-							option(value=0, selected="selected") 不耗材
-						else
-							option(value=0) 不耗材
-			.form-group.row
-				label.col-3.col-sm-2.col-form-label(for="isSizeIpt") 分尺寸
-				.col-9.col-sm-6
-					select#isSizeIpt.form-control(name="obj[isSize]", data-style="btn-info")
-						option(value=1) 分尺寸
-						if Pdspu.isSize == 0
-							-a;
-							option(value=0, selected="selected") 统一尺寸
-						else
-							option(value=0) 统一尺寸
-			.form-group.row
 				label.col-3.col-sm-2.col-form-label(for="SizeSystIpt") 尺寸标准
 				.col-9.col-sm-6
 					select#SizeSystIpt.form-control(name="obj[SizeSyst]", data-style="btn-info")
@@ -97,26 +77,6 @@ block content
 								option(value=SizeSyst._id, selected="selected") #{code}
 							else
 								option(value=SizeSyst._id) #{code}
-			.form-group.row
-				label.col-3.col-sm-2.col-form-label(for="isColorIpt") 分颜色
-				.col-9.col-sm-6
-					select#isColorIpt.form-control(name="obj[isColor]", data-style="btn-info")
-						option(value=1) 分颜色
-						if Pdspu.isColor == 0
-							-a;
-							option(value=0, selected="selected") 统一颜色
-						else
-							option(value=0) 统一颜色
-			.form-group.row
-				label.col-3.col-sm-2.col-form-label(for="isPternIpt") 是否印花
-				.col-9.col-sm-6
-					select#isPternIpt.form-control(name="obj[isPtern]", data-style="btn-info")
-						option(value=1) 印花
-						if Pdspu.isPtern == 0
-							-a;
-							option(value=0, selected="selected") 不印花
-						else
-							option(value=0) 不印花
 			.form-group.row
 				label.col-3.col-sm-2.col-form-label(for="sortIpt") sort
 				.col-9.col-sm-6

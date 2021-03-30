@@ -39,6 +39,7 @@ const Conf = {
 		Pdspu: {dir: '/PDSPU/', def: '/UPLOAD/DEF/PDSPU.JPG'},
 		Mtrial: {dir: '/MTRIAL/', def: '/UPLOAD/DEF/MTRIAL.JPG'},
 		Ptern: {dir: '/PTERN/', def: '/UPLOAD/DEF/PTERN.JPG'},
+		Color: {dir: '/COLOR/', def: '/UPLOAD/DEF/COLOR.JPG'}
 	},
 
 	shelf: {
