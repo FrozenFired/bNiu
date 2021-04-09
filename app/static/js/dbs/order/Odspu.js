@@ -43,7 +43,7 @@ const objectsRender = (objects, elemId, isReload, role) => {
 	$(elemId).append(elem);
 }
 const objectRender = (object, role) => {
-	const getUrl = "/bsPdspuUpdAjax";
+	const getUrl = "/bsOdspuUpdAjax";
 
 	let elem = '';
 	elem += '<div class="col-6 col-lg-4 mt-2 text-center border-bottom border-left objectCard">'
@@ -82,14 +82,14 @@ const objectRender = (object, role) => {
 
 				elem += '<input class="jsUpd-ipt form-control jsUpd-ipt-sort-sort-'+object._id;
 				elem += '" type="text" data-field="sort" data-subid="sort" data-id='+object._id;
-				elem += ' data-url="/bsPdspuUpdAjax" data-toup=1 value='+object.sort+' style="display:none">'
+				elem += ' data-url="/bsOdspuUpdAjax" data-toup=1 value='+object.sort+' style="display:none">'
 			elem += '</div>'
 			elem += '<div class="col-sm-6 text-right">'
-				elem += '<a href="/bsPdspu/'+object._id+'">[查看]</a>'
+				elem += '<a href="/bsOdspu/'+object._id+'">[查看]</a>'
 			elem += '</div>'
 		elem += '</div>'
 		elem += '<div class="text-right mt-3 jsDel-objElem" style="display:none">'
-			elem += '<a class="text-danger" href="/bsPdspuDel/'+object._id+'">[删除]</a>'
+			elem += '<a class="text-danger" href="/bsOdspuDel/'+object._id+'">[删除]</a>'
 		elem += '</div>'
 	elem += '</div>'
 	return elem;

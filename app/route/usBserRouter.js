@@ -16,6 +16,10 @@ const PdNome = require('../controllers/user/bser/product/PdNome');
 const PdspuBasic = require('../controllers/user/bser/product/basic');
 const PdspuAttr = require('../controllers/user/bser/product/attr');
 
+const Odspu = require('../controllers/user/bser/order/Odspu');
+
+const User = require('../controllers/user/bser/login/User');
+
 const MdFile = require('../middle/MdFile');
 
 const postForm = require('connect-multiparty')();
@@ -23,6 +27,24 @@ const postForm = require('connect-multiparty')();
 module.exports = app => {
 	/* ------------------------ 首页 登录页面 登录 登出 ------------------------ */
 	app.get('/bser', bserIsLogin, (req, res) => {return res.render("./user/bser/index", {title: "Home Bser", crUser: req.session.crUser});});
+
+	/* ============================================= order ============================================= */
+	app.get('/bsOdspus', bserIsLogin, Odspu.bsOdspus);
+	app.get('/bsOdspusAjax', bserIsLogin, Odspu.bsOdspusAjax);
+	app.get('/bsOdspuAdd', bserIsLogin, Odspu.bsOdspuAdd);
+
+	/* ============================================= User ============================================= */
+	app.get('/bsUsers', bserIsLogin, User.bsUsers);
+	app.get('/bsUsersAjax', bserIsLogin, User.bsUsersAjax);
+	app.get('/bsUser/:id', bserIsLogin, User.bsUser);
+	app.get('/bsUserDel/:id', bserIsLogin, User.bsUserDel);
+
+	app.post('/bsUserUpdInfo', bserIsLogin, postForm, User.bsUserUpdInfo);
+	app.post('/bsUserUpdCode', bserIsLogin, postForm, User.bsUserUpdCode);
+	app.post('/bsUserUpdPwd', bserIsLogin, postForm, User.bsUserUpdPwd);
+
+	app.get('/bsUserAdd', bserIsLogin, User.bsUserAdd);
+	app.post('/bsUserNew', bserIsLogin, postForm, User.bsUserNew);
 
 	/* ============================================= product ============================================= */
 	/* ------------------------ basic ------------------------ */

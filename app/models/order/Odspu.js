@@ -10,27 +10,25 @@ const dbSchema = new Schema({
 	code: String,	// 编号公司唯一
 	note: String,	// 订单备注
 	/* ------------------ Attr sku ------------------ */
-	Pdspu: {type: ObjectId, ref: 'Pdspu'},
-	Ptern: {type: ObjectId, ref: 'Ptern'},
-
-	Colors: [{type: ObjectId, ref: 'Color'}],	// 从Pdspu中的选择
-	sizes: [Number],							// 从Pdspu中的选择
+	Pdspus: [{type: ObjectId, ref: 'Pdspu'}],
+	Pdskus: [{type: ObjectId, ref: 'Pdsku'}],
 
 	Odskus: [{type: ObjectId, ref: 'Odsku'}],
 
 	/* ------------------ 价格 ------------------ */
 	quan: Number,	// 订货数量
 	ship: Number,	// 发货数量
-	price: Float,								// 出售时 Pdspu的价格
-	cost: Float,
 
-	client: {type: ObjectId, ref: 'User'},		// 客户
-
-
-	// 录入为0, 确认为5(与pd建立联系)，完成为10
-	step: Number,		// 订单状态
+	price: Float, 					// 订单价格
+	imp: Float,						// 应收价格
+	paid: Float,					// 实际收款
 	payment: Number,	// 款项状态
 
+	// 录入为1, 确认为5(与pd建立联系)，完成为10
+	step: Number,		// 订单状态
+
+	categ: Number,		// 订单类型->  1.商店卖出 5.网上下单
+	client: {type: ObjectId, ref: 'User'},		// 客户
 	crter: {type: ObjectId, ref: 'User'},		// 销售人员
 	/* ------------------ 自动生成 ------------------ */
 	Firm: {type: ObjectId, ref: 'Firm'},
@@ -40,6 +38,7 @@ const dbSchema = new Schema({
 
 dbSchema.pre('save', function(next) {	
 	if(this.isNew) {
+		if(!this.categ) this.categ = 1;
 		if(!this.step) this.step = 1;
 		this.crtAt = Date.now();
 	}

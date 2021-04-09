@@ -12,7 +12,7 @@ $(() => {
 	});
 	$(".new-ipt").blur(function(e) {
 		const target = $(e.target);
-		const url = target.data("url");		
+		const url = target.data("url");
 		const size = target.data("size");
 		const standard = target.data("standard");
 		const symbol = $(this).val().replace(/^\s*/g,"").toUpperCase();

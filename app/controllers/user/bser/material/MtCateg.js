@@ -26,7 +26,7 @@ exports.bsMtCategs = async(req, res) => {
 	}
 }
 exports.bsMtCategsAjax = async(req, res) => {
-	// console.log("/bsMtCategs");
+	// console.log("/bsMtCategsAjax");
 	try{
 		const crUser = req.session.crUser;
 

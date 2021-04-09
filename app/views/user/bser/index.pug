@@ -2,6 +2,20 @@ extends ../aalayout/layout
 
 block content
 	.container
+		include ./order/Odspu/add
+		hr
+		.row
+			.col-6.col-lg-3.text-center.mt-3
+				a(href="/bsOdspus")
+					img(src="/media/indicate/comment.png", width="50px", height="50px")
+					span.btn.btn-default.btn-lg.btn-block 订单列表
+			.col-6.col-lg-3.text-center.mt-3
+			.col-6.col-lg-3.text-center.mt-3
+			.col-6.col-lg-3.text-center.mt-3
+				a(href="/bsUsers")
+					img(src="/media/indicate/comment.png", width="50px", height="50px")
+					span.btn.btn-default.btn-lg.btn-block 客户列表
+		hr
 		.row
 			.col-6.col-lg-3.text-center.mt-3
 				a(href="/bsPdspus")
