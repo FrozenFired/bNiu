@@ -16,6 +16,7 @@ const PdNome = require('../controllers/user/bser/product/PdNome');
 const PdspuBasic = require('../controllers/user/bser/product/basic');
 const PdspuAttr = require('../controllers/user/bser/product/attr');
 
+const Order = require('../controllers/user/bser/order/Order');
 const Odspu = require('../controllers/user/bser/order/Odspu');
 
 const User = require('../controllers/user/bser/login/User');
@@ -29,9 +30,14 @@ module.exports = app => {
 	app.get('/bser', bserIsLogin, (req, res) => {return res.render("./user/bser/index", {title: "Home Bser", crUser: req.session.crUser});});
 
 	/* ============================================= order ============================================= */
-	app.get('/bsOdspus', bserIsLogin, Odspu.bsOdspus);
+	app.get('/bsOrders', bserIsLogin, Order.bsOrders);
+	app.get('/bsOrdersAjax', bserIsLogin, Order.bsOrdersAjax);
+	app.post('/bsOrderNew', bserIsLogin, postForm, Order.bsOrderNew);
+	app.get('/bsOrder/:id', bserIsLogin, Order.bsOrder);
+	app.get('/bsOrderDel/:id', bserIsLogin, Order.bsOrderDel);
+	/* ------------------------------- order ------------------------------- */
 	app.get('/bsOdspusAjax', bserIsLogin, Odspu.bsOdspusAjax);
-	app.get('/bsOdspuAdd', bserIsLogin, Odspu.bsOdspuAdd);
+	app.post('/bsOdspuNew', bserIsLogin, postForm, Odspu.bsOdspuNew);
 
 	/* ============================================= User ============================================= */
 	app.get('/bsUsers', bserIsLogin, User.bsUsers);
@@ -53,6 +59,7 @@ module.exports = app => {
 
 	app.get('/bsPdspus', bserIsLogin, PdspuBasic.bsPdspus);
 	app.get('/bsPdspusAjax', bserIsLogin, PdspuBasic.bsPdspusAjax);
+	app.get('/bsPdspuAjax', bserIsLogin, PdspuBasic.bsPdspuAjax);
 	app.get('/bsPdspu/:id', bserIsLogin, PdspuBasic.bsPdspu);
 	app.get('/bsPdspuDel/:id', bserIsLogin, PdspuBasic.bsPdspuDel);
 	app.get('/bsPdspuUp/:id', bserIsLogin, PdspuBasic.bsPdspuUp);

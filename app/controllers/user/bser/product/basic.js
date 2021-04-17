@@ -17,6 +17,7 @@ const SizeDB = require('../../../../models/attr/Size');
 const PdCostMtDB = require('../../../../models/product/PdCostMt');
 const PdskuDB = require('../../../../models/product/Pdsku');
 
+const OrderDB = require('../../../../models/order/Order');
 const OdspuDB = require('../../../../models/order/Odspu');
 
 exports.bsPdspus = async(req, res) => {
@@ -41,6 +42,20 @@ exports.bsPdspusAjax = async(req, res) => {
 		const crUser = req.session.crUser;
 
 		const {param, filter, sortBy, page, pagesize, skip} = PdspusParamFilter(req, crUser);
+		if(req.query.xOrder) {
+			const Order = await OrderDB.findOne({_id: req.query.xOrder},{Odspus: 1})
+				// .populate("Odspus", "Pdspu")
+				.populate({path: "Odspus", select: "Pdspu"})
+			if(Order && Order.Odspus && Order.Odspus.length>0) {
+				const xPdspus = new Array();
+				Order.Odspus.forEach((item) => {
+					if(item.Pdspu) {
+						xPdspus.push(item.Pdspu);
+					}
+				});
+				param["_id"] = {'$nin': xPdspus};
+			}
+		}
 		const count = await PdspuDB.countDocuments(param);
 		const objects = await PdspuDB.find(param, filter)
 			.populate("PdCategFir")
@@ -124,6 +139,34 @@ const PdspusParamFilter = (req, crUser) => {
 	return {param, filter, sortBy, page, pagesize, skip};
 }
 
+exports.bsPdspuAjax = async(req, res) => {
+	// console.log("/bsPdspuAjax");
+	try{
+		const crUser = req.session.crUser;
+
+		const param = {Firm: crUser.Firm, _id: req.query.id};
+
+		const object = await PdspuDB.findOne(param)
+			.populate("PdNome")
+			.populate("Pterns")
+			.populate("Colors")
+		if(!object) return res.json({status: 500, message: "没有此产品"});
+
+		let SizeSystId = null;
+		if(object.SizeSyst) SizeSystId = object.SizeSyst._id;
+
+		const Sizes = await SizeDB.find({SizeSyst: SizeSystId, Firm: crUser.Firm});
+
+		return res.status(200).json({
+			status: 200,
+			message: '成功获取',
+			data: {object, Sizes}
+		});
+	} catch(error) {
+		console.log(error)
+		return res.json({status: 500, message: "bsPdspuAjax Error!"});
+	}
+}
 
 
 

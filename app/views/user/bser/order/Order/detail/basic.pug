@@ -1,0 +1,75 @@
+.row
+
+.row
+	.col-8
+		.code 订单号: #{Order.code}
+	.col-4.text-right
+		.cter 客人: 
+			if Order.cter
+				-a;
+				span.text-info #{Order.cter.code}
+			else
+				span.text-danger 散客
+.row
+	.col-6.col-md-3
+		.step 状态： #{Order.step}
+	.col-6.col-md-3
+		.categ 类型: #{Order.categ}
+	.col-6.col-md-3
+		.payment 付款状态: #{Order.payment}
+	.col-6.col-md-3
+	.col-6.col-md-3
+.row
+	.col-6.col-md-3
+		.quant 订货数量: #{Order.quant}
+	.col-6.col-md-3
+		.ship 发货数量: #{Order.ship}
+.row
+	.col-6.col-md-3
+		.imp 应付: 
+			- let imp = 0;
+			if Order.imp && !isNaN(ParseFloat(Order.imp))
+				- imp = ParseFloat(Order.imp);
+			span.text-info #{imp.toFixed(2)} 
+			span Euro
+	.col-6.col-md-3
+		if Order.price != Order.imp
+			- let price = 0;
+			.price 原价: 
+				if Order.price && !isNaN(ParseFloat(Order.price))
+					- price = ParseFloat(Order.price);
+				span.text-info #{price.toFixed(2)} 
+				span Euro
+	.col-6.col-md-3
+		.paid 已付: 
+			- let paid = 0;
+			if Order.paid && !isNaN(ParseFloat(Order.paid))
+				- paid = ParseFloat(Order.paid);
+			span.text-info #{paid.toFixed(2)} 
+			span Euro
+
+	.col-6.col-md-3.text-right
+		.crter 开单人: 
+			if Order.crter
+				-a;
+				span.text-info #{Order.crter.code}
+			else
+				span.text-danger 数据丢失
+.row
+	.col-6.col-md-3
+		.crtAt 创建时间: #{moment(Order.crtAt).format("YY年MM月DD日")}
+	.col-6.col-md-3
+		.updAt 更新时间: #{moment(Order.updAt).format("YY年MM月DD日")}
+	.col-6.col-md-3
+		.startAt 开始时间: 
+			if Order.startAt
+				- startAt = Order.startAt;
+				span #{moment(startAt).format("YY年MM月DD日")}
+	.col-6.col-md-3
+		.finishAt 结束时间: 
+			if Order.finishAt
+				- finishAt = Order.finishAt;
+				span #{moment(finishAt).format("YY年MM月DD日")}
+if Order.note
+	- note = Order.note;
+	.note #{note}

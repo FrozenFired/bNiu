@@ -1,9 +1,14 @@
 const Conf = require('../../../../config/conf.js');
 const _ = require('underscore');
+const moment = require('moment');
 const MdFilter = require('../../../../middle/MdFilter');
+const FirmDB = require('../../../../models/login/Firm');
 
+const OrderDB = require('../../../../models/order/Order');
 const OdspuDB = require('../../../../models/order/Odspu');
 const OdskuDB = require('../../../../models/order/Odsku');
+
+const PdspuDB = require('../../../../models/product/Pdspu');
 
 exports.bsOdspus = async(req, res) => {
 	// console.log("/bsOdspus");
@@ -19,26 +24,32 @@ exports.bsOdspus = async(req, res) => {
 }
 
 exports.bsOdspusAjax = async(req, res) => {
-	// console.log("/bsOdspus");
+	// console.log("/bsOdspusAjax");
 	try{
 		const crUser = req.session.crUser;
 
 		const {param, filter, sortBy, page, pagesize, skip} = OdspusParamFilter(req, crUser);
+		if(req.query.Order) {
+			const Order = await OrderDB.findOne({_id: req.query.Order, Firm: crUser.Firm});
+			if(!Order) return res.json({status: 500, message: "订单信息错误"})
+			param["Order"] = Order._id;
+		}
+
 		const count = await OdspuDB.countDocuments(param);
-		const Odspus = await OdspuDB.find(param, filter)
+		const objects = await OdspuDB.find(param, filter)
 			.skip(skip).limit(pagesize)
 			.sort(sortBy);
 
-		let Odspu = null;
-		if(Odspus.length > 0) {
+		let object = null;
+		if(objects.length > 0 && req.query.code) {
 			const code = req.query.code.replace(/^\s*/g,"").toUpperCase();
-			Odspu = await OdspuDB.findOne({code: code, Firm: crUser.Firm}, filter);
+			object = await OdspuDB.findOne({code: code, Firm: crUser.Firm}, filter);
 		}
 
 		return res.status(200).json({
 			status: 200,
 			message: '成功获取',
-			data: {Odspu, Odspus, count, page, pagesize}
+			data: {object, objects, count, page, pagesize}
 		});
 	} catch(error) {
 		console.log(error)
@@ -52,13 +63,6 @@ const OdspusParamFilter = (req, crUser) => {
 	const filter = {};
 	const sortBy = {};
 
-	if(req.query.code) {
-		let symbConb = String(req.query.code)
-		symbConb = symbConb.replace(/^\s*/g,"").toUpperCase();
-		symbConb = new RegExp(symbConb + '.*');
-		param["code"] = {'$in': symbConb};
-	}
-
 	if(req.query.sortKey && req.query.sortVal) {
 		let sortKey = req.query.sortKey;
 		let sortVal = parseInt(req.query.sortVal);
@@ -67,46 +71,135 @@ const OdspusParamFilter = (req, crUser) => {
 		}
 	}
 
-	sortBy['sort'] = -1;
-	sortBy['updAt'] = -1;
+	sortBy['crtAt'] = -1;
 
 	const {page, pagesize, skip} = MdFilter.page_Filter(req);
 	return {param, filter, sortBy, page, pagesize, skip};
 }
 
-
-
-
-
-exports.bsOdspuAdd = async(req, res) => {
-	// console.log("/bsOdspuAdd");
+exports.bsOdspuAjax = async(req, res) => {
+	// console.log("/bsOdspuAjax");
 	try{
 		const crUser = req.session.crUser;
-		return res.render("./user/bser/order/Odspu/add", {title: "添加新订单", crUser});
+
+		const param = {Firm: crUser.Firm, _id: req.query.id};
+
+		const object = await OdspuDB.findOne(param)
+			.populate("Pterns")
+			.populate("Colors")
+			.populate("SizeSyst")
+		if(!object) return res.json({status: 500, message: "没有此产品"});
+
+		return res.status(200).json({
+			status: 200,
+			message: '成功获取',
+			data: {object}
+		});
 	} catch(error) {
-		return res.redirect("/error?info=bsOdspuAdd,Error&error="+error);
+		console.log(error)
+		return res.json({status: 500, message: "bsOdspuAjax Error!"});
 	}
 }
+
+
 
 exports.bsOdspuNew = async(req, res) => {
 	// console.log("/bsOdspuNew");
 	try{
 		const crUser = req.session.crUser;
 		const obj = req.body.obj;
-		obj.Firm = crUser.Firm;
-		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
-		if(obj.code.length < 1) return res.redirect("/error?info=bsOdspuNew,objCode");
+		const Firm = await FirmDB.findOne({_id: crUser.Firm});
+		if(!Firm) return res.redirect("/error?info=bsOdspuNew,Firm not Exist");
 
-		const OdspuSame = await OdspuDB.findOne({code: obj.code, Firm: crUser.Firm});
-		if(OdspuSame) return res.redirect("/error?info=bsOdspuNew,OdspuSame");
+		const Pdspu = await PdspuDB.findOne({_id : obj.Pdspu, Firm: crUser.Firm});
+		if(!Pdspu) return res.redirect("/error?info=bsOdspuNew,Pdspu not Exist");
+
+		const Order = await OrderDB.findOne({_id : obj.Order, Firm: crUser.Firm});
+		if(!Order) return res.redirect("/error?info=bsOdspuNew,Order not Exist");
+		obj.cter = Order.cter;
+		obj.crter = Order.crter;
+		obj.Firm = Order.Firm;
+
+		if(obj.Pterns) {
+			if(!(obj.Pterns instanceof Array)) {
+				obj.Pterns = [obj.Pterns];
+			}
+		}
+		if(obj.Colors) {
+			if(!(obj.Colors instanceof Array)) {
+				obj.Colors = [obj.Colors];
+			}
+		}
+		if(obj.sizes) {
+			if(!(obj.sizes instanceof Array)) {
+				obj.sizes = [obj.sizes];
+			}
+		}
+
+		const OdspuSame = await OdspuDB.findOne({Order: Order._id, Pdspu: Pdspu._id});
+		if(OdspuSame) return res.redirect("/error?info=bsOdspuNew,此订单中已经预定了此产品");
+
+		const _object = new OdspuDB(obj);
+		const OdspuSave = await _object.save();
+
+		Order.Odspus.unshift(OdspuSave._id);
+		const OrderSave = await Order.save();
+
+		return res.redirect("/bsOrder/"+Order._id);
+	} catch(error) {
+		return res.redirect("/error?info=bsOdspuNew,Error&error="+error);
+	}
+}
+exports.bsOdspuNewAjax = async(req, res) => {
+	// console.log("/bsOdspuNewAjax");
+	try{
+		const crUser = req.session.crUser;
+		const obj = req.body.obj;
+		const Firm = await FirmDB.findOne({_id: crUser.Firm});
+		if(!Firm) return res.json({status: 500, message: "bsOdspuNewAjax Firm not Exist"});
+
+		const Pdspu = await PdspuDB.findOne({_id : obj.Pdspu});
+		if(!Pdspu) res.json({status: 500, message: "bsOdspuNewAjax Pdspu not Exist"});
+
+		const Order = await OrderDB.findOne({_id : obj.Order});
+		if(!Order) res.json({status: 500, message: "bsOdspuNewAjax Order not Exist"});
+		obj.cter = Order.cter;
+		obj.crter = Order.crter;
+		obj.Firm = Order.Firm;
+
+		const OdspuSame = await OdspuDB.findOne({Firm: crUser.Firm, Order: Order._id, Pdspu: Pdspu._id});
+		if(OdspuSame) return res.json({status: 500, message: "bsOdspuNewAjax OdspuSame"});
 
 		const _object = new OdspuDB(obj);
 		const OdspuSave = await _object.save();
 		return res.redirect("/bsOdspus");
 	} catch(error) {
-		return res.redirect("/error?info=bsOdspuNew,Error&error="+error);
+		return res.json({status: 500, message: "bsOdspuNewAjax Error"});
 	}
 }
+
+
+exports.bsOdspu = async(req, res) => {
+	// console.log("/bsOdspu");
+	try{
+		const crUser = req.session.crUser;
+		const id = req.params.id;
+
+		const Odspu = await OdspuDB.findOne({_id: id, Firm: crUser.Firm})
+			.populate("cter")
+			.populate("crter")
+			.populate({
+				path: "Odskus", options: { sort: { crtAt: -1 }},
+				populate: [{path: "Pdsku"}, {path: "Pterns"}, {path: "Colors"}, {path: "Odskus"}]
+			})
+		if(!Odspu) return res.json({status: 500, message: "此订单已经不存在, 请刷新重试"});
+		return res.render("./user/bser/order/Odspu/detail", {title: "订单详情", Odspu, crUser});
+	} catch(error) {
+		console.log(error);
+		return res.redirect("/error?info=bsOdspuDel,Error&error="+error);
+	}
+}
+
 exports.bsOdspuUpdAjax = async(req, res) => {
 	// console.log("/bsOdspuUpdAjax");
 	try{
@@ -147,38 +240,13 @@ exports.bsOdspuDel = async(req, res) => {
 		const OdspuExist = await OdspuDB.findOne({_id: id, Firm: crUser.Firm});
 		if(!OdspuExist) return res.json({status: 500, message: "此订单已经不存在, 请刷新重试"});
 
-		const Odsku = await OdskuDB.findOne({Odspu: id, Firm: crUser.Firm});
-		if(Odsku) return res.redirect("/bsOdspus?info=["+Odsku.code+"] 等产品正在使用此订单, 不可删除。 除非把相应产品删除");
+		const Odsku = await OdskuDB.findOne({Odspu: id});
+		if(Odsku) return res.redirect("/bsOdspuDel?info=请先删除订单内容, 不可删除。 除非把相应产品删除");
 
 		const OdspuDel = await OdspuDB.deleteOne({_id: id, Firm: crUser.Firm});
 		return res.redirect("/bsOdspus");
 	} catch(error) {
 		console.log(error);
 		return res.redirect("/error?info=bsOdspuDel,Error&error="+error);
-	}
-}
-
-
-exports.bsOdspuNewAjax = async(req, res) => {
-	// console.log("/bsOdspuNewAjax");
-	try{
-		const crUser = req.session.crUser;
-
-		const code = req.body.code.replace(/^\s*/g,"").toUpperCase();
-		if(!code) return res.json({status: 500, message: "请输入订单标识, 请刷新重试"});
-
-		const OdspuSame = await OdspuDB.findOne({code: code, Firm: crUser.Firm});
-		if(OdspuSame) return res.json({status: 500, message: "已经存在, 请刷新重试"});
-
-		const obj = new Object();
-		obj.Firm = crUser.Firm;
-		obj.code = code;
-
-		const _object = new OdspuDB(obj);
-		const OdspuSave = await _object.save();
-		return res.json({status: 200})
-	} catch(error) {
-		console.log(error);
-		return res.json({status: 500, message: error});
 	}
 }

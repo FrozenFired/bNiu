@@ -7,16 +7,16 @@ block content
 			.border.p-2.my-3.rounded.text-center.text-warning
 				h3 #{info}
 				.text-right
-					a.btn.btn-default(href="/bsOdspus") 确认
+					a.btn.btn-default(href="/bsOrders") 确认
 		nav(aria-label="breadcrumb")
 			ol.breadcrumb
 				li.breadcrumb-item: a(href="/bser") Home
 				li.breadcrumb-item.active(aria-current="page") #{title}
 		.row.my-3
-			.col-6
+			.col-4
+			.col-8
 				input#codeSearch.form-control(type="text")
-			.col-6.text-right
-				button.btn.btn-danger.jsDel-btnClick.mr-5(type="button") -
+				//- button.btn.btn-danger.jsDel-btnClick(type="button") -
 
 		//- .PdNomesList
 			button.PdNomeClick.btn.mt-3(type="button" data-pdnome="") 产品名称:
@@ -25,7 +25,7 @@ block content
 				-a;
 				button.PdNomeClick.btn.btn-default.ml-4.mt-3(type="button" data-pdnome=PdNome._id) #{PdNome.code}
 		.objectsList
-			input#objectFilterAjax(type="hidden", value="/bsOdspusAjax?@#objectsElem@bs")
+			input#objectFilterAjax(type="hidden", value="/bsOrdersAjax?@#objectsElem@bs")
 			#objectsElem.mt-5
-	script(src="/js/bser/order/Odspu/list.js")
-	script(src="/js/dbs/order/Odspu.js")
+	script(src="/js/bser/order/Order/list.js")
+	script(src="/js/dbs/order/Order.js")

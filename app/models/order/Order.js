@@ -4,32 +4,37 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 const Float = require('mongoose-float').loadType(mongoose, 2);
 
-const colection = 'Odspu';
+const colection = 'Order';
 const dbSchema = new Schema({
+	/* ------------------ Basic ------------------ */
+	code: String,	// 编号公司唯一
+	note: String,	// 订单备注
 	/* ------------------ Attr sku ------------------ */
-	Order: {type: ObjectId, ref: 'Order'},
+	Odspus: [{type: ObjectId, ref: 'Odspu'}],
 
-	Pdspu: {type: ObjectId, ref: 'Pdspu'},
-	Pterns: [{type: ObjectId, ref: 'Ptern'}],
-	Colors: [{type: ObjectId, ref: 'Color'}],
-	sizes: [Number],
-
-	Odskus: [{type: ObjectId, ref: 'Odsku'}],
-
-	// /* ------------------ 价格 ------------------ */
-	quan: Number,	// 订货数量	下单后更新
-	ship: Number,	// 发货数量	完成后更新
+	/* ------------------ 价格 ------------------ */
+	quan: Number,	// 订货数量
+	ship: Number,	// 发货数量
 
 	price: Float, 					// 订单价格
 	imp: Float,						// 应收价格
+	paid: Float,					// 实际收款
 
-	// 为了后期分析数据， 每次添加的时候要根Order相同
-	cter: {type: ObjectId, ref: 'User'},		// 客户		
+	// 录入为1, 确认为5(与pd建立联系)，完成为10
+	step: Number,					// 订单状态
+	payment: Number,				// 款项状态
+
+	categ: Number,		// 订单类型->  1.商店卖出 5.网上下单
+
+	cter: {type: ObjectId, ref: 'User'},		// 客户
 	crter: {type: ObjectId, ref: 'User'},		// 销售人员
 	/* ------------------ 自动生成 ------------------ */
 	Firm: {type: ObjectId, ref: 'Firm'},
 	crtAt: Date,
 	updAt: Date,
+
+	startAt: Date,
+	finishAt: Date,
 });
 
 dbSchema.pre('save', function(next) {	

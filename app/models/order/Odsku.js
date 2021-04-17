@@ -20,7 +20,6 @@ const dbSchema = new Schema({
 	quan: Number,
 	ship: Number,	// 发货量
 
-	crter: {type: ObjectId, ref: 'User'},		// 销售人员
 	/* ------------------ 自动生成 ------------------ */
 	Firm: {type: ObjectId, ref: 'Firm'},
 	crtAt: Date,
