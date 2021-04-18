@@ -1,4 +1,6 @@
-0.1.5		订单中的Odspu列表
+0.2.0		修改产品尺寸为String
+0.1.5	e265c2e12778e0a6464cbbb1b530b314f095fedb
+			订单中的Odspu列表
 0.1.4	75fcbbca9d9fa6b46391c781a379d835a5bea91e
 			制作订单
 0.1.3	6a38548bf68badfa856d1d5968b4a79264d4b873

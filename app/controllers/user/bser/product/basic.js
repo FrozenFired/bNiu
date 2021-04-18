@@ -160,7 +160,7 @@ exports.bsPdspuAjax = async(req, res) => {
 		return res.status(200).json({
 			status: 200,
 			message: '成功获取',
-			data: {object, Sizes}
+			data: {object}
 		});
 	} catch(error) {
 		console.log(error)
@@ -428,11 +428,11 @@ exports.bsPdspu = async(req, res) => {
 		let SizeSystId = null;
 		if(Pdspu.SizeSyst) SizeSystId = Pdspu.SizeSyst._id;
 
-		const Sizes = await SizeDB.find({SizeSyst: SizeSystId, Firm: crUser.Firm});
+		// const Sizes = await SizeDB.find({SizeSyst: SizeSystId, Firm: crUser.Firm});
 		const SizeSysts = await SizeSystDB.find({Firm: crUser.Firm})
 			.sort({"sort": -1, "updAt": -1});
 
-		return res.render("./user/bser/product/Pdspu/detail", {title: "产品详情", Pdspu, Sizes, SizeSysts, crUser});
+		return res.render("./user/bser/product/Pdspu/detail", {title: "产品详情", Pdspu, SizeSysts, crUser});
 	} catch(error) {
 		console.log(error)
 		return res.redirect("/error?info=bsPdspu,Error&error="+error);

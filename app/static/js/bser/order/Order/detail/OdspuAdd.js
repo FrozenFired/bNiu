@@ -11,23 +11,23 @@ $(function() {
 					if(page+1 != results.data.page) {
 						// 如果数据错误 则不输出
 					} else {
-						let objects = results.data.objects;
-						let object = results.data.object;
+						let PdspuAdds = results.data.objects;
+						let PdspuAdd = results.data.object;
 						page = results.data.page
 						isMore = results.data.isMore
 						count = results.data.count
-						$("#objectCount").text(count)
+						$("#PdspuAddCount").text(count)
 						let temps = new Array();
-						if(object) {
-							for(let i=0; i<objects.length; i++) {
-								if(objects[i]._id != object._id) temps.push(objects[i]);
+						if(PdspuAdd) {
+							for(let i=0; i<PdspuAdds.length; i++) {
+								if(PdspuAdds[i]._id != PdspuAdd._id) temps.push(PdspuAdds[i]);
 							}
-							temps.unshift(object);
+							temps.unshift(PdspuAdd);
 						} else {
-							temps = objects;
+							temps = PdspuAdds;
 						}
 						if(temps.length > 0) {
-							objectsRender(temps, elemId, isReload, role)
+							PdspuAddsRender(temps, elemId, isReload, role)
 						}
 					}
 				} else {
@@ -37,17 +37,17 @@ $(function() {
 		});
 	}
 
-	const objectsRender = (objects, elemId, isReload, role) => {
+	const PdspuAddsRender = (PdspuAdds, elemId, isReload, role) => {
 		let elem = '<div class="row OdspuAddElem">'
-			for(let i=0; i<objects.length; i++) {
-				let object = objects[i];
-				elem += '<div class="col-4 col-md-3 col-lg-2 mt-2 text-center border-bottom border-left objectCard">'
-					elem += '<img class="js-click-imgEnlarge" src="'+object.photo+'" '
+			for(let i=0; i<PdspuAdds.length; i++) {
+				let PdspuAdd = PdspuAdds[i];
+				elem += '<div class="col-4 col-md-3 col-lg-2 mt-2 text-center border-bottom border-left PdspuAddCard">'
+					elem += '<img class="js-click-imgEnlarge" src="'+PdspuAdd.photo+'" '
 						elem += 'width="100%" height="120px" '
-						elem += 'style="object-fit: scale-down;"'
+						elem += 'style="PdspuAdd-fit: scale-down;"'
 					elem += '/>'
-					elem += '<h5>'+object.code+'</h5>'
-					elem += '<button class="btn btn-info newPdspuBtn" data-id='+object._id+' type="button">[选择]</button>'
+					elem += '<h5>'+PdspuAdd.code+'</h5>'
+					elem += '<button class="btn btn-info newPdspuBtn" data-id='+PdspuAdd._id+' type="button">[选择]</button>'
 				elem += '</div>'
 			}
 		elem += '</div>'
@@ -58,22 +58,22 @@ $(function() {
 
 	/* ====== 初始加载 =====*/
 	let urlQuery = '';
-	let objectParam = '';
+	let PdspuAddParam = '';
 	let elemId = '';
 	let role = '';
 	let OrderId = '';
-	objectsInit = () => {
+	PdspuAddsInit = () => {
 		OrderId = $("#OrderId").val();
-		const objectFilter = $("#OdspuAddFilterAjax").val();
-		if(objectFilter) {
-			objectParam = objectFilter.split('@')[0];
-			elemId = objectFilter.split('@')[1];
-			role = objectFilter.split('@')[2];
+		const PdspuAddFilter = $("#OdspuAddFilterAjax").val();
+		if(PdspuAddFilter) {
+			PdspuAddParam = PdspuAddFilter.split('@')[0];
+			elemId = PdspuAddFilter.split('@')[1];
+			role = PdspuAddFilter.split('@')[2];
 		}
-		urlQuery = objectParam;
-		getObjects(urlQuery, elemId, 1, role);
+		urlQuery = PdspuAddParam;
+		// getObjects(urlQuery, elemId, 1, role);
 	}
-	objectsInit();
+	PdspuAddsInit();
 
 	/* ====== 根据搜索关键词 显示系列 ====== */
 	$("body").on("focus", "#OdspuAddCodeSearch", (e) => {
@@ -88,7 +88,7 @@ $(function() {
 		if(code && code.length > 1) {
 			code = "&code=" + code;
 			page = 0;
-			urlQuery = objectParam + code;
+			urlQuery = PdspuAddParam + code;
 			getObjects(urlQuery, elemId, 1, role);
 		} else {
 			$(".OdspuAddElem").remove();
@@ -104,10 +104,10 @@ $(function() {
 			url: "/bsPdspuAjax?id="+id,
 			success: function(results) {
 				if(results.status === 200) {
-					let object = results.data.object;
+					let PdspuAdd = results.data.object;
 					let Sizes = results.data.Sizes;
 					if(!Sizes) Sizes = new Array();
-					objectRender(object, Sizes, elemId)
+					PdspuAddRender(PdspuAdd, Sizes, elemId)
 				} else {
 					alert(results.message);
 				}
@@ -115,25 +115,25 @@ $(function() {
 		});
 	})
 
-	const objectRender = (object, Sizes, elemId) => {
+	const PdspuAddRender = (PdspuAdd, Sizes, elemId) => {
 		let elem = '<form id="bsOdspuNewAjaxForm" class="OdspuAddElem" method="post" action="/bsOdspuNew" enctype="multipart/form-data">'
 		elem += '<input type="hidden" name="obj[Order]" value='+OrderId+'>'
-		elem += '<input type="hidden" name="obj[Pdspu]" value='+object._id+'>'
+		elem += '<input type="hidden" name="obj[Pdspu]" value='+PdspuAdd._id+'>'
 		elem += '<div class="row py-2 border">'
 			elem += '<div class="col-4 col-md-3 col-lg-2 mt-2 text-center">'
-				elem += '<img class="js-click-imgEnlarge" src="'+object.photo+'" '
+				elem += '<img class="js-click-imgEnlarge" src="'+PdspuAdd.photo+'" '
 					elem += 'width="100%" height="120px" '
-					elem += 'style="object-fit: scale-down;"'
+					elem += 'style="PdspuAdd-fit: scale-down;"'
 				elem += '/>'
-				elem += '<h5>'+object.code+'</h5>'
-				if(object.PdNome) {
-					elem += '<h5>'+object.PdNome.code+'</h5>'
+				elem += '<h5>'+PdspuAdd.code+'</h5>'
+				if(PdspuAdd.PdNome) {
+					elem += '<h5>'+PdspuAdd.PdNome.code+'</h5>'
 				}
 			elem += '</div>'
 			elem += '<div class="col-2 d-sm-block d-md-none"></div>'
 			elem += '<div class="col-6 col-md-3 col-lg-2 mt-2">'
-				if(object.Pterns && object.Pterns.length > 0) {
-					const Pterns = object.Pterns;
+				if(PdspuAdd.Pterns && PdspuAdd.Pterns.length > 0) {
+					const Pterns = PdspuAdd.Pterns;
 					elem += '<h4>印花</h4>';
 					for(i=0; i<Pterns.length; i++) {
 						const Ptern = Pterns[i];
@@ -148,8 +148,8 @@ $(function() {
 				}
 			elem += '</div>'
 			elem += '<div class="col-6 col-md-3 col-lg-2 mt-2">'
-				if(object.Colors && object.Colors.length > 0) {
-					const Colors = object.Colors;
+				if(PdspuAdd.Colors && PdspuAdd.Colors.length > 0) {
+					const Colors = PdspuAdd.Colors;
 					elem += '<h4>颜色</h4>';
 					for(i=0; i<Colors.length; i++) {
 						const Color = Colors[i];
@@ -164,24 +164,16 @@ $(function() {
 				}
 			elem += '</div>'
 			elem += '<div class="col-6 col-md-3 col-lg-2 mt-2">'
-				if(object.sizes && object.sizes.length > 0) {
-					const sizes = object.sizes;
+				if(PdspuAdd.sizes && PdspuAdd.sizes.length > 0) {
+					const sizes = PdspuAdd.sizes;
 					elem += '<h4>尺寸</h4>';
 					for(i=0; i<sizes.length; i++) {
 						const size = sizes[i];
-						let val = size;
-						for(j=0; j<Sizes.length; j++) {
-							const Size = Sizes[j];
-							if(Size.size == size) {
-								val = Size.symbol;
-								break;
-							}
-						}
 						elem += '<div class="form-check">';
 							elem += '<input class="form-check-input  checkIpt checkIpt-sizes" type="checkbox" name="obj[sizes]" value='
-							elem += val+' id="sizeCheck-'+size+'" checked="checked">';
+							elem += size+' id="sizeCheck-'+size+'" checked="checked">';
 							elem += '<label class="form-check-label" for="sizeCheck-'+size+'">'
-								elem += val
+								elem += size
 							elem += '</label>'
 						elem += '</div>'
 					}

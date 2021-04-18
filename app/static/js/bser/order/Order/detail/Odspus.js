@@ -76,7 +76,7 @@ $(function() {
 		if(Odspu.sizes && Odspu.sizes.length > 0) {
 			sizes = Odspu.sizes;
 		} else {
-			sizes.push("size Unico");
+			sizes.push(0);
 		}
 
 		let widthTr = 100/(sizes.length+1);
@@ -85,6 +85,8 @@ $(function() {
 		for(let PternsCyc=0; PternsCyc<Pterns.length; PternsCyc++) {
 			const Ptern = Pterns[PternsCyc];
 			let Ptern_Odskus = Odspu.Odskus.filter((Odsku_item) => {if((Odsku_item.Ptern == Ptern._id) || (String(Odsku_item.Ptern) == String(Ptern._id))) return true; return false; });
+			let Ptern_Pdskus = Pdspu.Pdskus.filter((Pdsku_item) => {if((Pdsku_item.Ptern == Ptern._id) || (String(Pdsku_item.Ptern) == String(Ptern._id))) return true; return false; });
+			// elem += '<div>'+Ptern_Odskus.length+'</div>'
 			elem += '<div class="PternTable col-12 py-3 pl-5" id="PternTable-'+Ptern._id+'">'
 				elem += '<div class="row mt-3">'
 					elem += '<div class="col-md-2 text-center">';
@@ -109,13 +111,22 @@ $(function() {
 								for(let ColorsCyc=0; ColorsCyc<Colors.length; ColorsCyc++) {
 									let Color = Colors[ColorsCyc]
 									let Color_Odskus = Ptern_Odskus.filter((Odsku_item) => {if((Odsku_item.Color == Color._id) || (String(Odsku_item.Color) == String(Color._id))) return true; return false; });
+									let Color_Pdskus = Ptern_Pdskus.filter((Pdsku_item) => {if((Pdsku_item.Color == Color._id) || (String(Pdsku_item.Color) == String(Color._id))) return true; return false; });
 									elem += '<tr>'
+										// elem += '<td>'+Color_Odskus.length+'</td>'
 										elem += '<td>'+Color.code+'</td>'
 										for(let sizesCyc=0; sizesCyc<sizes.length; sizesCyc++) {
 											let size = sizes[sizesCyc]
-											size_Odskus = Color_Odskus.filter((Odsku_item) => {return Odsku_item.size == size});
+											let size_Odskus = Color_Odskus;
+											let size_Pdskus = Color_Pdskus;
+											if(size != 0) {
+												size_Odskus = Color_Odskus.filter((Odsku_item) => {return Odsku_item.size == size});
+												size_Pdskus = Color_Pdskus.filter((Pdsku_item) => {return Pdsku_item.size == size});
+											}
 											elem += '<td>'
-												elem += OdskuFormRender(Odspu, size_Odskus, Ptern, Color, size);
+												let Odsku = new Object();
+												if(size_Odskus) Odsku = size_Odskus[0];
+												elem += OdskuFormRender(Odspu, Odsku, Ptern, Color, size, size_Pdskus[0]);
 											elem += '</td>'
 										}
 									elem += '</tr>'
@@ -133,44 +144,50 @@ $(function() {
 	const OdskuFormRender = (Odspu, Odsku, Ptern, Color, size, Pdsku) =>{
 		OdspuNewLen++;
 		let elem = "";
-		if(Odsku._id) {
-			elem += '<form class="bsOdskuUpdAjaxForm" id="bsOdskuUpdAjaxForm-'+OdspuUpdLen+'">'
+		if(Odsku) {
+			elem += '<form class="bsOdskuUpdAjax-Form" id="bsOdskuUpdAjax-Form-'+OdspuNewLen+'">'
 				elem += '<input type="hidden" name="obj[_id]" value='+Odsku._id+'>';
-				elem += '<input type="number" class="ajaxQuanIpt iptsty" data-edit="#bsOdskuUpdAjaxForm-" data-len='+OdspuNewLen+' name="obj[quan]" value='+Odsku.quan+'>';
-				elem += '<span>1'+Odsku+'</span>';
+				elem += '<input type="hidden" id="bsOdskuUpdAjax-orgQuan-'+OdspuNewLen+'" value='+Odsku.quan+'>';
+				elem += '<input type="number" class="ajaxQuanIpt iptsty" data-edit="bsOdskuUpdAjax" data-len='+OdspuNewLen+' name="obj[quan]" value='+Odsku.quan+'>';
 			elem += '</form>';
 		} else {
-			elem += '<form class="bsOdskuNewAjaxForm" id="bsOdskuNewAjaxForm-'+OdspuNewLen+'">'
+			elem += '<form class="bsOdskuNewAjax-Form" id="bsOdskuNewAjax-Form-'+OdspuNewLen+'">'
 				elem += '<input type="hidden" name="obj[Odspu]" value='+Odspu._id+'>';
 				elem += '<input type="hidden" name="obj[Pdspu]" value='+Odspu.Pdspu._id+'>';
 				elem += '<input type="hidden" name="obj[Ptern]" value='+Ptern._id+'>';
 				elem += '<input type="hidden" name="obj[Color]" value='+Color._id+'>';
+				elem += '<input type="hidden" name="obj[Pdsku]" value='+Pdsku._id+'>';
 				elem += '<input type="hidden" name="obj[size]" value='+size+'>';
-				elem += '<input type="number" class="ajaxQuanIpt iptsty" data-edit="#bsOdskuNewAjaxForm-" data-len='+OdspuNewLen+' name="obj[quan]" value=0>';
+				elem += '<input type="hidden" id="bsOdskuNewAjax-orgQuan-'+OdspuNewLen+'" value=0>';
+				elem += '<input type="number" class="ajaxQuanIpt iptsty" data-edit="bsOdskuNewAjax" data-len='+OdspuNewLen+' name="obj[quan]" value=0>';
 			elem += '</form>';
 		}
 		return elem;
 	}
 	$("body").on("blur", ".ajaxQuanIpt", function(e) {
+
 		const target = $(e.target);
 		const edit = target.data("edit");
 		const len = target.data("len");
-
-		const form = $(edit+len);
-		const data = form.serialize();
-		console.log(data)
-		$.ajax({
-			type: "POST",
-			url: "/bsOdskuNewAjax",
-			data: data,
-			success: function(results) {
-				if(results.status == 200) {
-					
-				} else {
-					alert(results.message);
+		const orgQuan = parseInt($("#"+edit+"-orgQuan-"+len).val());
+		const quan = parseInt($(this).val());
+		if(quan >= 0 && quan != orgQuan) {
+			const form = $("#"+edit+"-Form-"+len);
+			const data = form.serialize();
+			$.ajax({
+				type: "POST",
+				url: "/"+edit,
+				data: data,
+				success: function(results) {
+					if(results.status == 200) {
+						let Odsku = results.data.Odsku;
+						console.log(Odsku)
+					} else {
+						alert(results.message);
+					}
 				}
-			}
-		});
+			});
+		}
 	})
 	
 	/* ====== 初始加载 =====*/

@@ -33,7 +33,7 @@ const dbSchema = new Schema({
 	Colors: [{type: ObjectId, ref: 'Color'}],
 
 	SizeSyst: {type: ObjectId, ref: 'SizeSyst'},
-	sizes: [Number],
+	sizes: [String],
 
 	Pdskus: [{type: ObjectId, ref: 'Pdsku'}],
 

@@ -10,7 +10,7 @@ const dbSchema = new Schema({
 	Pdspu: {type: ObjectId, ref: 'Pdspu'},
 
 	Mtrial: {type: ObjectId, ref: 'Mtrial'},
-	size: Number,
+	size: String,
 
 	dosage: Float,
 

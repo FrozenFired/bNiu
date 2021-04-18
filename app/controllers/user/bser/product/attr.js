@@ -131,20 +131,30 @@ exports.bsPdspuSizeNewAjax = async(req, res) => {
 
 		let sizeNew = 10;
 		if(!Pdspu.sizes || Pdspu.sizes.length == 0) {
-			Pdspu.sizes.push(sizeNew);
+			// Pdspu.sizes.push(sizeNew);
 		} else {
 			if(size == "l"){
-				const sizel = Pdspu.sizes[0];
+				let sizel = Pdspu.sizes[0];
+				const Sizel = await SizeDB.findOne({SizeSyst: Pdspu.SizeSyst, symbol: sizel})
+				if(Sizel) sizel = Sizel.size;
+
 				if(sizel <= Conf.SizeNums[0]) return res.json({status: 500, message: "已经不可添加, 请联系管理员"});
 				sizeNew = sizel-1;
-				Pdspu.sizes.unshift(sizeNew);
-				
 			} else {
 				let sizer = Pdspu.sizes[Pdspu.sizes.length-1];
+				const Sizer = await SizeDB.findOne({SizeSyst: Pdspu.SizeSyst, symbol: sizer})
+				if(Sizer) sizer = Sizer.size;
+
 				if(sizer >= Conf.SizeNums[Conf.SizeNums.length-1]) return res.json({status: 500, message: "已经不可添加, 请联系管理员"});
 				sizeNew = sizer+1;
-				Pdspu.sizes.push(sizeNew);
 			}
+		}
+		const Size = await SizeDB.findOne({SizeSyst: Pdspu.SizeSyst, size: sizeNew})
+		if(Size) sizeNew = Size.symbol;
+		if(size == "l") {
+			Pdspu.sizes.unshift(sizeNew);
+		} else {
+			Pdspu.sizes.push(sizeNew);
 		}
 		
 		const crtObjParam = {Pdspu: id, size: null, Firm: crUser.Firm};

@@ -79,7 +79,7 @@ const OrdersParamFilter = (req, crUser) => {
 
 
 exports.bsOrderNew = async(req, res) => {
-	console.log("/bsOrderNew");
+	// console.log("/bsOrderNew");
 	try{
 		const crUser = req.session.crUser;
 		const obj = req.body.obj;

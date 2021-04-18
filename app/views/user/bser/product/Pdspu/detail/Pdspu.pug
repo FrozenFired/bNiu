@@ -86,11 +86,7 @@
 	.mt-2
 		each size in Pdspu.sizes
 			- let val = size;
-			each Size in Sizes
-				if Size.size == size
-					- val = Size.symbol;
-					- break;
-			span.mr-5 #{val}
+			span.mr-5 #{size}
 		
 .border.rounded.mt-3.p-3(style="width: 100%;")
 	.row

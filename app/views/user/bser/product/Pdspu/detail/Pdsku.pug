@@ -25,11 +25,11 @@ if Pdspu.Colors && Pdspu.Colors.length > 0
 else 
 	- Colors.push({_id: null, code: "Color Unico"});
 
-- let sizes = new Array();
+- var sizes = new Array();
 if Pdspu.sizes && Pdspu.sizes.length > 0
 	- sizes = Pdspu.sizes;
 else
-	- sizes.push("size Unico");
+	- sizes.push(0);
 
 
 - var widthTr = 100/(sizes.length+1);
@@ -53,10 +53,6 @@ each Ptern in Pterns
 					th(width=widthTr+"%")
 					each size in sizes
 						- let val = size;
-						each Size in Sizes
-							if Size.size == size
-								- val = Size.symbol;
-								- break;
 						th(width=widthTr+"%") #{val}
 			tbody
 				each Color in Colors
@@ -65,7 +61,7 @@ each Ptern in Pterns
 						td #{Color.code}
 
 						each size in sizes
-							if isNaN(size)
+							if size == 0
 								- size_Pdskus = Color_Pdskus;
 							else
 								- size_Pdskus = Color_Pdskus.filter((Pdsku_item) => {return Pdsku_item.size == size});
@@ -75,4 +71,4 @@ each Ptern in Pterns
 									- object=Pdsku, value=Pdsku.stock;
 									include ../../../../../aaPlugin/ajaxInputUpd
 								else
-									span 错误
+									span #{Color_Pdskus}
