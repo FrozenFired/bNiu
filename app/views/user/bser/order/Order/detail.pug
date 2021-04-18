@@ -14,8 +14,11 @@ block content
 				li.breadcrumb-item.active(aria-current="page") #{title}
 
 		input#OrderId(type="hidden", value=Order._id)
+		input#OrderStep(type="hidden", value=Order.step)
 		include ./detail/basic
 		hr
-		include ./detail/OdspuAdd
+		if Order.step == 1
+			-a;
+			include ./detail/OdspuAdd
 		include ./detail/Odspus
 		div(style="height: 300px")

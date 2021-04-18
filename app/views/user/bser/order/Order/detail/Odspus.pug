@@ -1,7 +1,15 @@
 .row.mt-5
 	.col-4
+		if Order.step == 1
+			-a;
+			button.btn.btn-info.changeStep(type="button" data-url="/bsOrderUpdStepAjax" data-id=Order._id, data-cr=Order.step, data-nt=15) 确认
+		else if Order.step == 15
+			-a;
+			button.btn.btn-info.changeStep(type="button" data-url="/bsOrderUpdStepAjax" data-id=Order._id, data-cr=Order.step, data-nt=20) 确认
 	.col-8.text-right
-		button.btn.btn-danger.jsDel-btnClick(type="button") -
+		if Order.step == 1
+			-a;
+			button.btn.btn-danger.jsDel-btnClick(type="button") -
 .OdspusList
 	input#OdspusFilterAjax(type="hidden", value="/bsOdspusAjax?Order="+Order._id+"@#OdspusElem@bs")
 	#OdspusElem.mt-3

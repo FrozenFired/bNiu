@@ -52,6 +52,13 @@ const Conf = {
 	},
 
 	SizeNums: [6, 7, 8, 9, 10, 11, 12, 13, 14],
+
+	OrderStep: {
+		init: {num: 1, val: "创建中"},
+		check: {num: 5, val: "审核中"},
+		ship: {num: 15, val: "发货中"},
+		finish: {num: 20, val: "完成"},
+	}
 }
 
 module.exports = Conf

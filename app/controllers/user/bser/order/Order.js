@@ -150,6 +150,30 @@ exports.bsOrder = async(req, res) => {
 	}
 }
 
+exports.bsOrderUpdStepAjax = async(req, res) => {
+	// console.log("/bsOrderUpdStepAjax");
+	try{
+		const crUser = req.session.crUser;
+		const id = req.query.id;		// 所要更改的Order的id
+		const Order = await OrderDB.findOne({_id: id, Firm: crUser.Firm})
+		if(!Order) return res.json({status: 500, message: "没有找到此订单信息, 请刷新重试"});
+
+		const cr = parseInt(req.query.cr);
+		if(cr != Order.step) return res.json({status: 500, message: "当前step值传递错误, 请刷新重试"});
+
+		const nt = parseInt(req.query.nt);
+		if(isNaN(nt)) return res.json({status: 500, message: "更改step值传递错误, 请刷新重试"});
+
+		Order.step = nt;
+
+		const OrderSave = Order.save();
+		return res.json({status: 200})
+	} catch(error) {
+		console.log(error);
+		return res.json({status: 500, message: error});
+	}
+}
+
 exports.bsOrderUpdAjax = async(req, res) => {
 	// console.log("/bsOrderUpdAjax");
 	try{

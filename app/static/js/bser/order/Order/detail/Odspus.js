@@ -1,5 +1,6 @@
 $(function() {
 	let OrderId = $("#OrderId").val();
+	let OrderStep = $("#OrderStep").val();
 
 	let page = 0;
 	let count;
@@ -126,7 +127,13 @@ $(function() {
 											elem += '<td>'
 												let Odsku = new Object();
 												if(size_Odskus) Odsku = size_Odskus[0];
-												elem += OdskuFormRender(Odspu, Odsku, Ptern, Color, size, size_Pdskus[0]);
+												if(OrderStep == 1) {
+													elem += OdskuQuanRender(Odspu, Odsku, Ptern, Color, size, size_Pdskus[0]);
+												} else if(OrderStep == 15) {
+													elem += OdskuShipRender(Odsku, size_Pdskus[0])
+												} else if(OrderStep == 20) {
+													elem += OdskuFinishRender(Odsku)
+												}
 											elem += '</td>'
 										}
 									elem += '</tr>'
@@ -141,7 +148,7 @@ $(function() {
 		return elem;
 	}
 	let OdspuNewLen = 0;
-	const OdskuFormRender = (Odspu, Odsku, Ptern, Color, size, Pdsku) =>{
+	const OdskuQuanRender = (Odspu, Odsku, Ptern, Color, size, Pdsku) =>{
 		OdspuNewLen++;
 		let elem = "";
 		if(Odsku) {
@@ -164,8 +171,28 @@ $(function() {
 		}
 		return elem;
 	}
+	const OdskuShipRender = (Odsku, Pdsku) =>{
+		let elem = "";
+		if(Odsku) {
+			elem += '<span class="mr-5" title="订量">'+Odsku.quan+'</span>';
+			elem += '<span title="库存">'+Pdsku.stock+'</span>';
+			elem += '<form class="bsOdskuUpdAjax-Form" id="bsOdskuUpdAjax-Form-'+Odsku._id+'">'
+				elem += '<input type="hidden" name="obj[_id]" value='+Odsku._id+'>';
+				elem += '<input type="hidden" id="bsOdskuUpdAjax-orgQuan-'+Odsku._id+'" value='+Odsku.ship+'>';
+				elem += '<input type="number" class="ajaxQuanIpt iptsty" data-edit="bsOdskuUpdAjax" data-len='+Odsku._id+' name="obj[ship]" value='+Odsku.ship+'>';
+			elem += '</form>';
+		}
+		return elem;
+	}
+	const OdskuFinishRender = (Odsku) =>{
+		let elem = "";
+		if(Odsku) {
+			elem += '<span class="mr-5" title="订量">'+Odsku.quan+'</span>';
+			elem += '<span title="发货量">'+Odsku.ship+'</span>';
+		}
+		return elem;
+	}
 	$("body").on("blur", ".ajaxQuanIpt", function(e) {
-
 		const target = $(e.target);
 		const edit = target.data("edit");
 		const len = target.data("len");
@@ -181,7 +208,7 @@ $(function() {
 				success: function(results) {
 					if(results.status == 200) {
 						let Odsku = results.data.Odsku;
-						console.log(Odsku)
+						$("#"+edit+"-orgQuan-"+len).val(Odsku.quan);
 					} else {
 						alert(results.message);
 					}
@@ -233,4 +260,25 @@ $(function() {
 			}
 		}
 	});
+
+
+	/* ====== 更新状态 ====== */
+	$("body").on("click", ".changeStep", function(e) {
+		const target = $(e.target);
+		const url = target.data("url");
+		const id = target.data("id");
+		const cr = target.data("cr");
+		const nt = target.data("nt");
+		$.ajax({
+			type: "GET",
+			url: url+"?id="+id+"&cr="+cr+"&nt="+nt,
+			success: function(results) {
+				if(results.status === 200) {
+					location.reload();
+				} else {
+					alert(results.message);
+				}
+			}
+		});
+	})
 })

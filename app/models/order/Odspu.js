@@ -24,6 +24,7 @@ const dbSchema = new Schema({
 	imp: Float,						// 应收价格
 
 	// 为了后期分析数据， 每次添加的时候要根Order相同
+	step: Number,					// 订单状态 // 录入为1, 提交为5 审核确认为15 完成为20
 	cter: {type: ObjectId, ref: 'User'},		// 客户		
 	crter: {type: ObjectId, ref: 'User'},		// 销售人员
 	/* ------------------ 自动生成 ------------------ */

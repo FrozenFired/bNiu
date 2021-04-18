@@ -38,13 +38,14 @@ const objectsRender = (objects, elemId, isReload, role) => {
 		elem += '<div class="row mt-3 border rounded p-3 objectsElem">'
 			elem += '<div class="col-md-6 col-lg-4">'
 				elem += '<a href="/bsOrder/'+object._id+'">编号: '+object.code+'</a>'
-			elem += '</div>'
-			elem += '<div class="col-md-6 col-lg-4 ">'
 				if(object.note) {
 					elem += '<div>备注: ';
 						elem += object.note;
 					elem += '</div>'
 				}
+			elem += '</div>'
+			elem += '<div class="col-md-6 col-lg-4 ">'
+				elem += object.step
 				// elem += '<div class="text-right mt-3 jsDel-objElem" style="display:none">'
 				// 	elem += '<a class="text-danger" href="/bsOrderDel/'+object._id+'">[删除]</a>'
 				// elem += '</div>'

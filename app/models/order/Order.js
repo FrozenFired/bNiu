@@ -20,7 +20,7 @@ const dbSchema = new Schema({
 	imp: Float,						// 应收价格
 	paid: Float,					// 实际收款
 
-	// 录入为1, 确认为5(与pd建立联系)，完成为10
+	// 录入为1, 提交为5 审核确认为15 完成为20
 	step: Number,					// 订单状态
 	payment: Number,				// 款项状态
 
