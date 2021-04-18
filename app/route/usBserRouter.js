@@ -18,6 +18,7 @@ const PdspuAttr = require('../controllers/user/bser/product/attr');
 
 const Order = require('../controllers/user/bser/order/Order');
 const Odspu = require('../controllers/user/bser/order/Odspu');
+const Odsku = require('../controllers/user/bser/order/Odsku');
 
 const User = require('../controllers/user/bser/login/User');
 
@@ -35,9 +36,13 @@ module.exports = app => {
 	app.post('/bsOrderNew', bserIsLogin, postForm, Order.bsOrderNew);
 	app.get('/bsOrder/:id', bserIsLogin, Order.bsOrder);
 	app.get('/bsOrderDel/:id', bserIsLogin, Order.bsOrderDel);
-	/* ------------------------------- order ------------------------------- */
+	/* ------------------------ Odspu ------------------------ */
 	app.get('/bsOdspusAjax', bserIsLogin, Odspu.bsOdspusAjax);
 	app.post('/bsOdspuNew', bserIsLogin, postForm, Odspu.bsOdspuNew);
+	app.get('/bsOdspuDel/:id', bserIsLogin, Odspu.bsOdspuDel);
+	/* ------------------------ Odsku ------------------------ */
+	app.post('/bsOdskuNewAjax', bserIsLogin, postForm, Odsku.bsOdskuNewAjax);
+	app.post('/bsOdskuUpdAjax', bserIsLogin, postForm, Odsku.bsOdskuUpdAjax);
 
 	/* ============================================= User ============================================= */
 	app.get('/bsUsers', bserIsLogin, User.bsUsers);

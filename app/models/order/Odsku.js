@@ -12,7 +12,7 @@ const dbSchema = new Schema({
 	// 为了前端排序
 	Pdspu: {type: ObjectId, ref: 'Pdspu'},
 	Ptern: {type: ObjectId, ref: 'Ptern'},
-	size: Number,
+	size: String,
 	Color: {type: ObjectId, ref: 'Color'},
 
 	Pdsku: {type: ObjectId, ref: 'Pdsku'},

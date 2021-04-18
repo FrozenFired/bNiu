@@ -179,7 +179,7 @@ $(function() {
 						}
 						elem += '<div class="form-check">';
 							elem += '<input class="form-check-input  checkIpt checkIpt-sizes" type="checkbox" name="obj[sizes]" value='
-							elem += size+' id="sizeCheck-'+size+'" checked="checked">';
+							elem += val+' id="sizeCheck-'+size+'" checked="checked">';
 							elem += '<label class="form-check-label" for="sizeCheck-'+size+'">'
 								elem += val
 							elem += '</label>'

@@ -12,7 +12,7 @@ const dbSchema = new Schema({
 	Pdspu: {type: ObjectId, ref: 'Pdspu'},
 	Pterns: [{type: ObjectId, ref: 'Ptern'}],
 	Colors: [{type: ObjectId, ref: 'Color'}],
-	sizes: [Number],
+	sizes: [String],
 
 	Odskus: [{type: ObjectId, ref: 'Odsku'}],
 

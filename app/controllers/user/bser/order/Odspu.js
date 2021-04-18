@@ -37,6 +37,14 @@ exports.bsOdspusAjax = async(req, res) => {
 
 		const count = await OdspuDB.countDocuments(param);
 		const objects = await OdspuDB.find(param, filter)
+			.populate({path: "Pdspu", populate: [
+				{path: "Pdskus"},
+				{path: "Pterns"},
+				{path: "Colors"},
+			]})
+			.populate("Pterns")
+			.populate("Colors")
+			.populate("Odskus")
 			.skip(skip).limit(pagesize)
 			.sort(sortBy);
 
@@ -237,14 +245,18 @@ exports.bsOdspuDel = async(req, res) => {
 		const crUser = req.session.crUser;
 
 		const id = req.params.id;
-		const OdspuExist = await OdspuDB.findOne({_id: id, Firm: crUser.Firm});
-		if(!OdspuExist) return res.json({status: 500, message: "此订单已经不存在, 请刷新重试"});
+		const Odspu = await OdspuDB.findOne({_id: id, Firm: crUser.Firm});
+		if(!Odspu) return res.redirect("/error?info=bsOdspuDel,此订单已经不存在, 请刷新重试");
 
-		const Odsku = await OdskuDB.findOne({Odspu: id});
-		if(Odsku) return res.redirect("/bsOdspuDel?info=请先删除订单内容, 不可删除。 除非把相应产品删除");
+		const Order = await OrderDB.findOne({_id: Odspu.Order}, {Odspus: 1});
+		if(!Order) return res.redirect("/error?info=bsOdspuDel,所属订单不存在, 请刷新重试");
+		Order.Odspus.remove(id);
+		const OrderSave = await Order.save();
+
+		const Odsku = await OdskuDB.deleteMany({Odspu: id});
 
 		const OdspuDel = await OdspuDB.deleteOne({_id: id, Firm: crUser.Firm});
-		return res.redirect("/bsOdspus");
+		return res.redirect("/bsOrder/"+Order._id);
 	} catch(error) {
 		console.log(error);
 		return res.redirect("/error?info=bsOdspuDel,Error&error="+error);

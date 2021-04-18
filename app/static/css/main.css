@@ -20,6 +20,16 @@ video.css-bg-video {
 	transform: translateX(-50%) translateY(-50%);
 	background-size: cover; 
 }
+
+.iptsty {
+	outline-style: none;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	padding: 4px 4px;
+	width: 80px;
+	font-size: 18px;
+}
+
 .css-img-neat {
 	object-fit: scale-down;
 }
