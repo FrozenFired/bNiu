@@ -58,7 +58,11 @@ const Conf = {
 		check: {num: 5, val: "审核中"},
 		ship: {num: 15, val: "发货中"},
 		finish: {num: 20, val: "完成"},
-	}
+	},
+	OrderCateg: {
+		shop: {num: 1, val: "商店下单"},
+		web: {num: 5, val: "网上下单"},
+	},
 }
 
 module.exports = Conf

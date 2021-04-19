@@ -121,6 +121,7 @@ exports.bsOdspuNew = async(req, res) => {
 
 		const Pdspu = await PdspuDB.findOne({_id : obj.Pdspu, Firm: crUser.Firm});
 		if(!Pdspu) return res.redirect("/error?info=bsOdspuNew,Pdspu not Exist");
+		obj.price = Pdspu.price;
 
 		const Order = await OrderDB.findOne({_id : obj.Order, Firm: crUser.Firm});
 		if(!Order) return res.redirect("/error?info=bsOdspuNew,Order not Exist");

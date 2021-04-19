@@ -28,9 +28,9 @@ const dbSchema = new Schema({
 
 dbSchema.pre('save', function(next) {	
 	if(this.isNew) {
-		this.crtAt = Date.now();
 		if(!this.quan) this.quan = 0;
 		if(!this.ship) this.ship = 0;
+		this.crtAt = Date.now();
 	}
 	this.updAt = Date.now();
 	next();

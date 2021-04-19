@@ -25,6 +25,9 @@ exports.bsOdskuNewAjax = async(req, res) => {
 		if(!Odspu) res.json({status: 500, message: "bsOdskuNewAjax Odspu not Exist"});
 		if(String(Odspu.Pdspu) != String(Pdspu._id)) return res.json({status: 500, message: "bsOdskuNewAjax 订单产品不一致"});
 
+		const Order = await OrderDB.findOne({_id: Odspu.Order});
+		if(!Odspu) res.json({status: 500, message: "bsOdskuNewAjax Order not Exist"});
+
 		const Pdsku = await PdskuDB.findOne({_id : obj.Pdsku});
 		if(!Pdsku) return res.json({status: 500, message: "bsOdskuNewAjax Pdsku not Exist"});
 		if(String(Pdsku.Pdspu) != String(Pdspu._id)) return res.json({status: 500, message: "bsOdskuNewAjax 此产品的SPU不包含此SKU"});
@@ -47,14 +50,25 @@ exports.bsOdskuNewAjax = async(req, res) => {
 			obj.size = null;
 		}
 
-		obj.quan = parseInt(obj.quan);
-		if(obj.quan < 0) return res.json({status: 500, message: "bsOdskuNewAjax 采购数量 参数错误 是大于0的整数"});
-
 		const OdskuSame = await OdskuDB.findOne({Firm: crUser.Firm, Odspu: Odspu._id, Pdspu: Pdspu._id, Pdsku: Pdsku._id});
 		if(OdskuSame) return res.json({status: 500, message: "bsOdskuNewAjax OdskuSame"});
 
+		obj.quan = parseInt(obj.quan);
+		if(obj.quan < 0) return res.json({status: 500, message: "bsOdskuNewAjax 采购数量 参数错误 是大于0的整数"});
+
 		const _object = new OdskuDB(obj);
 		Odspu.Odskus.push(_object._id);
+
+		const quanBal = obj.quan;
+		const totBal = Odspu.price * quanBal;
+
+		Odspu.quan += quanBal;
+		Odspu.tot += totBal;
+
+		Order.quan += quanBal;
+		Order.tot += totBal;
+
+		const OrderSave = await Order.save();
 		const OdspuSave = await Odspu.save();
 		const Odsku = await _object.save();
 		return res.json({status: 200, data: {Odsku}});
@@ -65,19 +79,66 @@ exports.bsOdskuNewAjax = async(req, res) => {
 }
 
 exports.bsOdskuUpdAjax = async(req, res) => {
-	// console.log("/bsOdskuUpdAjax");
+	console.log("/bsOdskuUpdAjax");
 	try{
 		const crUser = req.session.crUser;
 		const obj = req.body.obj;
 
-		obj.quan = parseInt(obj.quan);
-		if(obj.quan < 0) return res.json({status: 500, message: "bsOdskuUpdAjax 采购数量 参数错误 是大于0的整数"});
-
 		const Odsku = await OdskuDB.findOne({_id : obj._id});
 		if(!Odsku) res.json({status: 500, message: "bsOdskuUpdAjax 不存在, 请刷新重试!"});
 
-		Odsku.quan = obj.quan;
+		const Odspu = await OdspuDB.findOne({_id : Odsku.Odspu});
+		if(!Odspu) res.json({status: 500, message: "bsOdskuUpdAjax Odspu not Exist"});
+
+		const Order = await OrderDB.findOne({_id: Odspu.Order});
+		if(!Odspu) res.json({status: 500, message: "bsOdskuUpdAjax Order not Exist"});
+
+		if(Order.step == 1) {
+			obj.quan = parseInt(obj.quan);
+			if(obj.quan < 0) return res.json({status: 500, message: "bsOdskuUpdAjax 采购数量 参数错误 是大于0的整数"});
+			const quanBal = obj.quan - Odsku.quan;
+			const totBal = Odspu.price * quanBal;
+
+			Odspu.quan += quanBal;
+			Odspu.tot += totBal;
+
+			Order.quan += quanBal;
+			Order.tot += totBal;
+
+			Odsku.quan = obj.quan;
+		} else if(Order.step == 15) {
+			console.log(15)
+			if(obj.ship) {
+				console.log(obj.ship)
+				obj.ship = parseInt(obj.ship);
+				if(obj.ship < 0) return res.json({status: 500, message: "bsOdskuUpdAjax 发货数量 参数错误 是大于0的整数"});
+				const shipBal = obj.ship - Odsku.ship;
+				const totleBal = Odspu.price * shipBal;
+
+				Odspu.ship += shipBal;
+				Odspu.totle += totleBal;
+
+				Order.ship += shipBal;
+				Order.totle += totleBal;
+
+				Odsku.ship = obj.ship;
+			} else if(obj.balance) {
+				const shipBal = parseInt(obj.balance);
+				const totleBal = Odspu.price * shipBal;
+				obj.ship = Odsku.quan + shipBal;
+				if(obj.ship < 0) return res.json({status: 500, message: "bsOdskuUpdAjax 宗发货数量不能于0"});
+				Odspu.ship += shipBal;
+				Odspu.totle += totleBal;
+
+				Order.ship += shipBal;
+				Order.totle += totleBal;
+				Odsku.ship = obj.ship;
+			}
+		}
+
 		const OdskuSave = await Odsku.save();
+		const OdspuSave = await Odspu.save();
+		const OrderSave = await Order.save();
 		return res.json({status: 200, data: {Odsku}});
 	} catch(error) {
 		return res.json({status: 500, message: "bsOdskuUpdAjax Error"});

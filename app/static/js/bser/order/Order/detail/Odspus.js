@@ -38,7 +38,7 @@ $(function() {
 				if(object.Pdspu) {
 					let Pdspu = object.Pdspu;
 					elem += '<div class="col-6">'
-						elem += '<a href="/bsPdspu/'+Pdspu._id+'">编号: '+Pdspu.code+'</a>'
+						elem += '<a href="/bsPdspu/'+Pdspu._id+'">产品编号: '+Pdspu.code+'</a>'
 					elem += '</div>'
 					elem += '<div class="col-6 ">'
 						elem += '<div class="text-right jsDel-objElem" style="display:none">'

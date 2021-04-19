@@ -116,7 +116,7 @@ $(function() {
 	})
 
 	const PdspuAddRender = (PdspuAdd, Sizes, elemId) => {
-		let elem = '<form id="bsOdspuNewAjaxForm" class="OdspuAddElem" method="post" action="/bsOdspuNew" enctype="multipart/form-data">'
+		let elem = '<form id="bsOdspuNewForm" class="OdspuAddElem" method="post" action="/bsOdspuNew" enctype="multipart/form-data">'
 		elem += '<input type="hidden" name="obj[Order]" value='+OrderId+'>'
 		elem += '<input type="hidden" name="obj[Pdspu]" value='+PdspuAdd._id+'>'
 		elem += '<div class="row py-2 border">'
@@ -180,7 +180,7 @@ $(function() {
 				}
 			elem += '</div>'
 			elem += '<div class="col-12 text-right">'
-				elem += '<button id="bsOdspuNewAjaxBtn" class="btn btn-success" type="button">添加</button>'
+				elem += '<button id="bsOdspuNewBtn" class="btn btn-success" type="button">添加</button>'
 			elem += '</div>'
 		elem += '</div>'
 		elem += '</form>'
@@ -227,7 +227,7 @@ $(function() {
 	// })
 	/* -------------------- 颜色的选择 -------------------- */
 
-	$("body").on("click", "#bsOdspuNewAjaxBtn", function(e) {
+	$("body").on("click", "#bsOdspuNewBtn", function(e) {
 		let checkPtern = checkColor = checksize = 0;
 		let checkedPtern = checkedColor = checkedsize = 0;
 		$(".checkIpt-Pterns").each(function(index,elem) {
@@ -256,7 +256,7 @@ $(function() {
 		} else if(checksize != 0 && checkedsize == 0) {
 			alert("请选择尺寸")
 		} else {
-			$("#bsOdspuNewAjaxForm").submit();
+			$("#bsOdspuNewForm").submit();
 		}
 
 	})

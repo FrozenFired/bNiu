@@ -6,6 +6,7 @@ const FirmDB = require('../../../../models/login/Firm');
 
 const OrderDB = require('../../../../models/order/Order');
 const OdspuDB = require('../../../../models/order/Odspu');
+const OdskuDB = require('../../../../models/order/Odsku');
 
 exports.bsOrders = async(req, res) => {
 	// console.log("/bsOrders");
@@ -106,7 +107,6 @@ exports.bsOrderNew = async(req, res) => {
 		return res.redirect("/error?info=bsOrderNew,Error&error="+error);
 	}
 }
-
 const bsOrderGetCode = (code, FirmCode) => {
 	let today =parseInt(moment(Date.now()).format('YYMMDD')) // 计算今天的日期
 	let preOrdDay = 0, preOrdNum = 0;
@@ -162,9 +162,21 @@ exports.bsOrderUpdStepAjax = async(req, res) => {
 		if(cr != Order.step) return res.json({status: 500, message: "当前step值传递错误, 请刷新重试"});
 
 		const nt = parseInt(req.query.nt);
-		if(isNaN(nt)) return res.json({status: 500, message: "更改step值传递错误, 请刷新重试"});
+
+		if(cr == 1 && (nt == 5 || nt == 15)) {
+			Order.startAt = Date.now();
+			Order.imp = Order.tot;
+		} else if(cr == 5 && nt == 15) {
+
+		} else if(cr == 15 && nt == 20) {
+			Order.finishAt = Date.now();
+		} else {
+			return res.json({status: 500, message: "更改step值传递错误, 请刷新重试"});
+		}
 
 		Order.step = nt;
+
+		const OdspuUpdMany = await OdspuDB.updateMany({_id: Order.Odspus}, {step: nt});
 
 		const OrderSave = Order.save();
 		return res.json({status: 200})
@@ -211,11 +223,12 @@ exports.bsOrderDel = async(req, res) => {
 		const crUser = req.session.crUser;
 
 		const id = req.params.id;
-		const OrderExist = await OrderDB.findOne({_id: id, Firm: crUser.Firm});
-		if(!OrderExist) return res.json({status: 500, message: "此订单已经不存在, 请刷新重试"});
+		const Order = await OrderDB.findOne({_id: id, Firm: crUser.Firm});
+		if(!Order) return res.json({status: 500, message: "此订单已经不存在, 请刷新重试"});
 
-		const Odspu = await OdspuDB.findOne({Order: id});
-		if(Odspu) return res.redirect("/bsOrderDel?info=请先删除订单内容, 不可删除。 除非把相应产品删除");
+		
+		const OdskusDeleteMany = await OdskuDB.deleteMany({Odspu: {"$in": Order.Odspus}})
+		const OdspusDeleteMany = await OdspuDB.deleteMany({_id: {"$in": Order.Odspus}});
 
 		const OrderDel = await OrderDB.deleteOne({_id: id, Firm: crUser.Firm});
 		return res.redirect("/bsOrders");
