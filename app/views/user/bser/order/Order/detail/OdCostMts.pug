@@ -1,0 +1,15 @@
+if Order.OdCostMts
+	- OdCostMts = Order.OdCostMts;
+	table.table.table-striped
+		thead
+			tr
+				td 用料
+				td 用量
+				td 供货商
+		tbody
+			each OdCostMt in OdCostMts
+				- Mtrial = OdCostMt.Mtrial;
+				tr
+					td #{Mtrial.code}
+					td #{OdCostMt.dosage}
+					td #{Mtrial.MtFirm.code}

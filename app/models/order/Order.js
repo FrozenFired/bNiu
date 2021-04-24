@@ -11,6 +11,10 @@ const dbSchema = new Schema({
 	note: String,	// 订单备注
 	/* ------------------ Attr sku ------------------ */
 	Odspus: [{type: ObjectId, ref: 'Odspu'}],
+	OdCostMts: [{
+		Mtrial: {type: ObjectId, ref: 'Mtrial'},
+		dosage: Float,
+	}],
 
 	/* ------------------ 价格 ------------------ */
 	quan: Number,	// 订货数量

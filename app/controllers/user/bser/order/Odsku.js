@@ -79,7 +79,7 @@ exports.bsOdskuNewAjax = async(req, res) => {
 }
 
 exports.bsOdskuUpdAjax = async(req, res) => {
-	console.log("/bsOdskuUpdAjax");
+	// console.log("/bsOdskuUpdAjax");
 	try{
 		const crUser = req.session.crUser;
 		const obj = req.body.obj;
@@ -107,9 +107,7 @@ exports.bsOdskuUpdAjax = async(req, res) => {
 
 			Odsku.quan = obj.quan;
 		} else if(Order.step == 15) {
-			console.log(15)
 			if(obj.ship) {
-				console.log(obj.ship)
 				obj.ship = parseInt(obj.ship);
 				if(obj.ship < 0) return res.json({status: 500, message: "bsOdskuUpdAjax 发货数量 参数错误 是大于0的整数"});
 				const shipBal = obj.ship - Odsku.ship;

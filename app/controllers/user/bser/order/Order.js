@@ -139,10 +139,11 @@ exports.bsOrder = async(req, res) => {
 			.populate("cter")
 			.populate("crter")
 			.populate({
-				path: "Odspus", options: { sort: { crtAt: -1 }},
-				populate: [{path: "Pdspu"}, {path: "Pterns"}, {path: "Colors"}, {path: "Odskus"}]
+				path: "OdCostMts",
+				populate: {path: "Mtrial", populate: {path: "MtFirm", select: "code"}}
 			})
 		if(!Order) return res.json({status: 500, message: "此订单已经不存在, 请刷新重试"});
+
 		return res.render("./user/bser/order/Order/detail", {title: "订单详情", Order, crUser});
 	} catch(error) {
 		console.log(error);
@@ -155,21 +156,75 @@ exports.bsOrderUpdStepAjax = async(req, res) => {
 	try{
 		const crUser = req.session.crUser;
 		const id = req.query.id;		// 所要更改的Order的id
-		const Order = await OrderDB.findOne({_id: id, Firm: crUser.Firm})
-		if(!Order) return res.json({status: 500, message: "没有找到此订单信息, 请刷新重试"});
-
 		const cr = parseInt(req.query.cr);
-		if(cr != Order.step) return res.json({status: 500, message: "当前step值传递错误, 请刷新重试"});
-
 		const nt = parseInt(req.query.nt);
 
-		if(cr == 1 && (nt == 5 || nt == 15)) {
+		let Order;
+		if(cr == 1) {
+			Order = await OrderDB.findOne({_id: id, Firm: crUser.Firm})
+				.populate({
+					path: "Odspus", options: { sort: { crtAt: -1 }},
+					populate: {
+						path: "Odskus", populate: {
+							path: "Pdsku", populate: [{
+								path: "PdCostMts", match: {Mtrial: {$ne: null}}
+							}, {
+								path: "Pdspu", select: "code"
+							}]
+						}
+					}
+				})
+		} else {
+			Order = await OrderDB.findOne({_id: id, Firm: crUser.Firm})
+		}
+		if(!Order) return res.json({status: 500, message: "没有找到此订单信息, 请刷新重试"});
+
+		if(cr != Order.step) return res.json({status: 500, message: "当前step值传递错误, 请刷新重试"});
+
+		if(cr == 1 && (nt == 5 || nt == 15 || nt == 20)) {
 			Order.startAt = Date.now();
 			Order.imp = Order.tot;
+			if(nt == 20) {
+				Order.finishAt = Date.now();
+			}
+			const  Odskus = (Order.Odspus[0].Odskus);
+			let OdspuLen = OdskuLen = costMtLen = 0;
+			const OdCostMts = new Array();
+			Order.Odspus.forEach((Odspu) => {
+				OdspuLen++;
+				Odspu.Odskus.forEach((Odsku) => {
+					OdskuLen++;
+					Odsku.Pdsku.PdCostMts.forEach((PdCostMt) => {
+						if(!PdCostMt.dosage || isNaN(PdCostMt.dosage)) {
+							const Pdspu = Odsku.Pdsku.Pdspu;
+							return res.json({status: 500, message: Pdspu.code+" 没有填写用量, 请补充"});
+						} else {
+							costMtLen++;
+							let i=0;
+							for(; i<OdCostMts.length; i++) {
+								if(String(OdCostMts[i].Mtrial) == String(PdCostMt.Mtrial)) {
+									OdCostMts[i].dosage += PdCostMt.dosage * Odsku.quan;
+									break;
+								}
+							}
+							if(i == OdCostMts.length) {
+								const OdCostMt = new Object();
+								OdCostMt.Mtrial = PdCostMt.Mtrial;
+								OdCostMt.dosage = PdCostMt.dosage * Odsku.quan;
+								OdCostMts.push(OdCostMt);
+							}
+						}
+					})
+				})
+			})
+			Order.OdCostMts = OdCostMts;
+
 		} else if(cr == 5 && nt == 15) {
 
 		} else if(cr == 15 && nt == 20) {
 			Order.finishAt = Date.now();
+		} else if(cr == 20 && nt == 1){
+			Order.OdCostMts = [];
 		} else {
 			return res.json({status: 500, message: "更改step值传递错误, 请刷新重试"});
 		}

@@ -6,6 +6,8 @@
 		else if Order.step == 15
 			-a;
 			button.btn.btn-info.changeStep(type="button" data-url="/bsOrderUpdStepAjax" data-id=Order._id, data-cr=Order.step, data-nt=20) 确认
+		else if Order.step == 20
+			button.btn.btn-info.changeStep(type="button" data-url="/bsOrderUpdStepAjax" data-id=Order._id, data-cr=Order.step, data-nt=1) 取消
 	.col-8.text-right
 		if Order.step == 1
 			-a;

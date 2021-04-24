@@ -11,6 +11,7 @@ block content
 		nav(aria-label="breadcrumb")
 			ol.breadcrumb
 				li.breadcrumb-item: a(href="/bser") Home
+				li.breadcrumb-item: a(href="/bsOrders") 订单列表
 				li.breadcrumb-item.active(aria-current="page") #{title}
 
 		input#OrderId(type="hidden", value=Order._id)
@@ -21,4 +22,9 @@ block content
 			-a;
 			include ./detail/OdspuAdd
 		include ./detail/Odspus
+		div(style="height: 100px")
+
+		if Order.step != 1
+			include ./detail/OdCostMts
+
 		div(style="height: 300px")
