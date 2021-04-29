@@ -37,6 +37,7 @@ module.exports = app => {
 	app.get('/bsOrderUpdStepAjax', bserIsLogin, Order.bsOrderUpdStepAjax);
 	app.get('/bsOrder/:id', bserIsLogin, Order.bsOrder);
 	app.get('/bsOrderDel/:id', bserIsLogin, Order.bsOrderDel);
+	app.post('/bsOrderCostMtAjax', bserIsLogin, postForm, Order.bsOrderCostMtAjax);
 	/* ------------------------ Odspu ------------------------ */
 	app.get('/bsOdspusAjax', bserIsLogin, Odspu.bsOdspusAjax);
 	app.post('/bsOdspuNew', bserIsLogin, postForm, Odspu.bsOdspuNew);

@@ -17,6 +17,8 @@ block content
 		input#OrderId(type="hidden", value=Order._id)
 		input#OrderStep(type="hidden", value=Order.step)
 		include ./detail/basic
+		.text-right
+			a.text-danger(href="/bsOrderDel/"+Order._id) [删除]
 		hr
 		if Order.step == 1
 			-a;

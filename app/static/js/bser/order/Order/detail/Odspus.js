@@ -129,10 +129,10 @@ $(function() {
 												if(size_Odskus) Odsku = size_Odskus[0];
 												if(OrderStep == 1) {
 													elem += OdskuQuanRender(Odspu, Odsku, Ptern, Color, size, size_Pdskus[0]);
+												} else if(OrderStep == 10) {
+													elem += OdskuFinishRender(Odsku)
 												} else if(OrderStep == 15) {
 													elem += OdskuShipRender(Odsku, size_Pdskus[0])
-												} else if(OrderStep == 20) {
-													elem += OdskuFinishRender(Odsku)
 												}
 											elem += '</td>'
 										}
@@ -188,7 +188,7 @@ $(function() {
 		let elem = "";
 		if(Odsku) {
 			elem += '<span class="mr-5" title="订量">'+Odsku.quan+'</span>';
-			elem += '<span title="发货量">'+Odsku.ship+'</span>';
+			// elem += '<span title="发货量">'+Odsku.ship+'</span>';
 		}
 		return elem;
 	}

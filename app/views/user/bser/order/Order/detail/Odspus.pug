@@ -2,12 +2,14 @@
 	.col-4
 		if Order.step == 1
 			-a;
-			button.btn.btn-info.changeStep(type="button" data-url="/bsOrderUpdStepAjax" data-id=Order._id, data-cr=Order.step, data-nt=15) 确认
-		else if Order.step == 15
+			button.btn.btn-info.changeStep(type="button" data-url="/bsOrderUpdStepAjax" data-id=Order._id, data-cr=Order.step, data-nt=10) 确认
+		else if Order.step == 10
 			-a;
-			button.btn.btn-info.changeStep(type="button" data-url="/bsOrderUpdStepAjax" data-id=Order._id, data-cr=Order.step, data-nt=20) 确认
-		else if Order.step == 20
-			button.btn.btn-info.changeStep(type="button" data-url="/bsOrderUpdStepAjax" data-id=Order._id, data-cr=Order.step, data-nt=1) 取消
+			button.mr-3.btn.btn-secondary.changeStep(type="button" data-url="/bsOrderUpdStepAjax" data-id=Order._id, data-cr=Order.step, data-nt=50) 历史
+			button.btn.btn-warning.changeStep(type="button" data-url="/bsOrderUpdStepAjax" data-id=Order._id, data-cr=Order.step, data-nt=1) 重置
+		else if Order.step == 50
+			-a;
+			button.btn.btn-warning.changeStep(type="button" data-url="/bsOrderUpdStepAjax" data-id=Order._id, data-cr=Order.step, data-nt=1) 重置
 	.col-8.text-right
 		if Order.step == 1
 			-a;

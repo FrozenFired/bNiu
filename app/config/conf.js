@@ -56,8 +56,10 @@ const Conf = {
 	OrderStep: {
 		init: {num: 1, val: "创建中"},
 		check: {num: 5, val: "审核中"},
+		deal: {num: 10, val: "处理中"},
 		ship: {num: 15, val: "发货中"},
 		finish: {num: 20, val: "完成"},
+		history: {num: 50, val: "历史"},
 	},
 	OrderCateg: {
 		shop: {num: 1, val: "商店下单"},

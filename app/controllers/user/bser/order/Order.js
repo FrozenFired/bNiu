@@ -181,25 +181,34 @@ exports.bsOrderUpdStepAjax = async(req, res) => {
 
 		if(cr != Order.step) return res.json({status: 500, message: "当前step值传递错误, 请刷新重试"});
 
-		if(cr == 1 && (nt == 5 || nt == 15 || nt == 20)) {
+		if(cr == 1 && (nt == 5 || nt == 10 || nt == 15 || nt == 20)) {
 			Order.startAt = Date.now();
 			Order.imp = Order.tot;
 			if(nt == 20) {
 				Order.finishAt = Date.now();
 			}
-			const  Odskus = (Order.Odspus[0].Odskus);
-			let OdspuLen = OdskuLen = costMtLen = 0;
-			const OdCostMts = new Array();
-			Order.Odspus.forEach((Odspu) => {
-				OdspuLen++;
-				Odspu.Odskus.forEach((Odsku) => {
+
+			let errMsgBreak = null;		// 如果发生错误 则需要跳出循环 输出错误
+			const OdCostMts = new Array();	// 订单的用料保存
+			let OdskuLen = 0;	// 订单下的 sku数量
+			// Order.Odspus.forEach((Odspu) => {})
+			for(let OdspuIndex = 0; OdspuIndex < Order.Odspus.length; OdspuIndex++) {
+				const Odspu = Order.Odspus[OdspuIndex]
+				if(errMsgBreak) break;
+				// Odspu.Odskus.forEach((Odsku) => {})
+				for(let OdskuIndex = 0; OdskuIndex<Odspu.Odskus.length; OdskuIndex++) {
 					OdskuLen++;
-					Odsku.Pdsku.PdCostMts.forEach((PdCostMt) => {
+					const Odsku = Odspu.Odskus[OdskuIndex];
+					if(errMsgBreak) break;
+					// Odsku.Pdsku.PdCostMts.forEach((PdCostMt) => {})
+					for(let PdCostMtIndex = 0; PdCostMtIndex < Odsku.Pdsku.PdCostMts.length; PdCostMtIndex++) {
+						const PdCostMt = Odsku.Pdsku.PdCostMts[PdCostMtIndex];
+						if(errMsgBreak) break;
 						if(!PdCostMt.dosage || isNaN(PdCostMt.dosage)) {
 							const Pdspu = Odsku.Pdsku.Pdspu;
-							return res.json({status: 500, message: Pdspu.code+" 没有填写用量, 请补充"});
+							errMsgBreak = Pdspu.code+"号产品 没有填写用量, 请补充";
+							break;
 						} else {
-							costMtLen++;
 							let i=0;
 							for(; i<OdCostMts.length; i++) {
 								if(String(OdCostMts[i].Mtrial) == String(PdCostMt.Mtrial)) {
@@ -214,16 +223,14 @@ exports.bsOrderUpdStepAjax = async(req, res) => {
 								OdCostMts.push(OdCostMt);
 							}
 						}
-					})
-				})
-			})
+					}
+				}
+			}
+			if(errMsgBreak) return res.json({status: 500, message: errMsgBreak});
+			if(OdskuLen < 1) return res.json({status: 500, message: "请添加产品"})
 			Order.OdCostMts = OdCostMts;
 
-		} else if(cr == 5 && nt == 15) {
-
-		} else if(cr == 15 && nt == 20) {
-			Order.finishAt = Date.now();
-		} else if(cr == 20 && nt == 1){
+		} else if((cr == 5 || cr == 10 || cr == 15 || cr == 20 || cr == 50) && nt == 1){
 			Order.OdCostMts = [];
 		} else {
 			return res.json({status: 500, message: "更改step值传递错误, 请刷新重试"});
@@ -281,7 +288,6 @@ exports.bsOrderDel = async(req, res) => {
 		const Order = await OrderDB.findOne({_id: id, Firm: crUser.Firm});
 		if(!Order) return res.json({status: 500, message: "此订单已经不存在, 请刷新重试"});
 
-		
 		const OdskusDeleteMany = await OdskuDB.deleteMany({Odspu: {"$in": Order.Odspus}})
 		const OdspusDeleteMany = await OdspuDB.deleteMany({_id: {"$in": Order.Odspus}});
 
@@ -290,5 +296,50 @@ exports.bsOrderDel = async(req, res) => {
 	} catch(error) {
 		console.log(error);
 		return res.redirect("/error?info=bsOrderDel,Error&error="+error);
+	}
+}
+
+exports.bsOrderCostMtAjax = async(req, res) => {
+	// console.log("/bsOrderCostMtAjax");
+	try{
+		const OrderIds = req.body.OrderIds;
+		if(!OrderIds) return res.json({status: 500, message: "参数错误, 请传输订单编号"});
+		const idsArr = OrderIds.split(",")
+		const ids = new Array();
+		idsArr.forEach((item) => {
+			ids.push(item);
+		})
+		const Orders = await OrderDB.find({_id: {$in: ids}}, {OdCostMts: 1})
+			.populate({
+				path: "OdCostMts.Mtrial",
+				select: "code MtFirm",
+				populate: {path: "MtFirm", select: "code"}
+			})
+		const costMts = new Array();
+		Orders.forEach((Order) => {
+			Order.OdCostMts.forEach((OdCostMt) => {
+				let i = 0;
+				for(; i<costMts.length; i++) {
+					const costMt = costMts[i];
+					if(OdCostMt.Mtrial._id == costMt.Mtrial._id) {
+						costMt.dosage += OdCostMt.dosage;
+						break;
+					}
+				}
+				if(i == costMts.length) {
+					costMts.push(OdCostMt); 
+				}
+			})
+		})		
+		return res.status(200).json({
+			status: 200,
+			message: '成功获取',
+			data: {
+				costMts
+			}
+		});
+	} catch(error) {
+		console.log(error)
+		return res.json({status: 500, message: "bsOrderCostMtAjax Error!"});
 	}
 }

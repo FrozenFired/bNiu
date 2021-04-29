@@ -16,7 +16,6 @@ $(() => {
 		const size = target.data("size");
 		const standard = target.data("standard");
 		const symbol = $(this).val().replace(/^\s*/g,"").toUpperCase();
-		console.log(url)
 		const data = "size="+size+"&standard="+standard+"&symbol="+symbol;
 		$.ajax({
 			type: "POST",

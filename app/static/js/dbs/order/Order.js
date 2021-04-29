@@ -33,23 +33,46 @@ const getObjects = (urlQuery, elemId, isReload, role) => {
 
 const objectsRender = (objects, elemId, isReload, role) => {
 	let elem = ''
+	let checkboxFlag = false;
 	for(let i=0; i<objects.length; i++) {
 		let object = objects[i];
+		let textColor = "text-primary";
+		let step = "错误状态"
+		let checkboxElem = "";
+		if(object.step == 1) {
+			textColor = "text-info";
+			step = "创建中";
+		} else if(object.step == 10) {
+			textColor = "text-success";
+			step = "处理中";
+			checkboxElem += '<input type="checkbox" class="checkboxOrder" id="orderCheckbox-'+object._id+'" name="orders" checked="checked" value='+object._id+'>';
+			checkboxFlag = true;
+		} else if(object.step == 50) {
+			textColor = "text-secondary";
+			step = "历史";
+		}
+
 		elem += '<div class="row mt-3 border rounded p-3 objectsElem">'
-			elem += '<div class="col-md-6 col-lg-4">'
-				elem += '<a href="/bsOrder/'+object._id+'">编号: '+object.code+'</a>'
+			elem += '<div class="col-md-6 col-lg-4 mt-3">'
+				elem += '<a class="'+textColor+'" href="/bsOrder/'+object._id+'">编号: '+object.code+'</a>'
 				if(object.note) {
 					elem += '<div>备注: ';
 						elem += object.note;
 					elem += '</div>'
 				}
 			elem += '</div>'
-			elem += '<div class="col-md-6 col-lg-4 ">'
-				elem += object.step
+			elem += '<div class="col-md-6 col-lg-4 mt-3">'
+				elem += '<span class="mr-3">' + step + '</span>'
+				elem += checkboxElem
 				// elem += '<div class="text-right mt-3 jsDel-objElem" style="display:none">'
 				// 	elem += '<a class="text-danger" href="/bsOrderDel/'+object._id+'">[删除]</a>'
 				// elem += '</div>'
 			elem += '</div>'
+		elem += '</div>'
+	}
+	if(checkboxFlag) {
+		elem += '<div class="text-right mt-5">'
+			elem += '<button class="OdCostMtBtn btn btn-info" type="button">用料分析</button>'
 		elem += '</div>'
 	}
 	if(isReload == 1) $(".objectsElem").remove();
