@@ -140,7 +140,10 @@ exports.bsOrder = async(req, res) => {
 			.populate("crter")
 			.populate({
 				path: "OdCostMts",
-				populate: {path: "Mtrial", populate: {path: "MtFirm", select: "code"}}
+				populate: [
+					{path: "Mtrial", populate: {path: "MtFirm", select: "code"}},
+					{path: "Pterns.Ptern", select: "code"},
+				]
 			})
 		if(!Order) return res.json({status: 500, message: "此订单已经不存在, 请刷新重试"});
 
@@ -167,7 +170,9 @@ exports.bsOrderUpdStepAjax = async(req, res) => {
 					populate: {
 						path: "Odskus", populate: {
 							path: "Pdsku", populate: [{
-								path: "PdCostMts", match: {Mtrial: {$ne: null}}
+								path: "PdCostMts",
+								match: {Mtrial: {$ne: null}},
+								populate: {path: "Mtrial"}
 							}, {
 								path: "Pdspu", select: "code"
 							}]
@@ -198,11 +203,11 @@ exports.bsOrderUpdStepAjax = async(req, res) => {
 				// Odspu.Odskus.forEach((Odsku) => {})
 				for(let OdskuIndex = 0; OdskuIndex<Odspu.Odskus.length; OdskuIndex++) {
 					OdskuLen++;
-					const Odsku = Odspu.Odskus[OdskuIndex];
+					const Odsku = Odspu.Odskus[OdskuIndex];		// 找到订单的最小单位 订单SKU
 					if(errMsgBreak) break;
 					// Odsku.Pdsku.PdCostMts.forEach((PdCostMt) => {})
 					for(let PdCostMtIndex = 0; PdCostMtIndex < Odsku.Pdsku.PdCostMts.length; PdCostMtIndex++) {
-						const PdCostMt = Odsku.Pdsku.PdCostMts[PdCostMtIndex];
+						const PdCostMt = Odsku.Pdsku.PdCostMts[PdCostMtIndex];	// 找到此产品SKU的每个个用料
 						if(errMsgBreak) break;
 						if(!PdCostMt.dosage || isNaN(PdCostMt.dosage)) {
 							const Pdspu = Odsku.Pdsku.Pdspu;
@@ -211,15 +216,34 @@ exports.bsOrderUpdStepAjax = async(req, res) => {
 						} else {
 							let i=0;
 							for(; i<OdCostMts.length; i++) {
-								if(String(OdCostMts[i].Mtrial) == String(PdCostMt.Mtrial)) {
+								if(String(OdCostMts[i].Mtrial) == String(PdCostMt.Mtrial._id)) {
 									OdCostMts[i].dosage += PdCostMt.dosage * Odsku.quan;
+									if(PdCostMt.Mtrial.isPtern == 1) {
+										let j=0;
+										for(; j<OdCostMts[i].Pterns.length; j++) {
+											if(String(OdCostMts[i].Pterns[j].Ptern) == String(Odsku.Pdsku.Ptern)) {
+												OdCostMts[i].Pterns[j].dosage += PdCostMt.dosage * Odsku.quan;
+												break;
+											}
+										}
+										if(j == OdCostMts[i].Pterns.length) {
+											OdCostMts[i].Pterns.push({Ptern: Odsku.Pdsku.Ptern, dosage: PdCostMt.dosage * Odsku.quan});
+										}
+										// const Pterns = new Array();
+										// Pterns.push({Ptern: Odsku.Pdsku.Ptern, dosage: OdCostMt.dosage});
+										// OdCostMt.Pterns = Pterns;
+									}
 									break;
 								}
 							}
 							if(i == OdCostMts.length) {
 								const OdCostMt = new Object();
-								OdCostMt.Mtrial = PdCostMt.Mtrial;
+								OdCostMt.Mtrial = PdCostMt.Mtrial._id;
 								OdCostMt.dosage = PdCostMt.dosage * Odsku.quan;
+								OdCostMt.Pterns = new Array();
+								if(PdCostMt.Mtrial.isPtern == 1) {
+									OdCostMt.Pterns.push({Ptern: Odsku.Pdsku.Ptern, dosage: OdCostMt.dosage});
+								}
 								OdCostMts.push(OdCostMt);
 							}
 						}
@@ -230,7 +254,9 @@ exports.bsOrderUpdStepAjax = async(req, res) => {
 			if(OdskuLen < 1) return res.json({status: 500, message: "请添加产品"})
 			Order.OdCostMts = OdCostMts;
 
-		} else if((cr == 5 || cr == 10 || cr == 15 || cr == 20 || cr == 50) && nt == 1){
+		} else if((cr == 5 || cr == 10 || cr == 15 || cr == 20) && nt == 50) {
+			
+		} else if((cr == 5 || cr == 10 || cr == 15 || cr == 20 || cr == 50) && nt == 1) {
 			Order.OdCostMts = [];
 		} else {
 			return res.json({status: 500, message: "更改step值传递错误, 请刷新重试"});
@@ -315,6 +341,10 @@ exports.bsOrderCostMtAjax = async(req, res) => {
 				select: "code MtFirm",
 				populate: {path: "MtFirm", select: "code"}
 			})
+			.populate({
+				path: "OdCostMts.Pterns.Ptern",
+				select: "code"
+			})
 		const costMts = new Array();
 		Orders.forEach((Order) => {
 			Order.OdCostMts.forEach((OdCostMt) => {
@@ -323,6 +353,19 @@ exports.bsOrderCostMtAjax = async(req, res) => {
 					const costMt = costMts[i];
 					if(OdCostMt.Mtrial._id == costMt.Mtrial._id) {
 						costMt.dosage += OdCostMt.dosage;
+
+						for(let n=0; n<OdCostMt.Pterns.length; n++) {
+							let m=0;
+							for(; m<costMt.Pterns.length; m++) {
+								if(String(costMt.Pterns[m].Ptern._id) == String(OdCostMt.Pterns[n].Ptern._id)) {
+									costMt.Pterns[m].dosage += OdCostMt.Pterns[n].dosage;
+									break;
+								}
+							}
+							if(m == costMt.Pterns.length) {
+								costMt.Pterns.push(OdCostMt.Pterns[n]);
+							}
+						}
 						break;
 					}
 				}
@@ -330,7 +373,7 @@ exports.bsOrderCostMtAjax = async(req, res) => {
 					costMts.push(OdCostMt); 
 				}
 			})
-		})		
+		})
 		return res.status(200).json({
 			status: 200,
 			message: '成功获取',

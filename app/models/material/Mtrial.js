@@ -7,6 +7,7 @@ const Float = require('mongoose-float').loadType(mongoose, 2);
 const colection = 'Mtrial';
 const dbSchema = new Schema({
 	code: String,
+	isPtern: Number,
 
 	MtCategFir: {type: ObjectId, ref: 'MtCateg'},
 	MtCategSec: {type: ObjectId, ref: 'MtCateg'},
@@ -34,6 +35,7 @@ const dbSchema = new Schema({
 dbSchema.pre('save', function(next) {
 	if(this.isNew) {
 		if(!this.sort) this.sort = 1;
+		if(!this.isPtern) this.isPtern = -1;
 	}
 	this.updAt = Date.now();
 	next();

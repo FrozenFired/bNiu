@@ -65,6 +65,10 @@ const Conf = {
 		shop: {num: 1, val: "商店下单"},
 		web: {num: 5, val: "网上下单"},
 	},
+	isPtern: {
+		n: {num: -1, val: "不印花"},
+		y: {num: 1, val: "印花"},
+	},
 }
 
 module.exports = Conf

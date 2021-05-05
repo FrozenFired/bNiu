@@ -103,7 +103,17 @@ const costMtsRender = (costMts) => {
 				let Mtrial = costMt.Mtrial;
 				elem += '<tr>'
 					elem += '<td>'+Mtrial.code+'</td>'
-					elem += '<td>'+costMt.dosage+'</td>'
+					elem += '<td>'
+						elem += '<div>'+costMt.dosage+'</div>'
+						for(let j=0; j<costMt.Pterns.length; j++) {
+							let ptern = costMt.Pterns[j];
+							let Ptern = ptern.Ptern;
+							elem += '<div class="row">'
+								elem += '<div class="col-6">'+Ptern.code+'</div>'
+								elem += '<div class="col-6">'+ptern.dosage+'</div>'
+							elem += '</div>'
+						}
+					elem += '</td>'
 					elem += '<td>'+Mtrial.MtFirm.code+'</td>'
 				elem += '</tr>'
 			}

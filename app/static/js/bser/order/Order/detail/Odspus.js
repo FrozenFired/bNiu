@@ -129,7 +129,7 @@ $(function() {
 												if(size_Odskus) Odsku = size_Odskus[0];
 												if(OrderStep == 1) {
 													elem += OdskuQuanRender(Odspu, Odsku, Ptern, Color, size, size_Pdskus[0]);
-												} else if(OrderStep == 10) {
+												} else if(OrderStep == 10 || OrderStep == 50) {
 													elem += OdskuFinishRender(Odsku)
 												} else if(OrderStep == 15) {
 													elem += OdskuShipRender(Odsku, size_Pdskus[0])

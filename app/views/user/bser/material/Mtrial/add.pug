@@ -17,6 +17,13 @@ block content
 							- a;
 							option(value=MtFirm._id) #{MtFirm.code}
 			.form-group.row
+				label.col-3.col-sm-2.col-form-label(for="isPternIpt") 是否需要印花
+				.col-9.col-sm-6
+					select#isPternIpt.form-control(name="obj[isPtern]", data-style="btn-info")
+						each isPtern in Conf.isPtern
+							-a;
+							option(value=isPtern.num) #{isPtern.val}
+			.form-group.row
 				label.col-3.col-sm-2.col-form-label 分类
 				.col-3.col-sm-2
 					input#ipt-MtCateg-1.iptMtCateg.form-control(type="hidden", name="obj[MtCategFir]" autocomplete="off")

@@ -14,6 +14,10 @@ const dbSchema = new Schema({
 	OdCostMts: [{
 		Mtrial: {type: ObjectId, ref: 'Mtrial'},
 		dosage: Float,
+		Pterns: [{
+			Ptern: {type: ObjectId, ref: 'Ptern'},
+			dosage: Float
+		}]
 	}],
 
 	/* ------------------ 价格 ------------------ */

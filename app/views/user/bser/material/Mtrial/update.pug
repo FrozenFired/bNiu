@@ -22,24 +22,34 @@ block content
 							else
 								option(value=MtFirm._id) #{MtFirm.code}
 			.form-group.row
+				label.col-3.col-sm-2.col-form-label(for="isPternIpt") 是否需要印花
+				.col-9.col-sm-6
+					select#isPternIpt.form-control(name="obj[isPtern]", data-style="btn-info")
+						each isPtern in Conf.isPtern
+							if Mtrial.isPtern == isPtern.num
+								-a;
+								option(value=isPtern.num, selected="selected") #{isPtern.val}
+							else
+								option(value=isPtern.num) #{isPtern.val}
+			.form-group.row
 				label.col-3.col-sm-2.col-form-label 分类
 				- let MtCategFir = new Object();
 				if Mtrial.MtCategFir
 					- MtCategFir = Mtrial.MtCategFir;
 				.col-3.col-sm-2
-					input#ipt-MtCateg-1.iptMtCateg.form-control(type="text", name="obj[MtCategFir]", value=MtCategFir._id, autocomplete="off")
+					input#ipt-MtCateg-1.iptMtCateg.form-control(type="hidden", name="obj[MtCategFir]", value=MtCategFir._id, autocomplete="off")
 					input#req-MtCateg-1.reqMtCateg.form-control(type="text", value=MtCategFir.code, autocomplete="off")
 				- let MtCategSec = new Object();
 				if Mtrial.MtCategSec
 					- MtCategSec = Mtrial.MtCategSec;
 				.col-3.col-sm-2
-					input#ipt-MtCateg-2.iptMtCateg.form-control(type="text", name="obj[MtCategSec]", value=MtCategSec._id, autocomplete="off")
+					input#ipt-MtCateg-2.iptMtCateg.form-control(type="hidden", name="obj[MtCategSec]", value=MtCategSec._id, autocomplete="off")
 					input#req-MtCateg-2.reqMtCateg.form-control(type="text", value=MtCategSec.code, autocomplete="off")
 				- let MtCategThd = new Object();
 				if Mtrial.MtCategThd
 					- MtCategThd = Mtrial.MtCategThd;
 				.col-3.col-sm-2
-					input#ipt-MtCateg-3.iptMtCateg.form-control(type="text", name="obj[MtCategThd]", value=MtCategThd._id, autocomplete="off")
+					input#ipt-MtCateg-3.iptMtCateg.form-control(type="hidden", name="obj[MtCategThd]", value=MtCategThd._id, autocomplete="off")
 					input#req-MtCateg-3.reqMtCateg.form-control(type="text", value=MtCategThd.code, autocomplete="off")
 				.offset-3.offset-sm-2.col-9.col-sm-6.col-form-label#MtCateg-box
 			.form-group.row

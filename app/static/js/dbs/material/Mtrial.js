@@ -51,6 +51,11 @@ const objectRender = (object, role) => {
 		elem += '/>'
 		elem += '<h5>编号: '+object.code+'</h5>'
 		elem += '<h5>供货商: '+object.MtFirm.code+'</h5>'
+		if(object.isPtern == 1) {
+			elem += '<div class="text-info">需要印花</div>'
+		} else {
+			elem += '<div>不需要印花</div>'
+		} 
 		elem += '<div class="row">'
 			elem += '<div class="col-sm-6 text-left">'
 				elem += '<span class="bg-white text-info jsUpd-span jsUpd-span-sort-sort-'+object._id;

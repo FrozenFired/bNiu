@@ -54,6 +54,13 @@ block content
 								- selectedVal = "", value="", valueHide=1, fieldDesp="未选择供货商";
 							include ../../../../aaPlugin/ajaxSelectUpd
 							- fieldDesp = null, valueHide = null;
+						.isPtern
+							span 是否印花: 
+							if Mtrial.isPtern == 1
+								-a;
+								span #{Conf.isPtern.y.val}
+							else
+								span #{Conf.isPtern.n.val}
 						.MtCateg
 							if Mtrial.MtCategFir
 								- MtCategFir = Mtrial.MtCategFir;

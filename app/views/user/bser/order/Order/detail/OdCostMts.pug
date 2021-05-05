@@ -11,5 +11,13 @@ if Order.OdCostMts
 				- Mtrial = OdCostMt.Mtrial;
 				tr
 					td #{Mtrial.code}
-					td #{OdCostMt.dosage}
+					td
+						div #{OdCostMt.dosage} #{OdCostMt.pterns}
+						if Mtrial.isPtern == 1
+							- let Pterns = OdCostMt.Pterns;
+							each ptern in Pterns
+								- let Ptern = ptern.Ptern;
+								.row
+									.col-6 #{Ptern.code}
+									.col-6 #{ptern.dosage}
 					td #{Mtrial.MtFirm.code}
