@@ -1,24 +1,4 @@
 const Conf = {
-	// categStreamNums: [-1, 1, 1000],
-	// categStream: {
-	// 	streamdw: {num: -1, val: '下游公司'},
-	// 	streamup: {num: 1, val: '上游公司'},
-	// 	logistic: {num: 1000, val: '物流公司'}
-	// },
-
-	// categFirmNums: [50, 100, 500, 1000],
-	// categFirm: {
-	// 	// factory: {num: 1, val: '工厂'},
-	// 	// proxy: {num: 10, val: '代理公司'},
-	// 	// dealer: {num: 20, val: '经销公司'},
-	// 	supplier: {num: 50, val: '供应公司'},
-	// 	trading: {num: 100, val: '贸易公司'},
-	// 	sale: {num: 500, val: '销售公司'},
-	// 	logistic: {num: 1000, val: '物流公司'}
-	// },
-
-	// roleNums: [1, 3, 5, 10, 20, 25, 30, 50, 70, 90, 95, 99],
-	// roleAdmins: [1, 3, 5, 10],
 	roleNums: [1, 99],
 	roleAdmins: [1],
 	roleUser: {
@@ -53,6 +33,10 @@ const Conf = {
 
 	SizeNums: [6, 7, 8, 9, 10, 11, 12, 13, 14],
 
+	month: {
+		1: "JAN", 2: "FEB", 3: "MAR", 4: "APR", 5: "MAY", 6: "JUN",
+		7: "JUL", 8: "AUG", 9: "SEP", 10: "OCT", 11: "NOV", 12: "DEC"
+	},
 	OrderStep: {
 		init: {num: 1, val: "创建中"},
 		check: {num: 5, val: "审核中"},
@@ -69,6 +53,11 @@ const Conf = {
 		n: {num: -1, val: "不印花"},
 		y: {num: 1, val: "印花"},
 	},
+
+
+	bsOrderGetCode : (code, firmCode) => {
+		
+	}
 }
 
 module.exports = Conf

@@ -91,11 +91,7 @@ exports.bsOrderNew = async(req, res) => {
 
 		const preOrder = await OrderDB.findOne({Firm : crUser.Firm })
 			.sort({'crtAt': -1})
-		let code = null;
-		if(preOrder) {
-			code = preOrder.code;
-		}
-		obj.code = bsOrderGetCode(code, Firm.code);
+		obj.code = bsOrderGetCode(preOrder, crUser);
 
 		const OrderSame = await OrderDB.findOne({code: obj.code, Firm: crUser.Firm});
 		if(OrderSame) return res.redirect("/error?info=bsOrderNew,OrderSame");
@@ -107,26 +103,24 @@ exports.bsOrderNew = async(req, res) => {
 		return res.redirect("/error?info=bsOrderNew,Error&error="+error);
 	}
 }
-const bsOrderGetCode = (code, FirmCode) => {
-	let today =parseInt(moment(Date.now()).format('YYMMDD')) // 计算今天的日期
-	let preOrdDay = 0, preOrdNum = 0;
+const bsOrderGetCode = (preOrder, crUser) => {
+	const nowForm = new Date();
+	const year = nowForm.getFullYear();
+	const month = nowForm.getMonth()+1;
+	const Mth = Conf.month[month];
 
-	if(code) {
-		const arrs = code.split(FirmCode);
-		preOrdDay = arrs[0];
-		preOrdNum = arrs[1];
-	}
-
-	if(today == preOrdDay) {	// 判断上个订单的日期是否是今天
-		preOrdNum = parseInt(preOrdNum)+1
-	} else {					// 如果不是则从1开始
-		preOrdNum = 1
-	}
-	for(let len = (preOrdNum + "").length; len < 4; len = preOrdNum.length) { // 序列号补0
-		preOrdNum = "0" + preOrdNum;
+	let codeNum = "0001";
+	if(preOrder) {
+		const poMonth = Conf.month[preOrder.crtAt.getMonth()+1];
+		if(Mth == poMonth) {
+			codeNum = String(parseInt(preOrder.code.split(poMonth)[1])+1);
+			for(let len = codeNum.length; len < 4; len = codeNum.length) { // 序列号补0
+				codeNum = "0" + codeNum;
+			}
+		}
 	}
 	
-	return String(today) + FirmCode + String(preOrdNum);
+	return String(year%100) + Mth + codeNum;
 }
 
 exports.bsOrder = async(req, res) => {
@@ -335,7 +329,7 @@ exports.bsOrderCostMtAjax = async(req, res) => {
 		idsArr.forEach((item) => {
 			ids.push(item);
 		})
-		const Orders = await OrderDB.find({_id: {$in: ids}}, {OdCostMts: 1})
+		const Orders = await OrderDB.find({_id: {$in: ids}}, {OdCostMts: 1, code: 1})
 			.populate({
 				path: "OdCostMts.Mtrial",
 				select: "code MtFirm",
@@ -346,15 +340,16 @@ exports.bsOrderCostMtAjax = async(req, res) => {
 				select: "code"
 			})
 		const costMts = new Array();
-		Orders.forEach((Order) => {
-			Order.OdCostMts.forEach((OdCostMt) => {
+		Orders.forEach((Order) => {		// 分出 单个订单
+			Order.OdCostMts.forEach((OdCostMt) => {	// 每个订单下 分别的用料 
 				let i = 0;
 				for(; i<costMts.length; i++) {
 					const costMt = costMts[i];
+					// 如果此用料已经保存
 					if(OdCostMt.Mtrial._id == costMt.Mtrial._id) {
 						costMt.dosage += OdCostMt.dosage;
 
-						for(let n=0; n<OdCostMt.Pterns.length; n++) {
+						for(let n=0; n<OdCostMt.Pterns.length; n++) {	// 找出每个用料下的所有印花
 							let m=0;
 							for(; m<costMt.Pterns.length; m++) {
 								if(String(costMt.Pterns[m].Ptern._id) == String(OdCostMt.Pterns[n].Ptern._id)) {
@@ -364,12 +359,14 @@ exports.bsOrderCostMtAjax = async(req, res) => {
 							}
 							if(m == costMt.Pterns.length) {
 								costMt.Pterns.push(OdCostMt.Pterns[n]);
+								/* 不能push进取对象 */
+								costMt.Pterns[costMt.Pterns.length-1].Ptern = OdCostMt.Pterns[n].Ptern;
 							}
 						}
 						break;
 					}
 				}
-				if(i == costMts.length) {
+				if(i == costMts.length) {		// 以每种用料为基础 放入用料列表中
 					costMts.push(OdCostMt); 
 				}
 			})
@@ -382,7 +379,7 @@ exports.bsOrderCostMtAjax = async(req, res) => {
 			}
 		});
 	} catch(error) {
-		console.log(error)
+		console.log(error);
 		return res.json({status: 500, message: "bsOrderCostMtAjax Error!"});
 	}
 }

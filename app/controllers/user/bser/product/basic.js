@@ -194,7 +194,7 @@ const PdspuFilter_Func = async(req) => {
 		if(isNaN(obj.price)) return {obj: null, info: "PdspuFilter_Func,请输入正确售价"};
 		if(obj.cost) {
 			obj.cost = parseFloat(obj.cost);
-			if(isNaN(obj.cost)) return {obj: null, info: "PdspuFilter_Func,请输入正确采购价, 可以不输入"};
+			if(isNaN(obj.cost)) return {obj: null, info: "PdspuFilter_Func,请输入正确成本格式, 可以不输入"};
 		}
 		if(obj.weight) {
 			obj.weight = parseFloat(obj.weight);

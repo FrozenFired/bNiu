@@ -140,7 +140,7 @@ const MtrialFilter_Func = async(req) => {
 		if(obj.code.length < 1) return {obj: null, info: "/error?info=MtrialFilter_Func,请输入编号"}
 		if(obj.cost) {
 			obj.cost = parseFloat(obj.cost);
-			if(isNaN(obj.cost)) return {obj: null, info: "/error?info=MtrialFilter_Func, 请输入正确采购价, 可以不输入"};
+			if(isNaN(obj.cost)) return {obj: null, info: "/error?info=MtrialFilter_Func, 请输入正确成本格式, 可以不输入"};
 		}
 
 		if(!obj.MtFirm) return {obj: null, info: "/error?info=MtrialFilter_Func, 请选择印花厂"};
