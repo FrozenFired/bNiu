@@ -37,7 +37,7 @@ exports.bsPdspus = async(req, res) => {
 	}
 }
 exports.bsPdspusAjax = async(req, res) => {
-	// console.log("/bsPdspus");
+	// console.log("/bsPdspusAjax");
 	try{
 		const crUser = req.session.crUser;
 
@@ -72,10 +72,12 @@ exports.bsPdspusAjax = async(req, res) => {
 			object = await PdspuDB.findOne({code: code, Firm: crUser.Firm}, filter);
 		}
 
+		let isMore = 1;
+		if((page-1) * pagesize + objects.length >= count) isMore = 0;
 		return res.status(200).json({
 			status: 200,
 			message: '成功获取',
-			data: {object, objects, count, page, pagesize}
+			data: {object, objects, count, page, pagesize, isMore}
 		});
 	} catch(error) {
 		console.log(error)

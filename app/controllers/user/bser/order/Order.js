@@ -38,10 +38,12 @@ exports.bsOrdersAjax = async(req, res) => {
 			object = await OrderDB.findOne({code: code, Firm: crUser.Firm}, filter);
 		}
 
+		let isMore = 1;
+		if((page-1) * pagesize + objects.length >= count) isMore = 0;
 		return res.status(200).json({
 			status: 200,
 			message: '成功获取',
-			data: {object, objects, count, page, pagesize}
+			data: {object, objects, count, page, pagesize, isMore}
 		});
 	} catch(error) {
 		console.log(error)
@@ -51,6 +53,7 @@ exports.bsOrdersAjax = async(req, res) => {
 const OrdersParamFilter = (req, crUser) => {
 	let param = {
 		"Firm": crUser.Firm,
+		"step": {"$ne": Conf.OrderStep.history.num}
 	};
 	const filter = {};
 	const sortBy = {};
@@ -60,6 +63,12 @@ const OrdersParamFilter = (req, crUser) => {
 		symbConb = symbConb.replace(/^\s*/g,"").toUpperCase();
 		symbConb = new RegExp(symbConb + '.*');
 		param["code"] = {'$in': symbConb};
+		param["step"] = {'$ne': null};
+	}
+
+	if(req.query.step) {
+		let symbConb = parseInt(req.query.step)
+		param["step"] = symbConb;
 	}
 
 	if(req.query.sortKey && req.query.sortVal) {
