@@ -8,37 +8,44 @@ $(function() {
 		}
 	})
 
+	let is_mt_analys = false;
 	// 用料分析
-	$("body").on("click", ".OdCostMtBtn", (e) => {
-		const OrderIds = new Array();
-		$(".checkboxOrder").each(function(index,elem) {
-			if($(this).attr("checked")) {
-				OrderIds.push($(this).val())
-			}
-		})
-		if(OrderIds.length < 1) {
-			$(".costMts").remove();
-			alert("请选择订单")
+	$("body").on("click", ".analys_CostMtBtnBox", (e) => {
+		if(is_mt_analys) {
+			$("#costMts").hide();
 		} else {
-			const data = "OrderIds="+OrderIds;
-			$.ajax({
-				type: "POST",
-				url: "/bsOrderCostMtAjax",
-				data: data,
-				success: function(results) {
-					if(results.status === 200) {
-						const costMts = results.data.costMts;
-						if(costMts && costMts.length > 0) {
-							costMtsRender(costMts)
-						} else {
-							alert("信息错误")
-						}
-					} else {
-						alert(results.message)
-					}
+			$("#costMts").show();
+			const OrderIds = new Array();
+			$(".checkboxOrder").each(function(index,elem) {
+				if($(this).attr("checked")) {
+					OrderIds.push($(this).val())
 				}
-			});
+			})
+			if(OrderIds.length < 1) {
+				$(".costMts").remove();
+				alert("请选择订单")
+			} else {
+				const data = "OrderIds="+OrderIds;
+				$.ajax({
+					type: "POST",
+					url: "/bsOrderCostMtAjax",
+					data: data,
+					success: function(results) {
+						if(results.status === 200) {
+							const costMts = results.data.costMts;
+							if(costMts && costMts.length > 0) {
+								costMtsRender(costMts)
+							} else {
+								alert("信息错误")
+							}
+						} else {
+							alert(results.message)
+						}
+					}
+				});
+			}
 		}
+		is_mt_analys = !is_mt_analys;
 	})
 })
 

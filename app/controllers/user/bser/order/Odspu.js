@@ -10,6 +10,7 @@ const OdskuDB = require('../../../../models/order/Odsku');
 
 const PdspuDB = require('../../../../models/product/Pdspu');
 
+
 exports.bsOdspus = async(req, res) => {
 	// console.log("/bsOdspus");
 	try{

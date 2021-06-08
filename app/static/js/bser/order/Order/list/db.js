@@ -1,3 +1,20 @@
+let interval = "";
+let step = "";
+let code = "";
+
+const intervalFilter_func = ()=> {
+	const fromAt = $("#fromAt").val();
+	const toAt = $("#toAt").val();
+
+	interval = "";
+	if(fromAt && fromAt.length == 10) {
+		interval += "&fromAt="+fromAt;
+	}
+	if(toAt && toAt.length == 10) {
+		interval += "&toAt="+toAt;
+	}
+}
+
 $(function() {
 	/* ====== 初始加载 =====*/
 	let urlQuery = '';
@@ -17,10 +34,9 @@ $(function() {
 	}
 	objectsInit();
 
-
 	/* ====== 根据搜索关键词 显示系列 ====== */
 	$("body").on("input", "#codeSearch", (e) => {
-		let code = $("#codeSearch").val().replace(/(\s*$)/g, "").replace( /^\s*/, '').toUpperCase();
+		code = $("#codeSearch").val().replace(/(\s*$)/g, "").replace( /^\s*/, '').toUpperCase();
 
 		$(".stepClick").removeClass("btn-success");
 		$(".stepClick").addClass("btn-default");
@@ -38,6 +54,16 @@ $(function() {
 		getObjects(urlQuery, elemId, 1, role);
 	})
 
+	/* ====== 根据时间筛选 ====== */
+	$("#interval-Orders").click(function(e) {
+		intervalFilter_func();
+		if(interval.length > 0) {
+			page = 0;
+			urlQuery = objectParam + interval + step;
+			getObjects(urlQuery, elemId, 1, role);
+		}
+	})
+
 	/* ====== 点击订单状态 显示列表 ====== */
 	$(".stepClick").click(function(e) {
 		$("#codeSearch").val('');
@@ -45,9 +71,11 @@ $(function() {
 		$(".stepClick").removeClass("btn-success");
 		$(".stepClick").addClass("btn-default");
 
+		$("#fromAt").val("");
+		$("#toAt").val("");
 
 		const target = $(e.target);
-		let step = target.data("step");
+		step = target.data("step");
 		if(!step) {
 			step = "";
 			$("#stepAll").removeClass("btn-default");
@@ -149,10 +177,11 @@ const objectsRender = (objects, elemId, isReload, role) => {
 		elem += '</div>'
 	}
 	if(checkboxFlag) {
-		elem += '<div class="text-right objectsElem mt-5">'
-			elem += '<button class="OdCostMtBtn btn btn-info" type="button">用料分析</button>'
+		elem += '<div class="text-right objectsElem analys_CostMtBtnBox mt-5">'
+			elem += '<button class="analys_CostMtBtn btn btn-info" type="button">用料分析</button>'
 		elem += '</div>'
 	}
+	$(".analys_CostMtBtnBox").remove();
 	if(isReload == 1) $(".objectsElem").remove();
 	if(!elemId) elemId = "#objectsElem";
 	$(elemId).append(elem);

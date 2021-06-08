@@ -67,8 +67,21 @@ const OrdersParamFilter = (req, crUser) => {
 	}
 
 	if(req.query.step) {
-		let symbConb = parseInt(req.query.step)
-		param["step"] = symbConb;
+		if(req.query.step == "all") {
+			param["step"] = {"$ne": null};
+		} else {
+			let symbConb = parseInt(req.query.step)
+			param["step"] = symbConb;
+		}
+	}
+
+	if(req.query.fromAt) {
+		let symbConb = new Date(req.query.fromAt).setHours(0,0,0,0);
+		param["crtAt"] = {"$gte": symbConb};
+	}
+	if(req.query.toAt) {
+		let symbConb = new Date(req.query.toAt).setHours(23,59,59,0);
+		param["crtAt"] = {"$lt": symbConb};
 	}
 
 	if(req.query.sortKey && req.query.sortVal) {
@@ -288,17 +301,12 @@ exports.bsOrderUpdAjax = async(req, res) => {
 		let val = req.body.val;		// 数据的值
 
 		const field = req.body.field;
-		if(field == "code") {
-			val = String(val).replace(/^\s*/g,"").toUpperCase();
-			if(val.length < 1) return res.json({status: 500, message: "[bsOrderUpdAjax code] 订单不正确"});
-			const OrderSame = await OrderDB.findOne({code: val, Firm: crUser.Firm});
-			if(OrderSame) return res.json({status: 500, message: "有相同的编号"});
-		} else if(field == "sort") {
-			val = parseInt(val);
-			if(isNaN(val)) return res.json({status: 500, message: "[bsOrderUpdAjax sort] 排序为数字, 请传递正确的参数"});
+		if(field == "preShipAt") {
+			if(val.length != 10) return res.json({status: 400, message: "时间参数错误"});
+			Order[field] = new Date(val).setHours(0,0,0,0);
+		} else {
+			return res.json({status: 400, message: "不可修改此数据"});
 		}
-
-		Order[field] = val;
 
 		const OrderSave = Order.save();
 		return res.json({status: 200})
@@ -390,5 +398,52 @@ exports.bsOrderCostMtAjax = async(req, res) => {
 	} catch(error) {
 		console.log(error);
 		return res.json({status: 500, message: "bsOrderCostMtAjax Error!"});
+	}
+}
+
+exports.bsOrderAnalysAjax = async(req, res) => {
+	// console.log("/bsOrderAnalys");
+	try{
+		const crUser = req.session.crUser;
+
+		const {param, filter, sortBy, page, pagesize, skip} = OrdersParamFilter(req, crUser);
+
+		const objects = await OrderDB.find(param, {Odspus: 1})
+			.populate([
+				{
+					path: "Odspus", select: "quan Pdspu", 
+					populate: {path: "Pdspu", select: "code", populate: {path: "PdNome", select: "code"}}
+				}
+			])
+			.sort(sortBy);
+		const AnalysPdspus = new Array();
+		objects.forEach(order => {
+			order.Odspus.forEach(odspu => {
+				// console.log(odspu)
+				let i = 0;
+				for(;i<AnalysPdspus.length; i++) {
+					if(String(odspu.Pdspu._id) == AnalysPdspus[i].id) {
+						AnalysPdspus[i].quan += parseInt(odspu.quan);
+						break;
+					}
+				}
+				if(i == AnalysPdspus.length) {
+					const AnalysPdspu = new Object();
+					AnalysPdspu.id = String(odspu.Pdspu._id);
+					AnalysPdspu.code = String(odspu.Pdspu.code);
+					AnalysPdspu.nome = String(odspu.Pdspu.PdNome.code);
+					AnalysPdspu.quan = parseInt(odspu.quan);
+					AnalysPdspus.push(AnalysPdspu);
+				}
+			})
+		})
+		return res.status(200).json({
+			status: 200,
+			message: '成功获取',
+			data: {AnalysPdspus}
+		});
+	} catch(error) {
+		console.log(error)
+		return res.json({status: 500, message: "bsOrderAnalys Error!"});
 	}
 }

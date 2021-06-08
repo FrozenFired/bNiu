@@ -40,7 +40,7 @@
 if Order.step > 1
 	-a;
 	.row
-		.col-6.col-md-3
+		.col-6.col-md-3.noprint
 			- let tot = 0;
 			.tot 订货价: 
 				if Order.tot && !isNaN(parseFloat(Order.tot))
@@ -84,6 +84,20 @@ if Order.step > 1
 			if Order.startAt
 				- startAt = Order.startAt;
 				span #{moment(startAt).format("YY年MM月DD日 HH:mm:ss")}
+	.col-6.col-md-6.noprint
+		.preShipAt
+			span.preShipAt-btn 预计送货时间: 
+			- let preShipAt = '', preShipAtVal='';
+			if Order.preShipAt
+				- preShipAt = moment(Order.preShipAt).format("YYYY年MM月DD日");
+				- preShipAtVal = moment(Order.preShipAt).format("MM/DD/YYYY");
+			span#preShipAt-span #{preShipAt}
+			input#preShipAt-ipt.datepicker.form-control(type="text", readonly="readonly", value=preShipAtVal, style="display:none")
+	.col-6.col-md-6.noprint
+		if Order.preShipAt
+			-a;
+			span.mr-2.spanShip 距离送货倒计时: 
+			span.text-danger.countdownAt
 	//- if Order.step > 15
 		-a;
 		.col-6.col-md-3
@@ -94,3 +108,6 @@ if Order.step > 1
 if Order.note
 	- note = Order.note;
 	.note #{note}
+
+include ../../../../../aaComponent/timepicker
+script(src="/js/bser/order/Order/detail/basic.js")

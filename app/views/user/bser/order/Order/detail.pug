@@ -8,7 +8,7 @@ block content
 				h3 #{info}
 				.text-right
 					a.btn.btn-default(href="/bsOrder/"+Order._id) 确认
-		nav(aria-label="breadcrumb")
+		nav.noprint(aria-label="breadcrumb")
 			ol.breadcrumb
 				li.breadcrumb-item: a(href="/bser") Home
 				li.breadcrumb-item: a(href="/bsOrders") 订单列表
@@ -17,8 +17,9 @@ block content
 		input#OrderId(type="hidden", value=Order._id)
 		input#OrderStep(type="hidden", value=Order.step)
 		include ./detail/basic
-		.text-right
+		.text-right.noprint
 			a.text-danger(href="/bsOrderDel/"+Order._id) [删除]
+			button.ml-5.btn.btn-warning.js-click-printBtn(type="button") 打印
 		hr
 		if Order.step == 1
 			-a;

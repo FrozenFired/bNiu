@@ -61,6 +61,10 @@ $(() => {
 		const _this = $(this);//将当前的js-click-imgEnlarge元素作为_this传入函数
 		imgShowFront("#js-picZoom-outerdiv", "#js-picZoom-innerdiv", "#js-picZoom-zoomImg", _this);
 	});
+
+	$("body").on('click', '.js-click-printBtn', function(e) {
+		window.print();
+	})
 })
 
 /* ============= 页面滚动 隐藏导航栏 ============= */

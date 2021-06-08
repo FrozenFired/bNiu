@@ -43,6 +43,9 @@ const dbSchema = new Schema({
 	updAt: Date,
 
 	startAt: Date,
+	preShipAt: Date,
+
+	shipAt: Date,
 	finishAt: Date,
 });
 
@@ -63,6 +66,7 @@ dbSchema.pre('save', function(next) {
 		this.crtAt = Date.now();
 	}
 	this.updAt = Date.now();
+
 	next();
 })
 
