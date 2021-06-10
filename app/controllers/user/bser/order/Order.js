@@ -120,7 +120,7 @@ exports.bsOrderNew = async(req, res) => {
 
 		const _object = new OrderDB(obj);
 		const OrderSave = await _object.save();
-		return res.redirect("/bsOrders");
+		return res.redirect("/bsOrder/"+OrderSave._id);
 	} catch(error) {
 		return res.redirect("/error?info=bsOrderNew,Error&error="+error);
 	}
@@ -437,6 +437,14 @@ exports.bsOrderAnalysAjax = async(req, res) => {
 				}
 			})
 		})
+		function compare(p){ //这是比较函数
+			return function(m,n){
+				var a = m[p];
+				var b = n[p];
+				return b - a; //升序
+			}
+		}
+		AnalysPdspus.sort(compare("quan"));
 		return res.status(200).json({
 			status: 200,
 			message: '成功获取',

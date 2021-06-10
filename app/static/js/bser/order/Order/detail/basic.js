@@ -28,8 +28,8 @@ $(() => {
 
 	let end_time;
 	countdown = ()=> {//倒计时
-		var curr_time = parseInt(Date.parse(new Date()));
-		var diff_time=parseInt(end_time-curr_time)/1000;// 倒计时时间差
+		var curr_time = parseInt(Date.now());
+		var diff_time=parseInt((end_time-curr_time)/1000);// 倒计时时间差
 		var h = Math.floor(diff_time / 3600);
 		var m = Math.floor((diff_time / 60 % 60));
 		var s = Math.floor((diff_time % 60));
